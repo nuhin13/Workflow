@@ -1,0 +1,49 @@
+# harness.yaml — project topology & policy ("org code")
+# Read by the thin orchestrator scripts in agent/orchestrator/.
+version: 1
+project: "TicketingSystem"
+
+platforms:                      # fallback order for rate-limit handoff
+  - name: claude-code
+    adapter: agent/adapters/run-claude.sh
+    freeze_threshold_pct: 80    # freeze + handoff at 80% of 5h window
+    weekly_guard: true
+  - name: codex
+    adapter: agent/adapters/run-codex.sh
+    freeze_threshold_pct: 80
+  - name: opencode
+    adapter: agent/adapters/run-opencode.sh
+    freeze_threshold_pct: 80
+
+model_tiers:                    # routing hints (see skills/token-optimization)
+  plan_review: opus             # PM / Team Lead / architecture / final review
+  implement: sonnet             # default developer tier
+  trivial: haiku                # renames, boilerplate, log msgs, summaries
+
+budgets:
+  per_task_warn_usd: 5
+  per_epic_warn_usd: 60
+
+paths:
+  spec: spec/
+  epics: epics/
+  runs: runs/
+  handoffs: agent/handoffs/
+  rates: agent/rates/cost-config.yaml
+
+scheduler:
+  statuses: [todo, in-progress, review-requested, changes-requested, done, verified, blocked, frozen]
+  lanes: [backend, frontend, cli, infra, docs, cross-cutting]
+  pick_order: [unblocked, moscow, wsjf, critical_path]
+  wip_limit_parallel_agents: 3   # 2–4 is the sane range
+
+human_gates:                     # actions that ALWAYS pause for a human
+  - epic00_exit_review           # domain model + ADRs + skeleton before ANY feature epic shards
+  - feature_epic_breakdown       # approve the first wave the PM proposes
+  - epic_to_dev_merge
+  - dev_to_main_merge
+  - db_schema_migration
+  - new_dependency
+  - secrets_or_env_change
+  - auth_or_payment_code
+  - delete_over_50_lines
