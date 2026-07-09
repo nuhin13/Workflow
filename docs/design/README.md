@@ -3,7 +3,7 @@
 The Figma design is **law** for all UI work (the frontend equivalent of
 "spec is law").
 
-- **Figma file:** `<PASTE FIGMA URL HERE>`
+- **Figma file:** `https://www.figma.com/design/6EWJjcKEDzQVVUPADhWlZs/TIcket-System?node-id=0-1&m=dev`
 - **Access:** agents pull frames/tokens via the Figma MCP server declared in
   `.mcp.json` (local Dev-Mode server from the Figma desktop app, or the remote
   `https://mcp.figma.com/mcp`). Setup: `agent/mcp/figma.md`.
@@ -11,6 +11,7 @@ The Figma design is **law** for all UI work (the frontend equivalent of
   unavailable; name them `<screen>-<state>.png`.
 
 Rules for frontend tasks:
+
 1. Every frontend task file references the exact Figma frame(s) it implements.
 2. Design tokens (colors, spacing, type) are extracted ONCE during the genesis
    epic into a tokens package — components consume tokens, never hex values.
