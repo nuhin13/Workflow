@@ -46,7 +46,7 @@ shipped code                  every commit traces back to a BRD line
 | **Policy** | `harness.yaml` | Platforms, model tiers, budgets, WIP limit, human gates — "org code" |
 | **Roles** | `agent/agents/` | 7 role cards: pm, team-lead, orchestrator, qa, devops, developer-backend, developer-frontend. Each defines boundaries: what it may do, what it must hand off |
 | **Workflows** | `agent/workflows/` | 12 step-by-step processes: epic-breakdown, implement-task, qa-review, handoff-freeze/resume, retro, release, rollback triggers… Start with `_handoff_protocol.md` |
-| **Skills** | `agent/skills/` | 17 on-demand capability manuals: EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization… Loaded only when needed (keeps context cheap) |
+| **Skills** | `agent/skills/` | 19 on-demand capability manuals: SRS authoring, EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization, skill authoring… Loaded only when needed (keeps context cheap) |
 | **Work items** | `epics/` | Epic dirs with `epic.md`, `tracker.md`, `tasks/*.md`, `metrics.csv`. Templates in `epics/_templates/` |
 | **Orchestrator** | `agent/orchestrator/` | `scheduler.py` (DAG + picker), `metrics_collect.py` / `metrics_report.py` (cost), `dashboard_build.py` (HTML board), `ratelimit_guard.py` (freeze trigger) |
 | **Adapters (exec)** | `agent/adapters/` | `run-claude.sh`, `run-codex.sh`, `run-opencode.sh` — same prompt in, session + cost JSON out into `runs/` |
@@ -220,7 +220,7 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
 7. **Cross-platform orchestration is human-triggered.** Adapters run headless,
    but you (or the orchestrator agent) launch them; there is no background
    daemon moving work between platforms.
-8. **Learning curve.** 13 rules, 7 roles, 12 workflows, 17 skills. Newcomers:
+8. **Learning curve.** 13 rules, 7 roles, 12 workflows, 19 skills. Newcomers:
    read this doc + `docs/HUMAN-GUIDE.md`, ignore the rest until a workflow
    points at it.
 
@@ -229,7 +229,10 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
 ```
 0. make hooks                      # install git hooks
    pip install -r requirements.txt # pyyaml for the scheduler
-1. PM agent: draft spec/srs.md from docs/business/BRD.md  → HUMAN approves
+   ln -s ../agent/skills .claude/skills   # native skill discovery (Claude Code)
+   git branch development main            # integration branch must exist
+1. PM agent: draft spec/srs.md from docs/business/BRD.md
+   (skills/srs-authoring)                                 → HUMAN approves
 2. PM agent: /epic-breakdown → master epic map            → HUMAN approves
 3. Genesis epic E00: agent presents stack/architecture options with pros+cons
    → HUMAN decides ADRs (rule 13) → walking skeleton built → E00 exit gate
@@ -239,3 +242,97 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
 ```
 
 Paste the Figma URL into `docs/design/README.md` before any frontend epic.
+
+## 9. Session rituals (per agent session — any platform)
+
+The harness's continuity mechanism is the task file itself: §12 checklist =
+live progress log, §15 = self-review evidence, §18 + handoff packet = freeze
+state. That only works if every session follows the same ritual:
+
+**Session start (re-anchor before any new work)**
+1. `make validate` — never build on a broken DAG/frontmatter.
+2. Read the task file FULLY; find the first unchecked §12 item — that is
+   your starting point (checklist = progress file; git log confirms it).
+3. Read the relevant `agent/memory/lessons/<area>.md`; Graphiti pull if
+   connected (2 queries max, per skills/graphiti-memory).
+4. Resuming (frozen/blocked/changes-requested)? Re-run the last failing
+   tests FIRST to re-anchor reality, then continue.
+
+**Session end (leave the repo strange-agent-ready)**
+1. Commit everything (uncommitted work is invisible — protocol §4).
+2. Checklist ticks carry commit hashes; no `(uncommitted)` markers remain.
+3. Status frontmatter + tracker reflect reality NOW.
+4. Green or clearly red: tests pass, or §18 says exactly what fails and why.
+5. 📋 STATUS block: what/why/how-tested/risks/next.
+
+Verification is end-to-end, not test-suite-only: a "done" feature has been
+exercised through its real surface (API call, or browser via playwright for
+UI) at least once — the QA gate re-checks this, but the implementer proves
+it first (§15).
+
+## 10. Skill & workflow lifecycle (how the harness itself evolves)
+
+The harness treats its own process files as versioned software. Changes flow
+through the retro ladder — **never mid-epic, never without the human gate**:
+
+```
+mistake observed
+  → LESSON  agent/memory/lessons/<area>.md   (retro writes; 1st occurrence)
+    → RULE  fold into SKILL.md / role card   (recurrence ≥2; drafted AS A
+             DIFF at /retro; 🧍 human approves — skills are code)
+      → HOOK agent/hooks/ deterministic check (must-be-enforced tier)
+```
+
+- **Adding a brand-new skill after an epic:** follow
+  `agent/skills/skill-authoring/SKILL.md` — create the folder, wire it into
+  the role cards' `skills:` lists + the workflow step that uses it, update
+  the §2 table here, PR with human approval. A skill that isn't wired into
+  a role or workflow doesn't exist.
+- **Changing the constitution (AGENTS.md):** ADR + human approval, always.
+- **Inherited lessons:** `lessons/auth.md` + `lessons/process.md` ship
+  pre-seeded from a previous project run (marked as such) — their L-ids are
+  cited throughout qa-pr-review / security-review / tdd-workflow.
+
+## 11. How this compares to the market (positioning, July 2026)
+
+| Capability | GitHub Spec Kit | BMAD-Method | Anthropic long-running-harness guidance | **This harness** |
+|---|---|---|---|---|
+| Spec-first pipeline | ✅ specify→plan→tasks→implement | ✅ PRD→architecture→stories | — (assumes spec exists) | ✅ BRD→SRS→epics→tasks (EARS) |
+| Role-based multi-agent | – (single assistant) | ✅ 12+ roles | – | ✅ 7 roles, least-privilege MCP |
+| Cross-PLATFORM portability | ✅ 30+ tools (templates) | partial | – | ✅ AGENTS.md + adapters + freeze/resume packets |
+| Progress artifact for fresh context | tasks.md | stories | progress file + feature list + git | ✅ task §12 live checklist + tracker + packet |
+| Independent AI review gate | – | QA agent | verify with browser tools | ✅ peer (different MODEL) + QA gate + human gate |
+| Cost/token accounting | – | – | – | ✅ runs/ + metrics.csv + dashboard + budgets |
+| Self-improvement loop | – | – | – | ✅ retro ladder lesson→rule→hook |
+| Rate-limit resilience | – | – | compaction + artifacts | ✅ freeze packets + platform fallback |
+
+Takeaway: this harness already covers the union of Spec Kit's pipeline and
+BMAD's role system, and implements Anthropic's long-running-agent patterns
+(re-anchor ritual, structured progress artifacts, e2e verification) with two
+additions the market lacks: cross-model peer review and cost accounting.
+The price is ceremony (§7.1) — by design.
+
+## 12. Production-readiness checklist & known gaps
+
+Green before first feature epic:
+- [ ] git hooks installed (`make hooks`) and `development` branch exists
+- [ ] `.claude/skills` symlink (Claude Code) · statusline wired to
+      `agent/hooks/statusline-ratelimit.sh`
+- [ ] `.env` with MCP secrets (never committed); `/mcp` shows required
+      servers healthy — degraded fallbacks per skills/mcp-connections
+- [ ] Figma URL pasted into `docs/design/README.md`
+- [ ] `spec/srs.md` approved; `make validate` green
+- [ ] E00 exit gate: ADRs accepted, CI green, walking skeleton seen live
+- [ ] Branch protection on `main` + `development` (PR + CI required)
+
+Known gaps (accepted for now — revisit at retro):
+1. **Frontmatter is trusted, not enforced.** No hook validates status
+   transitions or `reviewed_by ≠ executed_by`; review gates catch it. A
+   pre-commit frontmatter linter is the natural next hook promotion.
+2. **No background daemon.** Freeze/resume and cross-platform dispatch are
+   human/orchestrator-triggered by design (§7.7).
+3. **CI is genesis-scoped.** Until E00 lands, `make test`/`make lint` don't
+   exist; the QA gate is manual-run until then.
+4. **Scheduler anti-collision needs the optional frontmatter `files:`
+   mirror** on parallel-risk tasks — sharding discipline, not tooling,
+   keeps it true (skills/task-sharding §4).

@@ -3,7 +3,7 @@ name: team-lead
 description: Tech Lead agent. Owns architecture, Epic 00 genesis draft, task sharding to nitty-gritty specs (files/APIs/functions), the dependency DAG, and final code-quality review.
 model: opus
 mcp: [graphiti, github, figma, database, context7]
-skills: [genesis-epic, task-sharding, api-contract-design, git-flow, priority-scheduling, graphiti-memory]
+skills: [genesis-epic, task-sharding, api-contract-design, git-flow, priority-scheduling, graphiti-memory, skill-authoring]
 ---
 # Team Lead Agent
 

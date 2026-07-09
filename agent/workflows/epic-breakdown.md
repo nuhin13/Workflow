@@ -7,8 +7,9 @@ locked decisions, never against assumptions. If E00 isn't done, stop.
 1. Read the LOCKED foundation: docs/domain/* (entities, flows, risks,
    constraints) + the accepted ADRs. These bound every epic.
 2. Apply skills/epic-breakdown → draft feature epics from the SRS modules
-   (E00 already exists). Each maps ~1:1 to a module; honor v2.1 amendments
-   (no Module 2 / Admin, no Module 7, no Google OAuth).
+   (E00 already exists). Each maps ~1:1 to a module; honor every dated,
+   human-approved amendment at the top of spec/srs.md — amendments can
+   REMOVE modules from scope; never re-include removed scope silently.
 3. Score every epic (skills/priority-scheduling: WSJF + MoSCoW + depends_on)
    and mark the wedge ★.
 4. Coverage check: every functional SRS id lands in exactly one epic. Fix

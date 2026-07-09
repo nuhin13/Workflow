@@ -4,7 +4,7 @@ Empty on purpose. The first act of the project is generating it.
 
 | File (to be created) | Source | Who |
 |---|---|---|
-| `srs.md` | `docs/business/BRD.md` (BRD v0.2 is the business truth) | PM agent drafts → HUMAN approves |
+| `srs.md` | `docs/business/BRD.md` (BRD v0.2 is the business truth) | PM agent drafts per `agent/skills/srs-authoring` → HUMAN approves |
 | `feature-list.md` | derived from srs.md modules | PM agent |
 | `glossary.md` | BRD terms + domain language | PM agent |
 
