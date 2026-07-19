@@ -225,16 +225,18 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
    read this doc + `docs/HUMAN-GUIDE.md`, ignore the rest until a workflow
    points at it.
 
-## 8. Bootstrap sequence for THIS project
+## 8. Bootstrap sequence for a NEW project
 
 ```
 0. make hooks                      # install git hooks
    pip install -r requirements.txt # pyyaml for the scheduler
-   ln -s ../agent/skills .claude/skills   # native skill discovery (Claude Code)
-   git branch development main            # integration branch must exist
-1. PM agent: draft spec/srs.md from docs/business/BRD.md
-   (skills/srs-authoring)                                 → HUMAN approves
-2. PM agent: /epic-breakdown → master epic map            → HUMAN approves
+   git branch development main     # integration branch must exist
+   (.claude/skills and .claude/agents are already symlinked into agent/)
+1. Phase 0-3: /kickoff → /brd → /prd → /features → /forecast
+   → /design → /trace → /tech-plan            → HUMAN approves each artifact
+   PM agent: draft spec/srs.md from BRD/PRD (skills/srs-authoring)
+                                              → HUMAN approves
+2. /dev-plan → master epic map                → HUMAN approves
 3. Genesis epic E00: agent presents stack/architecture options with pros+cons
    → HUMAN decides ADRs (rule 13) → walking skeleton built → E00 exit gate
 4. Team Lead updates AGENTS.md "Project conventions" placeholders

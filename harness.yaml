@@ -1,7 +1,7 @@
 # harness.yaml — project topology & policy ("org code")
 # Read by the thin orchestrator scripts in agent/orchestrator/.
 version: 1
-project: "TicketingSystem"
+project: "YourProject"           # set by /kickoff — keep in sync with memory/state.yaml
 
 platforms:                      # fallback order for rate-limit handoff
   - name: claude-code

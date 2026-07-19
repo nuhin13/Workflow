@@ -1,4 +1,4 @@
-# Ticketing System — harness tracker targets.
+# Agentic harness — tracker targets.
 # Stack ops (up/down/migrate/test/lint) are added by the genesis epic (E00)
 # once the stack is decided.
 PY := python3

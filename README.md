@@ -1,8 +1,9 @@
-# Ticketing System — platform-agnostic agentic delivery harness
+# Agentic Delivery Harness — platform-agnostic project template
 
-An embeddable, SDK-style help-desk ticketing system (BRD:
-`docs/business/BRD.md`, UI canon: Figma via `docs/design/README.md`) built
-end-to-end by a spec-driven, multi-agent, human-in-the-loop agentic harness.
+A **reusable skeleton** for building products with a spec-driven, multi-agent,
+human-in-the-loop agentic harness. This repo is not a product; it is the
+machine that builds products. Use it as a template: clone (or branch) per
+project, run `/kickoff`, and drive an idea from BRD to shipped code.
 
 The harness is **platform-agnostic**: Claude Code, Codex CLI, OpenCode and
 Cursor all drive the same constitution (`AGENTS.md`), the same skills
@@ -34,24 +35,35 @@ budgets, cross-platform rate-limit handoff.
 | An agent (any platform) | [`AGENTS.md`](AGENTS.md) — the constitution (16 rules) |
 | Resuming a session | `memory/state.yaml`, then `/status` |
 
-## Quick start
+## Starting a new project from this template
 
 ```bash
+# 1. New repo (or branch) from this skeleton
 pip install -r requirements.txt   # pyyaml (scheduler)
 make hooks                        # git hooks: co-author strip, branch protection
-make validate                     # DAG sanity
-make status                       # progress board
-make next                         # what runs now
+git branch development main      # integration branch
+
+# 2. If you already have a BRD / Figma design / SRS, drop them in:
+#      BRD  → docs/business/BRD.md      (or let /brd interview you)
+#      UI   → paste Figma URL into docs/design/README.md
+#      SRS  → spec/srs.md               (or let srs-authoring draft it)
+
+# 3. Kick off the pipeline (Claude Code shown; any platform works)
+#      /kickoff "<your product idea>"   → /brd → /prd → /features → …
 ```
 
-## Project state
+Daily driving: `make status` · `make next` · `make review` — details in
+[`docs/HUMAN-GUIDE.md`](docs/HUMAN-GUIDE.md).
 
-- [x] BRD v0.2 (`docs/business/BRD.md`)
-- [x] Figma URL linked in `docs/design/README.md` (UI is law)
+## Pipeline checklist (per project)
+
+- [ ] `/kickoff` — idea captured, state initialized
+- [ ] BRD (`/brd`) + human approval
 - [ ] PRD + feature list + forecast (`/prd`, `/features`, `/forecast`)
-- [ ] `spec/srs.md` drafted from BRD/PRD (PM agent) + human-approved
-- [ ] Design system + screen specs derived from Figma (`/design`, `/trace`)
+- [ ] Design system + screen specs (`/design`; Figma is law when linked)
+- [ ] Traceability matrix live (`/trace`)
 - [ ] Tech plan + ADRs — stack/architecture are HUMAN decisions (`/tech-plan`)
-- [ ] Dev plan + epic map (`/dev-plan`) + human-approved
+- [ ] `spec/srs.md` (EARS) + human approval
+- [ ] Dev plan + epic map (`/dev-plan`) + human approval
 - [ ] Epic 00 genesis: walking skeleton (`/build`, `/qa`, `/checkpoint`)
 - [ ] Feature waves

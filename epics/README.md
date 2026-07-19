@@ -1,4 +1,4 @@
-# Ticketing System · Master Epic Map
+# Master Epic Map
 
 > Empty until the PM agent runs `/epic-breakdown` against the approved
 > `spec/srs.md` and the HUMAN approves the map (constitution rule 4 +

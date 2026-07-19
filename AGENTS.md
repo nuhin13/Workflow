@@ -7,11 +7,11 @@
 
 ## What this repository is
 
-**Basic Ticketing System** — an embeddable, SDK-style help-desk ticketing
-platform (BRD v0.2; `docs/business/BRD.md` is the business source of truth;
-`spec/srs.md`, once generated and approved, is canonical for build) —
-built with a spec-driven, multi-agent, human-in-the-loop agentic harness.
-The UI reference is the Figma design (see `docs/design/README.md`). Work flows
+A **reusable, platform-agnostic agentic delivery harness** — the machine that
+builds products, not a product itself. The product under construction is
+defined by `docs/business/BRD.md` (business source of truth; `spec/srs.md`,
+once generated and approved, is canonical for build). The UI reference is the
+design canon in `docs/design/README.md` (Figma when linked). Work flows
 through a phased pipeline (skills in `agent/skills/`, `/name` on Claude Code):
 
 ```

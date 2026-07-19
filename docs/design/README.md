@@ -3,7 +3,8 @@
 The Figma design is **law** for all UI work (the frontend equivalent of
 "spec is law").
 
-- **Figma file:** `https://www.figma.com/design/6EWJjcKEDzQVVUPADhWlZs/TIcket-System?node-id=0-1&m=dev`
+- **Figma file:** `<paste your Figma file URL here>` (leave unset to design
+  Claude-native via `/design` — tokens, components, HTML prototype)
 - **Access:** agents pull frames/tokens via the Figma MCP server declared in
   `.mcp.json` (local Dev-Mode server from the Figma desktop app, or the remote
   `https://mcp.figma.com/mcp`). Setup: `agent/mcp/figma.md`.
