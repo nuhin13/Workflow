@@ -1,5 +1,13 @@
 # templates/ — canonical artifact templates
 
+**Why this exists.** Same-shaped artifacts every time: agents can parse
+them, humans can skim them, and nothing important gets silently dropped.
+
+**What it does NOT cover.** Epic/task/tracker templates (they live in
+`epics/_templates/` because the scheduler parses their frontmatter) and
+ADR/lesson/freeze-handoff templates (single canonical homes listed at
+the bottom).
+
 Constitution rule 14: every pipeline artifact starts from its template. Keep
 every section; write `N/A — reason` rather than deleting.
 

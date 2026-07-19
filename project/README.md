@@ -1,4 +1,11 @@
-# project/ — product workspace (pipeline artifacts, phases 0–4)
+# project/ — product workspace (phases 0–4)
+
+**Why this exists.** Your product's definition, phase by phase — kept
+apart from the harness (`agent/`) so the template stays reusable.
+
+**What it does NOT cover.** The BRD (`docs/business/`), the SRS
+(`spec/`), the work queue (`epics/`), and product code (Epic 00 decides
+where that lives).
 
 | Dir | Contents | Produced by |
 |---|---|---|

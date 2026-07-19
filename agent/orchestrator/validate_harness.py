@@ -54,6 +54,8 @@ def frontmatter(path):
 
 def check_agents(errs, warns):
     for path in sorted(glob.glob(os.path.join(ROOT, "agent", "agents", "*.md"))):
+        if os.path.basename(path) in ("README.md",) or os.path.basename(path).startswith("_"):
+            continue
         rel = os.path.relpath(path, ROOT)
         fm = frontmatter(path)
         if fm is None:
@@ -170,6 +172,25 @@ def check_lessons(errs, warns):
             errs.append(f"agent/memory/lessons/{area}.md promised by the lessons README but missing")
 
 
+README_DIRS = [
+    "agent", "agent/agents", "agent/skills", "agent/workflows",
+    "agent/orchestrator", "agent/adapters", "agent/hooks", "agent/handoffs",
+    "agent/memory", "agent/memory/lessons", "agent/memory/decisions",
+    "agent/memory/graphiti", "agent/mcp", "agent/rates",
+    "templates", "project", "epics", "memory", "spec",
+    "docs", "docs/business", "dashboard", "runs",
+]
+
+
+def check_readmes(errs, warns):
+    """Every portion of the harness explains itself: why it exists, how it
+    works, what it does not cover (see the folder-README convention)."""
+    for d in README_DIRS:
+        if not os.path.isfile(os.path.join(ROOT, d, "README.md")):
+            errs.append(f"{d}/README.md missing — every harness folder must explain "
+                        f"why it exists, how it works, and what it does not cover")
+
+
 def check_path_refs(errs, warns):
     sources = [os.path.join(ROOT, "AGENTS.md"), os.path.join(ROOT, "CLAUDE.md")]
     sources += glob.glob(os.path.join(ROOT, "agent", "agents", "*.md"))
@@ -189,13 +210,14 @@ def main():
     ap.add_argument("--strict", action="store_true", help="treat warnings as errors")
     args = ap.parse_args()
     errs, warns = [], []
-    for check in (check_agents, check_skills, check_epics_tasks, check_write_scopes, check_lessons, check_path_refs):
+    for check in (check_agents, check_skills, check_epics_tasks, check_write_scopes, check_lessons, check_readmes, check_path_refs):
         check(errs, warns)
     for w in warns:
         print(f"harness: ⚠ {w}")
     for e in errs:
         print(f"harness: ✗ {e}")
-    n_agents = len(glob.glob(os.path.join(ROOT, "agent", "agents", "*.md")))
+    n_agents = len([p for p in glob.glob(os.path.join(ROOT, "agent", "agents", "*.md"))
+                    if os.path.basename(p) != "README.md" and not os.path.basename(p).startswith("_")])
     n_skills = len(glob.glob(os.path.join(ROOT, "agent", "skills", "*", "SKILL.md")))
     if errs or (args.strict and warns):
         sys.exit(f"harness: validation FAILED — {len(errs)} error(s), {len(warns)} warning(s)")

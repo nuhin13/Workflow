@@ -1,5 +1,11 @@
 # memory/ — pipeline state
 
+**Why this exists.** A fresh session — on any platform — must resume the
+project from one file, with zero chat history. This folder is that file.
+
+**What it does NOT cover.** Long-term knowledge (lessons, ADRs, graph)
+lives in `agent/memory/` — see below.
+
 - `state.yaml` — the single source of truth for pipeline position (phase,
   epics, tasks, blockers, history). Read at session start; update after every
   completed stage (constitution rule 15). A fresh session — on any platform —

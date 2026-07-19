@@ -285,6 +285,10 @@ Structural changes (new roles, new phases) go through an ADR in
 
 ## 10. Map of the repo
 
+Every folder carries its own `README.md` answering three questions:
+**why it exists · how it works · what it does NOT cover.** The validator
+fails if one is missing. The map below is the short version.
+
 | Path | What lives there |
 |---|---|
 | `AGENTS.md` | the constitution — 16 rules, IDs, pipeline (start here) |

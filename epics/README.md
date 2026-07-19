@@ -1,3 +1,13 @@
+# epics/ — the work queue
+
+**Why this exists.** Work must be schedulable by a script, not by vibes.
+Every epic is a folder `E<NN>-<slug>/` with `epic.md`, `tasks/*.md`
+(YAML frontmatter the scheduler reads), QA reports, and a checkpoint.
+
+**What it does NOT cover.** Phase 0–4 artifacts (`project/`) and the SRS
+(`spec/`). Templates live in `_templates/` — the task template's
+`files:` mirror is mandatory (collision guard).
+
 # Master Epic Map
 
 > Empty until the PM agent runs `/epic-breakdown` against the approved
