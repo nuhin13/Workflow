@@ -2,15 +2,15 @@
 # A fresh session must be able to resume from this file alone.
 
 project:
-  name: null            # set by /kickoff
-  one_liner: null
-  started: null
+  name: TicketingSystem
+  one_liner: "Embeddable, SDK-style help-desk ticketing platform"
+  started: 2026-07-19
 
-phase: idle             # idle | business | design | traceability | tech-plan | dev-plan | build | done
+phase: business         # idle | business | design | traceability | tech-plan | dev-plan | build | done
 
 phases:
-  business:      { status: pending, artifacts: [] }   # pending | in-progress | done
-  design:        { status: pending, artifacts: [] }
+  business:      { status: in-progress, artifacts: [docs/business/BRD.md] }   # pending | in-progress | done
+  design:        { status: pending, artifacts: [docs/design/README.md] }      # Figma linked; system/screens pending
   traceability:  { status: pending, artifacts: [] }
   tech-plan:     { status: pending, artifacts: [] }
   dev-plan:      { status: pending, artifacts: [] }
@@ -30,4 +30,5 @@ epics: []
 current_epic: null
 blockers: []            # [{ id: Q-001, blocks: E01-T02, question: "…" }]
 
-history: []             # append-only: [{ at: ISO8601, event: "…" }]
+history:                # append-only: [{ at: ISO8601, event: "…" }]
+  - { at: 2026-07-19T00:00:00Z, event: "harness consolidated: all branches merged; BRD v0.2 + Figma link present; next: /prd → /features → /forecast, then srs-authoring" }

@@ -11,11 +11,29 @@
 platform (BRD v0.2; `docs/business/BRD.md` is the business source of truth;
 `spec/srs.md`, once generated and approved, is canonical for build) —
 built with a spec-driven, multi-agent, human-in-the-loop agentic harness.
-The UI reference is the Figma design (see `docs/design/README.md`). Work flows:
+The UI reference is the Figma design (see `docs/design/README.md`). Work flows
+through a phased pipeline (skills in `agent/skills/`, `/name` on Claude Code):
 
 ```
-BRD ──▶ spec/srs.md ──▶ Epic 00 (genesis) ──▶ Feature Epics ──▶ Tasks ──▶ QA-gated PRs ──▶ development ──▶ main
+Phase 0 business   /kickoff /brd /prd /features /forecast → docs/business/BRD.md · project/00-business/
+Phase 1 design     /design                                → project/01-design/ (Figma is law when linked)
+Phase 2 trace      /trace                                 → project/02-traceability/matrix.md (kept live forever)
+Phase 3 tech plan  /tech-plan                             → project/03-technical/ · ADRs in agent/memory/decisions/
+Phase 4 dev plan   /dev-plan /epic                        → project/04-plan/ · spec/srs.md · epics/E<NN>/
+Phase 5 build loop /build → /qa → /checkpoint (per epic)  → QA-gated PRs ──▶ development ──▶ main
 ```
+
+Phases run in order; a revisited phase must ripple (`/trace`) before work
+continues. PRD → `spec/srs.md` (EARS) is authored via skills/srs-authoring;
+once approved the SRS is canonical for build.
+
+**IDs (traceability — never invent other formats):** `BR-###` business req ·
+`FR-###` product req · `FT-###` feature · `SCR-###` screen · `FC-###` forecast
+assumption · `ADR-####` decision · `E<NN>` epic · `E<NN>-T<MM>` task
+(`E<NN>-B<MM>` bug) · `Q-###` open question · `D-###` discrepancy ·
+`L-<area>-<nnn>` lesson · `EARS-<AREA>-n` acceptance criterion. Every artifact
+lists what it traces from/to; `project/02-traceability/matrix.md` is the join
+table.
 
 ## Non-negotiable rules (the constitution)
 
@@ -62,6 +80,16 @@ BRD ──▶ spec/srs.md ──▶ Epic 00 (genesis) ──▶ Feature Epics �
     HUMAN`; status stays `proposed`). Once chosen, the agent records the
     decision + consequences and only THEN proceeds. Implementation choices
     *within* an accepted ADR are the agent's to make.
+14. **Templates always.** Every pipeline artifact starts from its file in
+    `templates/` (epics/tasks: `epics/_templates/`). Keep every section; write
+    `N/A — reason` rather than deleting.
+15. **State always.** After completing any stage, update `memory/state.yaml`
+    (phase, statuses, history). A fresh session must be able to resume from
+    state alone — read it at session start.
+16. **Traceability always.** Creating or changing any artifact ⇒ update
+    `project/02-traceability/matrix.md` in the same commit. Fixable mismatch:
+    fix in all linked artifacts. Unfixable: file a `D-###` discrepancy note
+    linked from both sides.
 
 ## Where to look next (load on demand, not by default)
 
@@ -75,6 +103,10 @@ BRD ──▶ spec/srs.md ──▶ Epic 00 (genesis) ──▶ Feature Epics �
 | UI work — the Figma design (UI is law) | `docs/design/README.md` |
 | Project-wide decisions / lessons | `agent/memory/decisions/`, `agent/memory/lessons/` |
 | The human operator's playbook | `docs/HUMAN-GUIDE.md` |
+| Pipeline position / resume point | `memory/state.yaml` (then `/status`) |
+| Canonical artifact templates | `templates/` · `epics/_templates/` |
+| Product workspace (phase artifacts) | `project/00-business/ … 04-plan/` |
+| Epics & task specs (the work queue) | `epics/E<NN>/` |
 | Current work queue | `make next` (scheduler) |
 | External platforms (Figma, DB, Jira, Slack, Graphiti) | `agent/mcp/README.md` |
 

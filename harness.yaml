@@ -30,6 +30,20 @@ paths:
   runs: runs/
   handoffs: agent/handoffs/
   rates: agent/rates/cost-config.yaml
+  templates: templates/            # + epics/_templates/ for epic/task/tracker
+  workspace: project/              # phase 0-4 artifacts (see project/README.md)
+  state: memory/state.yaml         # pipeline position — resume point for any platform
+  lessons: agent/memory/lessons/
+  decisions: agent/memory/decisions/
+
+pipeline:                          # phase → driver skills (slash commands on Claude Code)
+  business: [kickoff, brd, prd, features, forecast]
+  design: [design]
+  traceability: [trace]
+  tech_plan: [tech-plan]
+  dev_plan: [dev-plan, epic]
+  build_loop: [build, qa, checkpoint]
+  anytime: [status, question, lesson]
 
 scheduler:
   statuses: [todo, in-progress, review-requested, changes-requested, done, verified, blocked, frozen]

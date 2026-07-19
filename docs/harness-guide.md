@@ -41,17 +41,18 @@ shipped code                  every commit traces back to a BRD line
 
 | Layer | Location | Purpose |
 |---|---|---|
-| **Constitution** | `AGENTS.md` | 13 always-on rules every agent obeys every turn |
+| **Constitution** | `AGENTS.md` | 16 always-on rules every agent obeys every turn + the phased pipeline and ID conventions |
 | **Adapter** | `CLAUDE.md` (+ others) | Platform-specific glue pointing at AGENTS.md |
 | **Policy** | `harness.yaml` | Platforms, model tiers, budgets, WIP limit, human gates — "org code" |
-| **Roles** | `agent/agents/` | 7 role cards: pm, team-lead, orchestrator, qa, devops, developer-backend, developer-frontend. Each defines boundaries: what it may do, what it must hand off |
+| **Roles** | `agent/agents/` | 12 role cards / subagents: pm, team-lead, orchestrator, qa, devops, developer-backend, developer-frontend + pipeline roles analyst, designer, architect, planner, builder. Each defines boundaries: what it may do, what it must hand off. Mirrored at `.claude/agents` (symlink) |
 | **Workflows** | `agent/workflows/` | 12 step-by-step processes: epic-breakdown, implement-task, qa-review, handoff-freeze/resume, retro, release, rollback triggers… Start with `_handoff_protocol.md` |
-| **Skills** | `agent/skills/` | 19 on-demand capability manuals: SRS authoring, EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization, skill authoring… Loaded only when needed (keeps context cheap) |
+| **Skills** | `agent/skills/` | 35 on-demand skills: 16 pipeline drivers (/kickoff /brd /prd /features /forecast /design /trace /tech-plan /dev-plan /epic /build /qa /checkpoint /status /question /lesson) + capability manuals (SRS/EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization…). Mirrored at `.claude/skills` (symlink); loaded only when needed |
+| **Pipeline artifacts** | `templates/` → `project/` | Phase 0–4 artifacts (BRD/PRD/features/forecast, design system + screens, traceability matrix, tech plan, dev plan) — each starts from its template (see `templates/README.md`) |
 | **Work items** | `epics/` | Epic dirs with `epic.md`, `tracker.md`, `tasks/*.md`, `metrics.csv`. Templates in `epics/_templates/` |
 | **Orchestrator** | `agent/orchestrator/` | `scheduler.py` (DAG + picker), `metrics_collect.py` / `metrics_report.py` (cost), `dashboard_build.py` (HTML board), `ratelimit_guard.py` (freeze trigger) |
 | **Adapters (exec)** | `agent/adapters/` | `run-claude.sh`, `run-codex.sh`, `run-opencode.sh` — same prompt in, session + cost JSON out into `runs/` |
 | **Handoffs** | `agent/handoffs/` | Freeze packets (YAML) for cross-platform resume |
-| **Memory** | `agent/memory/` | `decisions/` (ADRs), `lessons/` (retro output), `graphiti/` (optional temporal knowledge graph) |
+| **Memory** | `agent/memory/` + `memory/state.yaml` | `decisions/` (ADRs), `lessons/` (retro output), `graphiti/` (optional temporal knowledge graph); `memory/state.yaml` is the pipeline position any platform resumes from |
 | **Hooks** | `agent/hooks/` | Git hooks: strip AI co-author trailers, block direct pushes to main/development. Statusline script for rate-limit visibility |
 | **Run logs** | `runs/<task-id>/` | Every headless run's session JSON + cost — the audit trail |
 
@@ -220,7 +221,7 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
 7. **Cross-platform orchestration is human-triggered.** Adapters run headless,
    but you (or the orchestrator agent) launch them; there is no background
    daemon moving work between platforms.
-8. **Learning curve.** 13 rules, 7 roles, 12 workflows, 19 skills. Newcomers:
+8. **Learning curve.** 16 rules, 12 roles, 12 workflows, 35 skills. Newcomers:
    read this doc + `docs/HUMAN-GUIDE.md`, ignore the rest until a workflow
    points at it.
 

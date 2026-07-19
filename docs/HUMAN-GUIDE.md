@@ -6,12 +6,13 @@ fit. Here is everything you actually do.
 ## Your gates (where the system stops for you)
 | Gate | When | You check |
 |---|---|---|
+| Phase artifacts (BRD/PRD/design/tech-plan/dev-plan) | end of each pipeline phase | approve the artifact + its handoff block before the next phase runs |
 | **Epic 00 exit review** | after E00 tasks | domain model + ADRs accepted, skeleton seen responding — the big one |
 | First-wave + map approval | after /epic-breakdown | right epics? right wave? right priorities? |
 | Genesis ADRs | during Epic 00 | stack/architecture/security decisions |
 | /analyze report | before an epic's tasks dispatch | specs complete & consistent |
 | Bug priorities | after each /bug-sweep | severity is QA's; PRIORITY is yours |
-| Epic → dev PR | epic finished | does it match what the business needs? |
+| Epic → dev PR (`/checkpoint`) | epic finished | demo runs? does it match what the business needs? approve/remap/rework |
 | Release (dev→main) | /release | ship it? |
 | Retro promotions | after /retro | approve skill/rule edits (they're code) |
 | Anything in harness.yaml `human_gates` | anytime | migrations, deps, auth… |
