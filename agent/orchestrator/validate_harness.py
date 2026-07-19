@@ -114,6 +114,50 @@ def check_epics_tasks(errs, warns):
                 errs.append(f"{trel}: status '{t.get('status')}' but no reviewed_by recorded")
 
 
+def load_scopes():
+    try:
+        cfg = yaml.safe_load(open(os.path.join(ROOT, "harness.yaml"), encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError):
+        return {}, [], []
+    ws = cfg.get("write_scopes") or {}
+    shared = list(ws.get("shared") or [])
+    product = list(ws.get("product_code") or [])
+    roles = {}
+    for role, paths in ws.items():
+        if role in ("shared", "product_code"):
+            continue
+        expanded = []
+        for p in paths or []:
+            expanded.extend(product if p == "product_code" else [p])
+        roles[role] = expanded
+    return roles, shared, product
+
+
+def check_write_scopes(errs, warns):
+    roles, shared, _ = load_scopes()
+    if not roles:
+        return
+    for tp in sorted(glob.glob(os.path.join(ROOT, "epics", "E*", "tasks", "*.md"))):
+        trel = os.path.relpath(tp, ROOT)
+        t = frontmatter(tp) or {}
+        owner = str(t.get("owner_agent") or "")
+        files = t.get("files") or {}
+        paths = (files.get("create") or []) + (files.get("update") or [])
+        if not owner:
+            if paths:
+                warns.append(f"{trel}: files: planned but no owner_agent — scope unchecked")
+            continue
+        if owner not in roles:
+            errs.append(f"{trel}: owner_agent '{owner}' has no write_scopes entry in harness.yaml")
+            continue
+        allowed = roles[owner] + shared
+        for path in paths:
+            p = str(path)
+            if not any(p.startswith(a.rstrip("/")) or p == a for a in allowed):
+                errs.append(f"{trel}: '{p}' is outside {owner}'s write_scopes "
+                            f"(harness.yaml guardrail)")
+
+
 def check_lessons(errs, warns):
     readme = os.path.join(ROOT, "agent", "memory", "lessons", "README.md")
     if not os.path.isfile(readme):
@@ -145,7 +189,7 @@ def main():
     ap.add_argument("--strict", action="store_true", help="treat warnings as errors")
     args = ap.parse_args()
     errs, warns = [], []
-    for check in (check_agents, check_skills, check_epics_tasks, check_lessons, check_path_refs):
+    for check in (check_agents, check_skills, check_epics_tasks, check_write_scopes, check_lessons, check_path_refs):
         check(errs, warns)
     for w in warns:
         print(f"harness: ⚠ {w}")

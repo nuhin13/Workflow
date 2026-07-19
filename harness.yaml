@@ -51,6 +51,40 @@ scheduler:
   pick_order: [unblocked, moscow, wsjf, critical_path]
   wip_limit_parallel_agents: 3   # 2–4 is the sane range
 
+# ── guardrails: who may write where ─────────────────────────────────────────
+# Path allowlists per role. The validator errors when a task's files: plan
+# falls outside its owner_agent's scope. Overlap is allowed. Runtime tool
+# restriction is deliberately NOT used (every role writes repo artifacts);
+# enforcement = this declaration + validator + peer review + QA + git hooks.
+write_scopes:
+  shared:            # every role may write these
+    - memory/state.yaml
+    - project/02-traceability/
+    - project/open-questions.md
+    - agent/memory/lessons/
+    - runs/
+  product_code:      # developers' code surface — E00 genesis REPLACES this
+    - src/
+    - tests/
+  analyst:     [docs/business/, project/00-business/, project/assets/]
+  designer:    [project/01-design/, docs/design/, project/assets/design-imports/]
+  architect:   [project/03-technical/, agent/memory/decisions/]
+  pm:          [spec/, epics/, project/00-business/]
+  team-lead:   [project/04-plan/, epics/, spec/, agent/memory/decisions/]
+  developer-backend:  [product_code, epics/]   # epics/ = own task file status/checklist only
+  developer-frontend: [product_code, epics/]
+  qa:          [epics/, product_code]          # product_code = TESTS only (card rule)
+  devops:      [.github/, infra/, docker/, Makefile, product_code]
+  orchestrator: [memory/, epics/, dashboard/, runs/]
+
+# Who may change the HARNESS itself (agent/, AGENTS.md, CLAUDE.md, templates/,
+# harness.yaml): only via the lesson->rule promotion ladder (skills/retro) or
+# skills/skill-authoring, with human approval. Product work never edits these.
+harness_change_policy:
+  protected: [agent/, AGENTS.md, CLAUDE.md, templates/, harness.yaml, epics/_templates/]
+  allowed_via: [skill-authoring, retro, lesson]
+  requires: human_approval
+
 human_gates:                     # actions that ALWAYS pause for a human
   - epic00_exit_review           # domain model + ADRs + skeleton before ANY feature epic shards
   - feature_epic_breakdown       # approve the first wave the PM proposes

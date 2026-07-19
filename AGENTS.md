@@ -59,7 +59,10 @@ table.
    stop, log to `## Open Questions`, request review.
 6. **Stay in scope.** Each task file lists `What NOT to do`. Respect it. Do not
    refactor unrelated code, do not upgrade dependencies, do not "improve" things
-   outside the task.
+   outside the task. Each ROLE also has a declared write scope
+   (`harness.yaml: write_scopes`, validator-enforced); harness files (agent/,
+   AGENTS.md, templates/…) change only via lesson promotion or
+   skills/skill-authoring with human approval (`harness_change_policy`).
 7. **Log everything.** Every headless run is stored under `runs/<task_id>/`.
    Every completed task appends a row to its epic's `metrics.csv`.
 8. **Memory before work.** Before starting a task: read its task file fully,

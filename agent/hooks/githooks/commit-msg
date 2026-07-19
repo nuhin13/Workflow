@@ -10,4 +10,13 @@ if ! echo "$first_line" | grep -qE '^(feat|fix|test|chore|refactor|docs|wip|ci)(
     echo "harness: ⚠ commit message doesn't match 'type(E03-T07): summary'" >&2
   fi
 fi
+# 3. Harness-change nudge (warn, don't block): protected paths should change
+# only via the lesson->rule ladder or skill-authoring, with human approval
+# (harness.yaml: harness_change_policy).
+if git diff --cached --name-only 2>/dev/null | grep -qE '^(agent/|AGENTS\.md|CLAUDE\.md|templates/|harness\.yaml|epics/_templates/)'; then
+  case "$first_line" in
+    *lesson*|*skill*|*harness*|*retro*) : ;;
+    *) echo "harness: ⚠ this commit changes protected harness files — allowed only via lesson promotion / skill-authoring with human approval (harness.yaml: harness_change_policy)" >&2 ;;
+  esac
+fi
 exit 0
