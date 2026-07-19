@@ -51,9 +51,9 @@ route → handler → domain → store → response → rendered UI. Describe it
 | ID | Task | Spec file | Depends on | Status |
 |---|---|---|---|---|
 | E00-T01 | Repo scaffold + toolchain | tasks/E00-T01.md | — | pending |
-| T-00.02 | CI pipeline | tasks/T-00.02.md | E00-T01 | pending |
-| T-00.03 | Walking skeleton slice | tasks/T-00.03.md | E00-T01 | pending |
-| T-00.04 | conventions.md + example reference feature | tasks/T-00.04.md | T-00.03 | pending |
+| E00-T02 | CI pipeline | tasks/E00-T02.md | E00-T01 | pending |
+| E00-T03 | Walking skeleton slice | tasks/E00-T03.md | E00-T01 | pending |
+| E00-T04 | conventions.md + example reference feature | tasks/E00-T04.md | E00-T03 | pending |
 
 ## 6. Open questions
 | ID | Question | Blocks | Status |

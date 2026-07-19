@@ -5,7 +5,9 @@ description: Run the independent QA agent against a task or epic — fresh conte
 
 # /qa — independent verification
 
-Argument: `E<NN>` or `E<NN>-T<MM>` (default: current epic if all tasks `review-requested`).
+Argument: `E<NN>` or `E<NN>-T<MM>` (default: current epic if all tasks are
+peer-approved). The EPIC gate is mandatory before epic→development (rule 3);
+task-level QA is on-demand — required for high-risk tasks.
 
 1. **Isolation is the point.** Dispatch the **qa** agent in a fresh context with ONLY: the
    spec path(s), conventions.md path, matrix path, repo. Do NOT pass implementer transcripts,

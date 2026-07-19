@@ -1,4 +1,7 @@
 # /qa-review PR(E<NN>-T<MM>)  (agents: peer reviewer + qa)
+> Runs at the epic QA gate (each task PR re-verified against the full epic
+> diff) and on demand for high-risk task PRs (constitution rule 3). Per-task
+> peer review is the merge gate for ordinary task PRs.
 0. Precondition: PEER review done by a different agent/model than
    `executed_by` (protocol §2); peer notes in the tracker Review log.
 1. QA applies skills/qa-pr-review fully; runs the suite itself.

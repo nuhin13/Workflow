@@ -14,8 +14,9 @@ status:      ## per-epic progress board
 	$(SCHED) --status
 review:      ## tasks waiting for peer/QA review
 	$(SCHED) --review-queue
-validate:    ## DAG + frontmatter sanity
+validate:    ## DAG + frontmatter + constitution sanity
 	$(SCHED) --validate
+	$(PY) agent/orchestrator/validate_harness.py
 dashboard:   ## rebuild dashboard/index.html
 	$(PY) agent/orchestrator/dashboard_build.py
 metrics:     ## summarize task/epic token+cost usage from metrics.csv

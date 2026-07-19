@@ -225,6 +225,32 @@ def print_table(title, rows):
         )
 
 
+def load_budgets():
+    if yaml is None:
+        return {}
+    try:
+        data = yaml.safe_load(open(os.path.join(ROOT, "harness.yaml"), encoding="utf-8")) or {}
+    except OSError:
+        return {}
+    return data.get("budgets") or {}
+
+
+def budget_warnings(task_rows, epic_rows):
+    budgets = load_budgets()
+    task_warn = fnum(budgets.get("per_task_warn_usd"))
+    epic_warn = fnum(budgets.get("per_epic_warn_usd"))
+    warnings = []
+    for row in task_rows:
+        cost = row["actual_cost_usd"] or row["estimated_cost_usd"]
+        if task_warn and cost > task_warn:
+            warnings.append(f"task {row['key']}: ${cost:.2f} exceeds per_task_warn_usd (${task_warn:.2f})")
+    for row in epic_rows:
+        cost = row["actual_cost_usd"] or row["estimated_cost_usd"]
+        if epic_warn and cost > epic_warn:
+            warnings.append(f"epic {row['key']}: ${cost:.2f} exceeds per_epic_warn_usd (${epic_warn:.2f})")
+    return warnings
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--json", action="store_true", help="emit machine-readable JSON")
@@ -239,6 +265,7 @@ def main():
             "rows": row_count,
             "tasks": [row_for_json(row) for row in task_rows],
             "epics": [row_for_json(row) for row in epic_rows],
+            "budget_warnings": budget_warnings(task_rows, epic_rows),
         }, indent=2))
         return
 
@@ -254,6 +281,11 @@ def main():
     print_table("task token usage", task_rows)
     print()
     print_table("epic token usage", epic_rows)
+    warnings = budget_warnings(task_rows, epic_rows)
+    if warnings:
+        print()
+        for w in warnings:
+            print(f"harness: \u26a0 budget: {w}")
 
 
 if __name__ == "__main__":

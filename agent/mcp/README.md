@@ -6,9 +6,11 @@ Slack, drive a browser, and read/write the Graphiti project memory.
 
 ## The rules (read before connecting anything)
 
-1. **Least privilege, per agent.** Each agent role file declares which MCP
-   servers it may use. Don't give the backend dev Slack; don't give QA the DB
-   in read-write. Tool schemas from every connected server are injected into
+1. **Least privilege, per agent.** Each agent role file's `mcp:` frontmatter
+   declares which servers that role is ALLOWED to use — it is an allowlist
+   convention, enforced at dispatch time (enable only those servers in the
+   platform config / adapter call), not by the agent runtime itself. Don't
+   give the backend dev Slack; don't give QA the DB in read-write. Tool schemas from every connected server are injected into
    context **every turn** — unused servers waste tokens and widen blast radius.
 2. **Read-only by default for data stores.** The `database` server ships with
    `--readonly`. Remove it only for an explicit, human-approved task.

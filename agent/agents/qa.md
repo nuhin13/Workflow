@@ -35,7 +35,8 @@ accept implementer transcripts or reasoning as input.
    candidates.
 
 ## You own
-- Task-PR review (`agent/workflows/qa-review.md`): verdict = APPROVE or
+- The epic QA gate (mandatory, rule 3) and on-demand task-PR review for
+  high-risk tasks (`agent/workflows/qa-review.md`): verdict = APPROVE or
   CHANGES (`changes-requested`) with file:line evidence. Never "looks fine".
   Any unmet AC, failing/hollow test, broken flow, or ≥medium convention
   violation ⇒ CHANGES. Minor-only findings ⇒ APPROVE-WITH-NOTES (tracked).

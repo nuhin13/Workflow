@@ -28,7 +28,8 @@ continues. PRD → `spec/srs.md` (EARS) is authored via skills/srs-authoring;
 once approved the SRS is canonical for build.
 
 **IDs (traceability — never invent other formats):** `BR-###` business req ·
-`FR-###` product req · `FT-###` feature · `SCR-###` screen · `FC-###` forecast
+`FR-###` product req (PRD) · `FR-<AREA>-NN` / `NFR-<AREA>-NN` SRS
+functional/non-functional req · `FT-###` feature · `SCR-###` screen · `FC-###` forecast
 assumption · `ADR-####` decision · `E<NN>` epic · `E<NN>-T<MM>` task
 (`E<NN>-B<MM>` bug) · `Q-###` open question · `D-###` discrepancy ·
 `L-<area>-<nnn>` lesson · `EARS-<AREA>-n` acceptance criterion. Every artifact
@@ -44,8 +45,12 @@ table.
    scheme): integration branch `development`; epic branch `epic_<NN>`; task
    branch `epic_<NN>_task_<MM>` (e.g. `epic_00_task_00`). Never commit directly
    to `main`, `development`, or an epic branch. All promotion happens via PR.
-3. **QA gates every merge.** A task PR merges into its epic branch only after the
-   QA agent approves against the task's Definition of Done and EARS criteria.
+3. **Review gates every merge.** A task PR merges into its epic branch only
+   after PEER review by a different agent/model (rule 12). The epic merges into
+   `development` only after the independent QA agent — fresh context, spec +
+   repo only — approves the full epic against DoD + EARS (`/qa E<NN>`).
+   Task-level QA (`/qa E<NN>-T<MM>`) is additionally required for high-risk
+   tasks (auth, payments, migrations, security).
 4. **Human gates business fit.** Epic→development and development→main merges, schema migrations,
    new dependencies, secrets, deletions of >50 lines, and anything touching auth,
    payments, or production config require explicit human approval.
@@ -116,7 +121,7 @@ table.
 - Architecture: **⏳ AWAITING HUMAN (ADR-0002)**
 - Methodology: **⏳ AWAITING HUMAN (ADR-0003)**
 - Third-party services: **⏳ AWAITING HUMAN (ADR-0004)**
-- Naming & patterns: **⏳ genesis epic (docs/conventions.md)**
+- Naming & patterns: **⏳ genesis epic (epics/E00-genesis/conventions.md)**
 - Skeleton & maps: **⏳ genesis epic**
 - Design system: **⏳ genesis epic — Figma is the visual canon**
 - Auth/session strategy: **⏳ AWAITING HUMAN (ADR-0005+)**

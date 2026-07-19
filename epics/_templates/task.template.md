@@ -14,8 +14,10 @@ token_estimate: { tier: M, range: "50k-150k" }   # S 5–15k · M 50–150k · L
 priority: { moscow: must, p: P2 }                # P1 preempts (bugs mainly)
 depends_on: []                   # task ids; cross-epic: E02-T04
 blocks: []
-traces_to: [FR-XXXX-000, UC-0.0.0]   # spec is law — at least one id
+traces_to: [FR-AUTH-01, UC-1.1.1]    # spec is law — at least one SRS id (FR-<AREA>-NN / UC-x.y.z)
 external_services: []            # e.g. [email, storage, queue]
+files: { create: [], update: [] }  # MANDATORY mirror of §5 — the scheduler's
+                                   # parallel-collision guard reads this
 feature_flags: []                # flags this task introduces/toggles
 ui_reference: n/a                # REQUIRED if layer: frontend — Figma frame(s) this builds
                                  # (link or frame name; see docs/design/README.md — UI is law)
@@ -161,7 +163,7 @@ functions:
 > (`Status:` / `Answer:` / `Answered by:`) so tooling can find + fill them.
 > Status: 🟡 open · 🟢 answered · ⚪ deferred.
 
-- **OQ-<id> — <short title>.** <the question / the gap>
+- **Q-### — <short title>.** <the question / the gap>
   - **Status:** 🟡 open
   - **Answer:** _<empty — fill here>_
   - **Answered by:** _<human name | agent id> (manual|auto)_

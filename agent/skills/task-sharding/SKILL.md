@@ -24,7 +24,7 @@ execute it without improvising — and a human can read it in 2 minutes.
      EARS ids, DoD.
 3. **Anti-collision pass**: re-shard until no two parallelizable tasks write
    the same file (the #1 source of agent merge conflicts).
-4. OPTIONAL frontmatter mirror `files: {create: [...], update: [...]}` on
+4. MANDATORY frontmatter mirror `files: {create: [...], update: [...]}` on
    parallel-risk tasks — the scheduler uses it for anti-collision checks.
 5. Update `tracker.md` (state machine + mermaid dependency graph) and run the
    scheduler to sanity-check the DAG has no cycles:

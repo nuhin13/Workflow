@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""Harness self-validation — enforce the constitution's machine-checkable rules.
+
+Complements scheduler.py --validate (DAG, statuses, traces_to presence) with:
+  - agent cards: frontmatter parses, name+description present, every skill in
+    `skills:` exists under agent/skills/
+  - skills: every dir has SKILL.md with name+description frontmatter
+  - task files: id grammar E<NN>-T<MM>/E<NN>-B<MM>, traces_to id grammar,
+    mandatory `files:` mirror (create/update lists), peer rule
+    reviewed_by != executed_by once a review is recorded
+  - epic files: id grammar E<NN>
+  - lessons: every area file promised by the README exists
+  - doc rot: repo paths referenced from AGENTS.md / CLAUDE.md / agent cards /
+    skills exist on disk
+
+Exit 1 on errors; warnings don't fail the run.
+Usage: python3 agent/orchestrator/validate_harness.py [--strict]
+"""
+import argparse, glob, os, re, sys
+
+try:
+    import yaml
+except ImportError:
+    sys.exit("harness: pip install pyyaml (see requirements.txt)")
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+TASK_ID = re.compile(r"^E\d{2}-[TB]\d{2}$")
+EPIC_ID = re.compile(r"^E\d{2}$")
+TRACE_ID = re.compile(
+    r"^(BR-\d{3}|FR-\d{3}|FR-[A-Z0-9]+-\d{1,3}|NFR-[A-Z0-9]+-\d{1,3}|FT-\d{3}"
+    r"|SCR-\d{3}|FC-\d{3}|ADR-\d{3,4}|UC-[\d.]+|EARS-[A-Z0-9]+-\d+|Module-\d+)$"
+)
+# repo-relative path references worth existence-checking. Only STATIC harness
+# paths — files under project/, spec/, epics/E* and docs/domain/ are pipeline
+# OUTPUTS that legitimately don't exist in the pristine template.
+PATH_REF = re.compile(
+    r"`((?:agent/(?:skills|workflows|agents|memory|adapters|hooks|mcp|orchestrator)|"
+    r"templates|epics/_templates|memory)/[A-Za-z0-9_./-]+)`"
+)
+
+
+def frontmatter(path):
+    text = open(path, encoding="utf-8").read()
+    m = re.match(r"\s*---\s*\n(.*?)\n---\s*\n", text, re.S)
+    if not m:
+        return None
+    try:
+        data = yaml.safe_load(m.group(1))
+        return data if isinstance(data, dict) else None
+    except yaml.YAMLError:
+        return None
+
+
+def check_agents(errs, warns):
+    for path in sorted(glob.glob(os.path.join(ROOT, "agent", "agents", "*.md"))):
+        rel = os.path.relpath(path, ROOT)
+        fm = frontmatter(path)
+        if fm is None:
+            errs.append(f"{rel}: missing or unparseable frontmatter")
+            continue
+        for field in ("name", "description"):
+            if not fm.get(field):
+                errs.append(f"{rel}: frontmatter missing '{field}'")
+        for skill in fm.get("skills") or []:
+            if not os.path.isfile(os.path.join(ROOT, "agent", "skills", str(skill), "SKILL.md")):
+                errs.append(f"{rel}: skills: '{skill}' has no agent/skills/{skill}/SKILL.md")
+
+
+def check_skills(errs, warns):
+    for d in sorted(glob.glob(os.path.join(ROOT, "agent", "skills", "*"))):
+        if not os.path.isdir(d):
+            continue
+        rel = os.path.relpath(d, ROOT)
+        sk = os.path.join(d, "SKILL.md")
+        if not os.path.isfile(sk):
+            errs.append(f"{rel}: no SKILL.md")
+            continue
+        fm = frontmatter(sk)
+        if fm is None or not fm.get("name") or not fm.get("description"):
+            errs.append(f"{rel}/SKILL.md: frontmatter must define name + description")
+
+
+def check_epics_tasks(errs, warns):
+    for ep in sorted(glob.glob(os.path.join(ROOT, "epics", "E*", "epic.md"))):
+        rel = os.path.relpath(ep, ROOT)
+        fm = frontmatter(ep) or {}
+        eid = str(fm.get("id") or "")
+        if not EPIC_ID.match(eid):
+            errs.append(f"{rel}: epic id '{eid}' does not match E<NN>")
+        for tp in sorted(glob.glob(os.path.join(os.path.dirname(ep), "tasks", "*.md"))):
+            trel = os.path.relpath(tp, ROOT)
+            t = frontmatter(tp)
+            if t is None:
+                errs.append(f"{trel}: missing or unparseable frontmatter")
+                continue
+            tid = str(t.get("id") or "")
+            if not TASK_ID.match(tid):
+                errs.append(f"{trel}: task id '{tid}' does not match E<NN>-T<MM> / E<NN>-B<MM>")
+            for ref in t.get("traces_to") or []:
+                if not TRACE_ID.match(str(ref)):
+                    errs.append(f"{trel}: traces_to id '{ref}' outside the constitution's ID grammar")
+            files = t.get("files")
+            if not isinstance(files, dict) or not ("create" in files or "update" in files):
+                errs.append(f"{trel}: mandatory frontmatter 'files: {{create: [], update: []}}' missing "
+                            f"(scheduler collision guard)")
+            elif t.get("status") in ("in-progress", "review-requested") and not (
+                    (files.get("create") or []) + (files.get("update") or [])):
+                warns.append(f"{trel}: in-flight with empty files: lists — collision guard inert")
+            executed, reviewed = t.get("executed_by"), t.get("reviewed_by")
+            if reviewed and executed and str(reviewed).strip() == str(executed).strip():
+                errs.append(f"{trel}: reviewed_by == executed_by ('{reviewed}') violates the peer rule (rule 12)")
+            if str(t.get("status")) in ("done", "verified") and executed and not reviewed:
+                errs.append(f"{trel}: status '{t.get('status')}' but no reviewed_by recorded")
+
+
+def check_lessons(errs, warns):
+    readme = os.path.join(ROOT, "agent", "memory", "lessons", "README.md")
+    if not os.path.isfile(readme):
+        errs.append("agent/memory/lessons/README.md missing")
+        return
+    for area in re.findall(r"`([a-z-]+)\.md`", open(readme, encoding="utf-8").read()):
+        if area == "_template":
+            continue
+        if not os.path.isfile(os.path.join(ROOT, "agent", "memory", "lessons", f"{area}.md")):
+            errs.append(f"agent/memory/lessons/{area}.md promised by the lessons README but missing")
+
+
+def check_path_refs(errs, warns):
+    sources = [os.path.join(ROOT, "AGENTS.md"), os.path.join(ROOT, "CLAUDE.md")]
+    sources += glob.glob(os.path.join(ROOT, "agent", "agents", "*.md"))
+    sources += glob.glob(os.path.join(ROOT, "agent", "skills", "*", "SKILL.md"))
+    for src in sources:
+        rel = os.path.relpath(src, ROOT)
+        for ref in PATH_REF.findall(open(src, encoding="utf-8").read()):
+            if any(ch in ref for ch in "<>*#?…"):
+                continue
+            target = os.path.join(ROOT, ref)
+            if not (os.path.isfile(target) or os.path.isdir(target)):
+                warns.append(f"{rel}: references '{ref}' which does not exist")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--strict", action="store_true", help="treat warnings as errors")
+    args = ap.parse_args()
+    errs, warns = [], []
+    for check in (check_agents, check_skills, check_epics_tasks, check_lessons, check_path_refs):
+        check(errs, warns)
+    for w in warns:
+        print(f"harness: ⚠ {w}")
+    for e in errs:
+        print(f"harness: ✗ {e}")
+    n_agents = len(glob.glob(os.path.join(ROOT, "agent", "agents", "*.md")))
+    n_skills = len(glob.glob(os.path.join(ROOT, "agent", "skills", "*", "SKILL.md")))
+    if errs or (args.strict and warns):
+        sys.exit(f"harness: validation FAILED — {len(errs)} error(s), {len(warns)} warning(s)")
+    print(f"harness: {n_agents} agents, {n_skills} skills, "
+          f"{len(warns)} warning(s) — constitution checks OK ✓")
+
+
+if __name__ == "__main__":
+    main()
