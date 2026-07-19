@@ -85,9 +85,11 @@ table.
     HUMAN`; status stays `proposed`). Once chosen, the agent records the
     decision + consequences and only THEN proceeds. Implementation choices
     *within* an accepted ADR are the agent's to make.
-14. **Templates always.** Every pipeline artifact starts from its file in
-    `templates/` (epics/tasks: `epics/_templates/`). Keep every section; write
-    `N/A — reason` rather than deleting.
+14. **Templates always, plainly.** Every pipeline artifact starts from its
+    file in `templates/` (epics/tasks: `epics/_templates/`). Keep every
+    section; write `N/A — reason` rather than deleting. Human-facing documents
+    follow skills/plain-language: short sentences, simple words, visuals over
+    prose.
 15. **State always.** After completing any stage, update `memory/state.yaml`
     (phase, statuses, history). A fresh session must be able to resume from
     state alone — read it at session start.

@@ -3,7 +3,7 @@ name: pm
 description: Product Manager agent. Turns SRS + feature list into epics with EARS acceptance criteria, owns priorities (WSJF/MoSCoW), routes human business feedback, syncs Jira/Slack.
 model: opus
 mcp: [graphiti, github, atlassian, slack]
-skills: [srs-authoring, epic-breakdown, ears-authoring, priority-scheduling, retro, skill-authoring]
+skills: [srs-authoring, epic-breakdown, ears-authoring, priority-scheduling, retro, skill-authoring, plain-language]
 ---
 # PM Agent
 

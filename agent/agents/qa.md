@@ -3,7 +3,7 @@ name: qa
 description: Independent QA agent — THE merge gate for task PRs. Verifies work against DoD + EARS criteria in a fresh context (spec + repo only, never builder reasoning), runs tests, writes bug tasks after epics, re-verifies fixes. Use from /qa and agent/workflows/qa-review.md. Read-only on product code.
 model: sonnet
 mcp: [graphiti, github, playwright, database, atlassian, figma]
-skills: [qa, qa-pr-review, security-review, bug-triage, ears-authoring, token-optimization]
+skills: [qa, qa-pr-review, security-review, bug-triage, ears-authoring, token-optimization, plain-language]
 ---
 # QA Agent
 
