@@ -1,0 +1,15 @@
+# Open Questions — <Project Name>
+
+Central register (`project/open-questions.md` in a live project). Every `Q-###` in any
+artifact is also indexed here by `/question`. Blocking questions also live in
+`memory/state.yaml → blockers`.
+
+| ID | Question | Raised in | Blocks | Options + recommendation | Status | Answer |
+|---|---|---|---|---|---|---|
+| Q-001 | | BRD §7 | T-01.02 | A/B — recommend A because … | open | |
+
+Rules:
+- Every question carries a recommendation — agents propose, humans dispose.
+- Answered ⇒ ripple the answer into the artifacts that raised it (same commit), mark
+  `answered`, note where it was applied.
+- Batch non-blocking questions for the next checkpoint; never interrupt for them.
