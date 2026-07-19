@@ -7,7 +7,7 @@ description: Create or revise the Business Requirements Document from its templa
 
 1. Read `memory/state.yaml` and `project/00-business/idea.md` (plus existing BRD if
    revising).
-2. Delegate to the **analyst** agent: produce/revise `project/00-business/brd.md` from
+2. Delegate to the **analyst** agent: produce/revise `docs/business/BRD.md` from
    `templates/brd.md`, following its interrogation rules. Pass along `$ARGUMENTS` and the
    idea file.
 3. Present the human: the executive summary, the objectives table, the out-of-scope list,

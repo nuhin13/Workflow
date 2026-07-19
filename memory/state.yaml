@@ -18,16 +18,16 @@ phases:
 
 # Filled by /dev-plan, maintained by /epic, /build, /qa, /checkpoint
 epics: []
-# - id: EP-00
+# - id: E00
 #   title: Skeleton
-#   status: pending        # pending | specced | building | qa | checkpoint | done | remapped
+#   status: todo           # todo | specced | in-progress | qa | checkpoint | done | remapped
 #   runnable_flow: "…what a human can run when this epic is done…"
 #   tasks:
-#     - { id: T-00.01, title: "…", status: pending, owner: null }   # pending|building|blocked|built|qa-passed|qa-failed
+#     - { id: E00-T01, title: "…", status: todo, owner: null }   # todo|in-progress|review-requested|changes-requested|done|verified · side: blocked|frozen
 #   qa_report: null
 #   checkpoint: null
 
 current_epic: null
-blockers: []            # [{ id: Q-001, blocks: T-01.02, question: "…" }]
+blockers: []            # [{ id: Q-001, blocks: E01-T02, question: "…" }]
 
 history: []             # append-only: [{ at: ISO8601, event: "…" }]

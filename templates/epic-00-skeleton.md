@@ -1,13 +1,13 @@
-# EP-00 — Project Skeleton
+# E00 — Project Skeleton
 
 - Traces from: Tech plan, ADRs, Design system
 - Status: specced | building | qa | checkpoint | done
 - Runnable flow when done: repo boots from clean clone with documented commands; one
   walking-skeleton request travels UI → API → data and back; CI runs lint + tests green.
 
-EP-00 exists to make every later epic identical in shape. Anything two builders could do
+E00 exists to make every later epic identical in shape. Anything two builders could do
 two different ways gets decided HERE, once. `conventions.md` (§3 extracted to
-`project/05-epics/EP-00-skeleton/conventions.md`) is quoted verbatim in every task spec.
+`epics/E00-genesis/conventions.md`) is quoted verbatim in every task spec.
 
 ## 1. Project structure
 Full tree with a one-line purpose per directory — where EVERY kind of code goes:
@@ -50,9 +50,9 @@ route → handler → domain → store → response → rendered UI. Describe it
 ## 5. Tasks
 | ID | Task | Spec file | Depends on | Status |
 |---|---|---|---|---|
-| T-00.01 | Repo scaffold + toolchain | tasks/T-00.01.md | — | pending |
-| T-00.02 | CI pipeline | tasks/T-00.02.md | T-00.01 | pending |
-| T-00.03 | Walking skeleton slice | tasks/T-00.03.md | T-00.01 | pending |
+| E00-T01 | Repo scaffold + toolchain | tasks/E00-T01.md | — | pending |
+| T-00.02 | CI pipeline | tasks/T-00.02.md | E00-T01 | pending |
+| T-00.03 | Walking skeleton slice | tasks/T-00.03.md | E00-T01 | pending |
 | T-00.04 | conventions.md + example reference feature | tasks/T-00.04.md | T-00.03 | pending |
 
 ## 6. Open questions

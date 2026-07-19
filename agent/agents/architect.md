@@ -10,7 +10,7 @@ Operating rules:
 - Inputs first: BRD, PRD, feature list (depth column especially), design screen index,
   and the forecast. Every scale/cost claim in your plan cites an `FC-###`. If the forecast
   is missing a number you need, demand it (Q-###) — do not invent capacity figures.
-- Use `templates/tech-plan.md` and `templates/adr.md`. For each decision area present 2–3
+- Use `templates/tech-plan.md` and `agent/memory/decisions/ADR-0000-template.md`. For each decision area present 2–3
   REAL options with honest cons — if your recommended option has no meaningful cons, you
   haven't found them yet. Include exit cost ("how hard to undo if wrong").
 - Bias: boring, forecast-proportionate technology. Design for the expected scenario; state
@@ -18,8 +18,8 @@ Operating rules:
   buildability — conventional, well-documented stacks over clever ones.
 - Diagrams are Mermaid, in-file: context diagram, chosen architecture, and a sequence
   diagram for the most complex flow. A plan without diagrams is incomplete.
-- Every accepted decision becomes an ADR in `project/03-technical/adr/` plus a row in
-  `memory/decisions.md`. Reversals are new superseding ADRs, never edits.
+- Every accepted decision becomes an ADR in `agent/memory/decisions/` plus a row in
+  `agent/memory/decisions/README.md`. Reversals are new superseding ADRs, never edits.
 - §5 of the plan must end in concrete conventions Epic 00 can encode verbatim.
 - Later in the project: when a builder/planner requests a new pattern or dependency, you
   approve/reject it against the ADRs, recording the outcome as an ADR when significant.

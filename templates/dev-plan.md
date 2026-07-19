@@ -1,21 +1,21 @@
 # Development Plan — <Project Name>
 
 - Traces from: Feature list, Tech plan, Design
-- Traces to: Epics (`EP-##`)
+- Traces to: Epics (`E<NN>`)
 - Last updated: YYYY-MM-DD
 
 ## 1. Epic map
-EP-00 is always the skeleton. Every later epic is a runnable user flow — "runnable flow"
+E00 is always the skeleton. Every later epic is a runnable user flow — "runnable flow"
 must name what a human can DO when the epic is done, not what code exists.
 
 | ID | Epic | Runnable flow when done | Features | Depends on | Size | Status |
 |---|---|---|---|---|---|---|
-| EP-00 | Skeleton | App runs end-to-end: boot, health, CI green, one walking-skeleton request | — | — | M | pending |
-| EP-01 | | "A user can …" | FT-### | EP-00 | | pending |
+| E00 | Skeleton | App runs end-to-end: boot, health, CI green, one walking-skeleton request | — | — | M | pending |
+| E01 | | "A user can …" | FT-### | E00 | | pending |
 
 ```mermaid
 graph LR
-  EP00[EP-00 Skeleton] --> EP01[EP-01 …]
+  EP00[E00 Skeleton] --> EP01[E01 …]
 ```
 
 ## 2. Sequencing rationale

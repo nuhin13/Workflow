@@ -12,8 +12,8 @@ description: Run Phase 3 via the architect agent — technical plan with real mu
 3. Present decisions to the human ONE AREA AT A TIME: options table + diagram +
    recommendation; capture accept/override. Overrides are recorded with the human's
    reasoning — never silently swapped.
-4. Each accepted decision → `project/03-technical/adr/ADR-###-<slug>.md`
-   (`templates/adr.md`) + row in `memory/decisions.md`.
+4. Each accepted decision → `agent/memory/decisions/ADR-###-<slug>.md`
+   (`agent/memory/decisions/ADR-0000-template.md`) + row in `agent/memory/decisions/README.md`.
 5. When all areas are decided: mark plan `decided`, complete §4 (target architecture) and
    §5 (conventions feed for Epic 00), Handoff, `phase: dev-plan`, commit
    `tech-plan: decided (ADR-001..NNN)`.

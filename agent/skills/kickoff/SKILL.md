@@ -11,7 +11,8 @@ description: Start a new project in the harness — capture the idea, initialize
    users, the problem, any known constraints (budget, deadline, platform), what "success in
    6 months" looks like. Ask in ONE batched round of questions.
 3. **Initialize:**
-   - Create `project/00-business/ … 05-epics/`, `project/assets/design-imports/`,
+   - Create `project/00-business/ … 04-plan/` (epics live in `epics/`),
+     `project/assets/design-imports/`,
      `project/open-questions.md` (from `templates/open-questions.md`).
    - Fill `memory/state.yaml`: project name/one-liner/started, `phase: business`,
      business `in-progress`, history entry "kickoff".

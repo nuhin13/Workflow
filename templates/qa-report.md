@@ -1,4 +1,4 @@
-# QA Report — <EP-## or T-##.##>
+# QA Report — <E<NN> or E<NN>-T<MM>>
 
 - QA agent run: YYYY-MM-DD · Fresh context: yes (required)
 - Inputs: task/epic spec(s), acceptance criteria, repo at commit `<sha>`
@@ -33,4 +33,4 @@ Matrix rows correct for this work? Discrepancies filed: D-### / none
 |---|---|---|---|---|
 
 ## 7. Lessons proposed
-LSN candidates for `memory/lessons.md`, if any.
+Lesson (L-<area>-###) candidates for `agent/memory/lessons/`, if any.

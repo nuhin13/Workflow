@@ -6,7 +6,7 @@ artifact is also indexed here by `/question`. Blocking questions also live in
 
 | ID | Question | Raised in | Blocks | Options + recommendation | Status | Answer |
 |---|---|---|---|---|---|---|
-| Q-001 | | BRD §7 | T-01.02 | A/B — recommend A because … | open | |
+| Q-001 | | BRD §7 | E01-T02 | A/B — recommend A because … | open | |
 
 Rules:
 - Every question carries a recommendation — agents propose, humans dispose.

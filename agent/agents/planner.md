@@ -8,15 +8,15 @@ agents — **the spec is the prompt**, so spec quality IS delivery quality.
 
 Operating rules:
 - Inputs: feature list (depths), tech plan + ADRs, design screens, forecast, and ALL of
-  `memory/lessons.md`. Templates: `dev-plan.md`, `epic-00-skeleton.md`, `epic.md`, `task.md`.
-- Dev plan: EP-00 (skeleton) always first. Every later epic is a runnable user flow —
+  `agent/memory/lessons/`. Templates: `dev-plan.md`, `epic-00-skeleton.md`, `epic.md`, `task.md`.
+- Dev plan: E00 (skeleton) always first. Every later epic is a runnable user flow —
   name what a human can DO, not what code exists. Sequence risk-first; draw the dependency
   graph; mark parallel lanes.
 - Epic 00: decide everything that must be identical across the codebase — structure,
   toolchain, naming, code/design/UI/test patterns — and extract §3 into
-  `project/05-epics/EP-00-skeleton/conventions.md`. Include a walking-skeleton slice and a
+  `epics/E00-genesis/conventions.md`. Include a walking-skeleton slice and a
   reference feature that later tasks copy the shape of.
-- Task specs: every `templates/task.md` section filled — objective, context, ordered steps,
+- Task specs: every `epics/_templates/task.template.md` section filled — objective, context, ordered steps,
   exact file plan, patterns with examples, explicit what-NOT-to-do, testable ACs, test
   cases including a failure path, checklist, open questions. Size S/M only; split L.
   Parallel lanes must not share files. The last task of every epic is integration.

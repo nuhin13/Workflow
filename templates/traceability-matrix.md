@@ -9,14 +9,14 @@ One row per product requirement. `—` means intentionally none; blank means MIS
 
 | BR | FR | FT (feature) | SCR (screens) | EP / Tasks | Tests | Status | Notes |
 |---|---|---|---|---|---|---|---|
-| BR-010 | FR-001 | FT-001 | SCR-001, SCR-002 | EP-01 / T-01.01 | TC-01.01.1 | in-build | |
+| BR-010 | FR-001 | FT-001 | SCR-001, SCR-002 | E01 / T-01.01 | TC-01.01.1 | in-build | |
 
-Status: planned | designed | in-build | qa-passed | shipped | drifted (has D-###)
+Status: planned | designed | in-build | done | verified | shipped | drifted (has D-###)
 
 ## 2. Reverse checks (run by /trace)
 - Every FT maps to ≥1 FR, and every MVP FR maps to ≥1 FT
 - Every SCR is referenced by ≥1 FT; every FT with UI has ≥1 SCR
-- Every epic task traces to ≥1 FT or to EP-00 (skeleton)
+- Every epic task traces to ≥1 FT or to E00 (skeleton)
 - Orphans found go to §3 as discrepancies
 
 ## 3. Discrepancy notes

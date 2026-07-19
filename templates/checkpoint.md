@@ -1,4 +1,4 @@
-# Checkpoint — EP-## <Epic title>
+# Checkpoint — E<NN> <Epic title>
 
 - Date: YYYY-MM-DD · Human reviewer: <name>
 - QA verdict at checkpoint: PASS / PASS-WITH-NOTES (a FAIL cannot reach checkpoint)

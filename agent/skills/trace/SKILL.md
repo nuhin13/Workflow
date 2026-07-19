@@ -11,7 +11,7 @@ description: Build or verify the BRD↔feature↔UI↔epic↔test traceability m
    IDs and Traces-from/to declarations; rebuild §1 rows and per-row status.
 3. **Verify (reverse checks):**
    - MVP FR without FT · FT without FR · FT-with-UI without SCR · SCR unreferenced by any FT
-   - Epic/task not tracing to any FT (except EP-00) · qa-passed rows without listed tests
+   - Epic/task not tracing to any FT (except E00) · done/verified rows without listed tests
    - Content drift: screen spec vs prototype vs built UI; BRD/PRD statements contradicted
      by later artifacts.
 4. **Resolve:** mechanical/unambiguous fixes → apply to ALL linked artifacts in the same

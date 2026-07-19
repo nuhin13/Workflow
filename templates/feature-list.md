@@ -1,7 +1,7 @@
 # Feature List — <Project Name>
 
 - ID prefix: `FT-###`
-- Traces from: PRD (`FR-###`) · Traces to: Screens (`SCR-###`), Epics (`EP-##`)
+- Traces from: PRD (`FR-###`) · Traces to: Screens (`SCR-###`), Epics (`E<NN>`)
 - Last updated: YYYY-MM-DD
 
 One row per feature. A feature = a coherent capability a user would name. Depth notes feed
@@ -9,7 +9,7 @@ the tech plan and epic sizing — fill them honestly, they drive estimates.
 
 | ID | Feature | Description (1 line) | Traces from | Depth (S/M/L/XL) | Depth notes (why) | Priority | MVP? | Screens | Epic |
 |---|---|---|---|---|---|---|---|---|---|
-| FT-001 | | | FR-001 | M | | Must | yes | SCR-001 | EP-01 |
+| FT-001 | | | FR-001 | M | | Must | yes | SCR-001 | E01 |
 
 ## Depth guide
 - **S** — CRUD-ish, one screen, no new patterns
