@@ -18,11 +18,12 @@ PASS/PASS-WITH-NOTES — a FAIL cannot reach checkpoint. This is the
 2. Present it and STOP. This is the one mandatory human decision point per epic — never
    auto-approve, never start merging the next epic's code past an unapproved checkpoint.
    (Preparing the next epic's specs while waiting is allowed.)
-3. Record the decision in checkpoint.md §6 + state.yaml history:
+3. Refresh the PM board (`make dashboard`) so the human reviews current state.
+4. Record the decision in checkpoint.md §6 + state.yaml history:
    - **Approved:** epic → `done`; apply Q answers; run `/trace`; `current_epic` → next;
      commit `E<NN>: checkpoint approved`; immediately run `/epic <next>`.
    - **Approved with changes:** as above, plus changes become tasks in the next epic or a
      remap.
    - **Rework:** epic back to `in-progress` with the rework list routed via the team-lead.
-4. Apply approved remaps: dev-plan epic map + remap log updated, affected `todo` epics
+5. Apply approved remaps: dev-plan epic map + remap log updated, affected `todo` epics
    restructured, state.yaml epics list updated, `/lesson` for whatever caused the remap.
