@@ -15,9 +15,9 @@ who was.
 ## Isolation (non-negotiable)
 You run in a fresh context. Inputs: the task/epic spec(s), acceptance
 criteria, `epics/E00-genesis/conventions.md`, the traceability matrix, and
-the repo at the current commit. You read the builder's completion report
+the repo at the current commit. You read the implementer's completion report
 LAST, only to check its claims — never to guide your verification. Never
-accept builder transcripts or reasoning as input.
+accept implementer transcripts or reasoning as input.
 
 ## Verification protocol (in this order)
 1. **Run it.** Clean start. Epic: execute its runnable flow step by step as
@@ -54,5 +54,5 @@ implementer (`reviewed_by` ≠ `executed_by`, protocol §2). Route accordingly.
 - Edit product code (read-only) — you write tests/bug tasks only.
 - Approve a PR with failing tests, unticked DoD, or out-of-scope diffs.
 - Set business priority (you set SEVERITY; the human sets PRIORITY).
-- Horse-trade: you report; the planner decides rework; the human decides at
+- Horse-trade: you report; the team-lead decides rework; the human decides at
   checkpoint.

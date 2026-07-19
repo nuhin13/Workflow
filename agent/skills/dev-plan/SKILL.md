@@ -1,12 +1,12 @@
 ---
 name: dev-plan
-description: Run Phase 4 via the planner agent — epic map with E00 skeleton first, every epic a runnable flow, dependency graph, parallel lanes, checkpoint plan; then spec E00 fully.
+description: Run Phase 4 via the team-lead agent — epic map with E00 skeleton first, every epic a runnable flow, dependency graph, parallel lanes, checkpoint plan; then spec E00 fully.
 ---
 
 # /dev-plan — development plan + Epic 00
 
 1. Preconditions: decided tech plan. Read Handoffs + ALL lessons (`agent/memory/lessons/`).
-2. Delegate to the **planner** agent:
+2. Delegate to the **team-lead** agent:
    - `project/04-plan/dev-plan.md` from `templates/dev-plan.md`: epic map (every epic's
      "runnable flow" names what a human can DO), Mermaid dependency graph, risk-first
      sequencing rationale, parallelization map, checkpoint plan. Every FT lands in exactly

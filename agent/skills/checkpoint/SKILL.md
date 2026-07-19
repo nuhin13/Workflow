@@ -23,6 +23,6 @@ PASS/PASS-WITH-NOTES — a FAIL cannot reach checkpoint. This is the
      commit `E<NN>: checkpoint approved`; immediately run `/epic <next>`.
    - **Approved with changes:** as above, plus changes become tasks in the next epic or a
      remap.
-   - **Rework:** epic back to `in-progress` with the rework list routed via the planner.
+   - **Rework:** epic back to `in-progress` with the rework list routed via the team-lead.
 4. Apply approved remaps: dev-plan epic map + remap log updated, affected `todo` epics
    restructured, state.yaml epics list updated, `/lesson` for whatever caused the remap.

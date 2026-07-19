@@ -44,7 +44,7 @@ shipped code                  every commit traces back to a BRD line
 | **Constitution** | `AGENTS.md` | 16 always-on rules every agent obeys every turn + the phased pipeline and ID conventions |
 | **Adapter** | `CLAUDE.md` (+ others) | Platform-specific glue pointing at AGENTS.md |
 | **Policy** | `harness.yaml` | Platforms, model tiers, budgets, WIP limit, human gates — "org code" |
-| **Roles** | `agent/agents/` | 12 role cards / subagents: pm, team-lead, orchestrator, qa, devops, developer-backend, developer-frontend + pipeline roles analyst, designer, architect, planner, builder. Each defines boundaries: what it may do, what it must hand off. Mirrored at `.claude/agents` (symlink) |
+| **Roles** | `agent/agents/` | 10 role cards / subagents: pm, team-lead (delivery planner), orchestrator, qa, devops, developer-backend, developer-frontend + pipeline roles analyst, designer, architect. Each defines boundaries: what it may do, what it must hand off. Mirrored at `.claude/agents` (symlink) |
 | **Workflows** | `agent/workflows/` | 12 step-by-step processes: epic-breakdown, implement-task, qa-review, handoff-freeze/resume, retro, release, rollback triggers… Start with `_handoff_protocol.md` |
 | **Skills** | `agent/skills/` | 35 on-demand skills: 16 pipeline drivers (/kickoff /brd /prd /features /forecast /design /trace /tech-plan /dev-plan /epic /build /qa /checkpoint /status /question /lesson) + capability manuals (SRS/EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization…). Mirrored at `.claude/skills` (symlink); loaded only when needed |
 | **Pipeline artifacts** | `templates/` → `project/` | Phase 0–4 artifacts (BRD/PRD/features/forecast, design system + screens, traceability matrix, tech plan, dev plan) — each starts from its template (see `templates/README.md`) |
@@ -221,7 +221,7 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
 7. **Cross-platform orchestration is human-triggered.** Adapters run headless,
    but you (or the orchestrator agent) launch them; there is no background
    daemon moving work between platforms.
-8. **Learning curve.** 16 rules, 12 roles, 12 workflows, 35 skills. Newcomers:
+8. **Learning curve.** 16 rules, 10 roles, 12 workflows, 35 skills. Newcomers:
    read this doc + `docs/HUMAN-GUIDE.md`, ignore the rest until a workflow
    points at it.
 
@@ -301,7 +301,7 @@ mistake observed
 | Capability | GitHub Spec Kit | BMAD-Method | Anthropic long-running-harness guidance | **This harness** |
 |---|---|---|---|---|
 | Spec-first pipeline | ✅ specify→plan→tasks→implement | ✅ PRD→architecture→stories | — (assumes spec exists) | ✅ BRD→SRS→epics→tasks (EARS) |
-| Role-based multi-agent | – (single assistant) | ✅ 12+ roles | – | ✅ 7 roles, least-privilege MCP |
+| Role-based multi-agent | – (single assistant) | ✅ 12+ roles | – | ✅ 10 roles, least-privilege MCP |
 | Cross-PLATFORM portability | ✅ 30+ tools (templates) | partial | – | ✅ AGENTS.md + adapters + freeze/resume packets |
 | Progress artifact for fresh context | tasks.md | stories | progress file + feature list + git | ✅ task §12 live checklist + tracker + packet |
 | Independent AI review gate | – | QA agent | verify with browser tools | ✅ peer (different MODEL) + QA gate + human gate |

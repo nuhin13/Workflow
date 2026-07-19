@@ -14,8 +14,8 @@ every section; write `N/A — reason` rather than deleting.
 | Traceability matrix | `traceability-matrix.md` | `project/02-traceability/matrix.md` | /trace |
 | Discrepancy note | `discrepancy-note.md` | `project/02-traceability/discrepancies/D-###.md` | /trace |
 | Tech plan | `tech-plan.md` | `project/03-technical/tech-plan.md` | /tech-plan (architect) |
-| Dev plan | `dev-plan.md` | `project/04-plan/dev-plan.md` | /dev-plan (planner) |
-| Epic 00 (genesis) | `epic-00-skeleton.md` | `epics/E00-genesis/epic.md` | /dev-plan (planner) |
+| Dev plan | `dev-plan.md` | `project/04-plan/dev-plan.md` | /dev-plan (team-lead) |
+| Epic 00 (genesis) | `epic-00-skeleton.md` | `epics/E00-genesis/epic.md` | /dev-plan (team-lead) |
 | Open questions | `open-questions.md` | `project/open-questions.md` | /question |
 | Checkpoint | `checkpoint.md` | `epics/E<NN>/checkpoint.md` | /checkpoint |
 | QA report | `qa-report.md` | `epics/E<NN>/qa/<id>-report.md` | /qa (qa agent) |

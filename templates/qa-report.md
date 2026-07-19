@@ -2,7 +2,7 @@
 
 - QA agent run: YYYY-MM-DD · Fresh context: yes (required)
 - Inputs: task/epic spec(s), acceptance criteria, repo at commit `<sha>`
-- Explicitly NOT consulted before verdicts: builder completion reports, builder reasoning
+- Explicitly NOT consulted before verdicts: implementer completion reports or reasoning
 
 ## Verdict
 **PASS / FAIL / PASS-WITH-NOTES** (fail = any AC unmet, any test case failing, any

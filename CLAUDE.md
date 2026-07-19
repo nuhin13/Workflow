@@ -23,6 +23,13 @@ Claude Code specifics for this repo:
   - statusLine wired to `agent/hooks/statusline-ratelimit.sh` for rate-limit
     freeze detection (5-hour and weekly windows).
 - MCP servers for this project are declared in `.mcp.json` (project scope).
+- **Subagent frontmatter convention**: `name`, `description`, `model` are
+  standard Claude Code fields. `mcp:` and `skills:` are harness extensions
+  (ignored by Claude Code, used as routing documentation and by other
+  platforms' adapters). Role boundaries ("read-only", "never writes product
+  code") are enforced by the constitution, peer review, and the git hooks —
+  not by tool restriction, since every role writes repo artifacts (specs,
+  reports, state).
 
 Other platforms (Codex CLI, OpenCode, Cursor) read `AGENTS.md` natively and
 reach the same skills by path; adapter scripts live in `agent/adapters/`,

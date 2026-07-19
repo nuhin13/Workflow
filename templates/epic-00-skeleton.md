@@ -5,7 +5,7 @@
 - Runnable flow when done: repo boots from clean clone with documented commands; one
   walking-skeleton request travels UI → API → data and back; CI runs lint + tests green.
 
-E00 exists to make every later epic identical in shape. Anything two builders could do
+E00 exists to make every later epic identical in shape. Anything two implementers could do
 two different ways gets decided HERE, once. `conventions.md` (§3 extracted to
 `epics/E00-genesis/conventions.md`) is quoted verbatim in every task spec.
 
