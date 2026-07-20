@@ -1,12 +1,88 @@
-# Gradle files
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# JetBrains IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/
+
+# Node / JS
+node_modules/
+dist/
+/build/
+.cache/
+.next/
+*.tsbuildinfo
+next-env.d.ts
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+vendor/
+bin/
+
+# Misc
+*.tmp
+*.swp
+*.bak
+coverage/
+.coverage
+
+# Harness
+runs/*/
+dashboard/index.html
+__pycache__/
+*.pyc
+agent/handoffs/*.yaml
+!agent/handoffs/_template.handoff.yaml
+agent/handoffs/*.diff
+agent/handoffs/.FREEZE
+
+# prompt/answer audit logs are curated evidence — keep them versioned
+!runs/_prompt-log/
+!runs/_prompt-log/**
+
+# Playwright
+test-results/
+playwright-report/
+.playwright/
+
+# Android / Gradle (from original main)
 .gradle/
-build/
 
 # Local configuration file (sdk path, etc)
 local.properties
 
-# Log/OS Files
-*.log
 
 # Android Studio generated files and folders
 captures/
@@ -16,8 +92,6 @@ captures/
 *.apk
 output-metadata.json
 
-# IntelliJ
-*.iml
 .idea/
 misc.xml
 deploymentTargetDropDown.xml

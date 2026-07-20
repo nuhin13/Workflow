@@ -1,0 +1,33 @@
+# Pipeline state — single source of truth. Update after every completed stage.
+# A fresh session must be able to resume from this file alone.
+
+project:
+  name: null            # set by /kickoff
+  one_liner: null
+  started: null
+
+phase: idle             # idle | business | design | traceability | tech-plan | dev-plan | build | done
+
+phases:
+  business:      { status: pending, artifacts: [] }   # pending | in-progress | done
+  design:        { status: pending, artifacts: [] }
+  traceability:  { status: pending, artifacts: [] }
+  tech-plan:     { status: pending, artifacts: [] }
+  dev-plan:      { status: pending, artifacts: [] }
+  build:         { status: pending }
+
+# Filled by /dev-plan, maintained by /epic, /build, /qa, /checkpoint
+epics: []
+# - id: E00
+#   title: Skeleton
+#   status: todo           # todo | specced | in-progress | qa | checkpoint | done | remapped
+#   runnable_flow: "…what a human can run when this epic is done…"
+#   tasks:
+#     - { id: E00-T01, title: "…", status: todo, owner: null }   # todo|in-progress|review-requested|changes-requested|done|verified · side: blocked|frozen
+#   qa_report: null
+#   checkpoint: null
+
+current_epic: null
+blockers: []            # [{ id: Q-001, blocks: E01-T02, question: "…" }]
+
+history: []             # append-only: [{ at: ISO8601, event: "…" }]

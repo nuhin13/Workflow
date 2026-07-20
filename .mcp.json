@@ -1,0 +1,49 @@
+{
+  "$comment": "the harness MCP connections (Claude Code project scope). Docs per server: agent/mcp/. Env vars are expanded from your shell / .env. Enable ONLY what an agent needs — every connected server's tool schemas consume context tokens on every turn (see skills/token-optimization).",
+  "mcpServers": {
+    "graphiti": {
+      "type": "http",
+      "url": "http://localhost:8000/mcp/",
+      "$comment": "Temporal knowledge-graph project memory (getzep/graphiti MCP server + FalkorDB). Setup: agent/mcp/graphiti.md"
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "$comment": "Official GitHub remote MCP (PRs, issues, branches). OAuth on first use. Docs: agent/mcp/github.md"
+    },
+    "atlassian": {
+      "type": "sse",
+      "url": "https://mcp.atlassian.com/v1/sse",
+      "$comment": "Official Atlassian remote MCP — Jira + Confluence (OAuth). Docs: agent/mcp/jira.md"
+    },
+    "figma": {
+      "type": "http",
+      "url": "http://127.0.0.1:3845/mcp",
+      "$comment": "Figma Dev Mode MCP served locally by the Figma desktop app (Preferences > Enable Dev Mode MCP Server). Remote alternative: https://mcp.figma.com/mcp. Docs: agent/mcp/figma.md"
+    },
+    "database": {
+      "command": "npx",
+      "args": ["-y", "@bytebase/dbhub", "--transport", "stdio", "--dsn", "${HARNESS_DB_DSN}", "--readonly"],
+      "env": {},
+      "$comment": "Universal DB MCP (Postgres/MySQL/MariaDB/SQL Server/SQLite) via DBHub. READ-ONLY by default — never point agents at prod read-write. Docs: agent/mcp/database.md"
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "slack-mcp-server@latest", "--transport", "stdio"],
+      "env": {
+        "SLACK_MCP_XOXP_TOKEN": "${SLACK_MCP_XOXP_TOKEN}"
+      },
+      "$comment": "Community Slack MCP (the original reference server was archived). Verify the package & scopes before use. Docs: agent/mcp/slack.md"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "$comment": "Browser automation for the QA agent (E2E checks against the running app)."
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "$comment": "Up-to-date library docs lookup — reduces hallucinated APIs in unfamiliar frameworks. Optional."
+    }
+  }
+}
