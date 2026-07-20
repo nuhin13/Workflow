@@ -41,6 +41,10 @@ flowchart TB
 
 Two layers, one rule: **every arrow ends at a human gate before it moves on.**
 
+Prefer it visual and interactive? Open
+[`docs/harness-flow.html`](docs/harness-flow.html) in a browser — the full
+flow chart of the harness, one self-contained file.
+
 ---
 
 ## 2. How a platform talks to the agents
