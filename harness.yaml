@@ -2,6 +2,8 @@
 # Read by the thin orchestrator scripts in agent/orchestrator/.
 version: 1
 project: "YourProject"           # set by /kickoff — keep in sync with memory/state.yaml
+template_repo: null              # set by /harness-sync setup — where harness updates
+                                 # are pulled from and universal lessons promoted to
 
 platforms:                      # fallback order for rate-limit handoff
   - name: claude-code

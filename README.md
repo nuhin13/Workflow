@@ -41,6 +41,10 @@ flowchart TB
 
 Two layers, one rule: **every arrow ends at a human gate before it moves on.**
 
+Prefer it visual and interactive? Open
+[`docs/harness-flow.html`](docs/harness-flow.html) in a browser — the full
+flow chart of the harness, one self-contained file.
+
 ---
 
 ## 2. How a platform talks to the agents
@@ -229,6 +233,7 @@ Daily driving needs three commands:
 pip install -r requirements.txt   # pyyaml
 make hooks                        # git hooks (branch protection, no AI trailers)
 git branch development main      # integration branch
+git remote add template <this-template-repo-url>   # for /harness-sync
 make validate                     # both validators must pass
 ```
 
@@ -280,6 +285,25 @@ The harness improves through a fixed ladder — never by drive-by edits:
 
 Structural changes (new roles, new phases) go through an ADR in
 `agent/memory/decisions/` like any other significant decision.
+
+**Across repos** (template ↔ your project repos), `/harness-sync` moves
+improvements both ways — each direction human-gated:
+
+```mermaid
+flowchart LR
+    T["🏛 Template repo<br>(this skeleton +<br>universal seed lessons)"]
+    P1["📦 Project A repo<br>own memory, lessons,<br>state, specs"]
+    P2["📦 Project B repo"]
+    T -->|"clone (inherits all seeds)"| P1
+    T -->|clone| P2
+    T -.->|"/harness-sync pull<br>(harness files only)"| P1
+    P1 -.->|"/harness-sync promote<br>(universal lessons → PR)"| T
+```
+
+Each project keeps its own memory (`memory/state.yaml`,
+`agent/memory/`). Only *universal* lessons — rules that would help any
+product — travel back to the template as inherited seeds. Project
+content (specs, state, product lessons) never leaves its repo.
 
 ---
 

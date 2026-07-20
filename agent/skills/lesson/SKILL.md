@@ -18,4 +18,6 @@ description: Append a lesson learned (L-<area>-###) to agent/memory/lessons/ —
 3. If the rule is universal (would apply to every future project), ALSO propose the
    corresponding one-line edit to the harness itself (template, agent, or skill file) —
    that's how the harness compounds. Apply it if the human approves or it's unambiguous.
+   Then send it upstream: `/harness-sync promote L-<area>-nnn` opens a PR on the
+   template repo so every FUTURE project inherits the rule too.
 4. Commit `lesson: L-<area>-### <title>`.
