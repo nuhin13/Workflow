@@ -27,6 +27,15 @@ Phases run in order; a revisited phase must ripple (`/trace`) before work
 continues. PRD → `spec/srs.md` (EARS) is authored via skills/srs-authoring;
 once approved the SRS is canonical for build.
 
+**Profiles decide how much of this runs (v2 · ADR-0001).** `/kickoff` sets a
+`profile` (`small`/`medium`/`large`/`extra-large`/`enterprise`, human-picked)
+that selects which phases run, which human gates apply, how deep review goes,
+which git tiers exist, and QA depth (`harness.yaml: profiles`). The rules below
+are the FULL (enterprise) set; a lighter profile applies the subset its
+`profiles` entry lists — e.g. the `development` branch tier and SRS/forecast
+phases exist only at `extra-large`+. Escalating a profile mid-project is
+recorded like an ADR; downgrading must state the verification it drops.
+
 **IDs (traceability — never invent other formats):** `BR-###` business req ·
 `FR-###` product req (PRD) · `FR-<AREA>-NN` / `NFR-<AREA>-NN` SRS
 functional/non-functional req · `FT-###` feature · `SCR-###` screen · `FC-###` forecast
@@ -44,7 +53,10 @@ table.
 2. **One task = one branch = one worktree.** Branch names (flat underscore
    scheme): integration branch `development`; epic branch `epic_<NN>`; task
    branch `epic_<NN>_task_<MM>` (e.g. `epic_00_task_00`). Never commit directly
-   to `main`, `development`, or an epic branch. All promotion happens via PR.
+   to `main`, `development`, or an epic branch. Which tiers exist — and whether
+   promotion needs a PR or a recorded squash-merge — is set by the profile's
+   `git:` block (`require_pr` is true only at `enterprise`); parallel agents
+   always need separate worktrees regardless of profile.
 3. **Review gates every merge.** A task PR merges into its epic branch only
    after PEER review by a different agent/model (rule 12). The epic merges into
    `development` only after the independent QA agent — fresh context, spec +
