@@ -4,6 +4,50 @@ version: 1
 project: "YourProject"           # set by /kickoff — keep in sync with memory/state.yaml
 template_repo: null              # set by /harness-sync setup — where harness updates
                                  # are pulled from and universal lessons promoted to
+profile: null                    # small|medium|large|extra-large|enterprise — set by /kickoff
+                                 # (agent recommends, human picks; see profiles + ADR-0001)
+
+# ── profiles: how much process this project runs (v2 · ADR-0001) ─────────────
+# The agent RECOMMENDS one at kickoff from signals (team size, regulated domain,
+# money handling, forecast scale, integrations) then STOPS; the human picks
+# (rule 13). Escalation up (e.g. medium→large) is allowed mid-project and is
+# recorded like an ADR; a downgrade must state what verification it drops.
+profiles:
+  small:                         # spike, demo, internal tool, < 1 week
+    phases:    [business, design, build]
+    human_gates: [release]
+    review:    self-review only
+    git:       { tiers: [main, task], require_pr: false }
+    qa:        risky_tasks_only
+  medium:                        # real product, solo / small team (TireBook)
+    phases:    [business, design, dev_plan, build]
+    human_gates: [scope, db_schema_migration, auth_or_payment_code, release]
+    review:    peer_on_code_light_on_docs
+    git:       { tiers: [main, epic, task], require_pr: false }
+    qa:        epic_sweep_plus_high_risk
+  large:                         # bigger product, more surface / integrations
+    phases:    [business, design, traceability, dev_plan, build]
+    human_gates: [scope, feature_epic_breakdown, db_schema_migration, auth_or_payment_code, new_dependency, release]
+    review:    peer_on_all_code
+    git:       { tiers: [main, epic, task], require_pr: false }
+    qa:        epic_sweep_plus_high_risk
+  extra-large:                   # near-enterprise, staged releases
+    phases:    [business, design, traceability, tech_plan, dev_plan, build]
+    human_gates: [scope, feature_epic_breakdown, epic_to_dev_merge, dev_to_main_merge, db_schema_migration, auth_or_payment_code, new_dependency, secrets_or_env_change, release]
+    review:    peer_plus_qa_on_code
+    git:       { tiers: [main, development, epic, task], require_pr: false }
+    qa:        every_code_task
+  enterprise:                    # regulated, multi-team, external audit
+    phases:    all               # + forecast + srs + full trace + full tech-plan
+    human_gates: [epic00_exit_review, feature_epic_breakdown, epic_to_dev_merge, dev_to_main_merge, db_schema_migration, new_dependency, secrets_or_env_change, auth_or_payment_code, delete_over_50_lines, release]
+    review:    peer_plus_independent_qa_every_task
+    git:       { tiers: [main, development, epic, task], require_pr: true }
+    qa:        every_task
+
+# BRD + a UI reference are ENTRY conditions, not phase outputs (v2 · ADR-0001 D-5).
+prerequisites:
+  required: [brd, ui_reference]  # /kickoff hard-blocks without both — no --no-ui
+  ui_reference_forms: [figma, html_prototype, agent_generated_design, stitch_export, screenshots]
 
 platforms:                      # fallback order for rate-limit handoff
   - name: claude-code
@@ -17,10 +61,30 @@ platforms:                      # fallback order for rate-limit handoff
     adapter: agent/adapters/run-opencode.sh
     freeze_threshold_pct: 80
 
-model_tiers:                    # routing hints (see skills/token-optimization)
-  plan_review: opus             # PM / Team Lead / architecture / final review
-  implement: sonnet             # default developer tier
-  trivial: haiku                # renames, boilerplate, log msgs, summaries
+model_tiers:                    # v2 · ADR-0001 D-6 — tiers are the portable unit.
+                                # Task frontmatter + role cards carry `tier:`, NEVER a
+                                # model name. Each tier maps to a model PER PLATFORM; no
+                                # platform is the default. If the active platform has no
+                                # mapping for a tier, the run STOPS and asks (no silent
+                                # cross-vendor fallback). Adapters resolve their own row.
+  deep:                         # decisions expensive to get wrong; security surfaces
+    intent: "deepest reasoning available on the active platform"
+    claude-code: opus
+    codex:       gpt-5-codex-high   # set to your Codex high-reasoning model
+    opencode:    null                # unset → stops and asks
+    gemini-cli:  null
+  build:                        # normal implementation against a written contract
+    intent: "competent coding against a spec"
+    claude-code: sonnet
+    codex:       gpt-5-codex
+    opencode:    null
+    gemini-cli:  null
+  cheap:                        # mechanical edits, renames, summaries
+    intent: "reasoning depth buys nothing here"
+    claude-code: haiku
+    codex:       gpt-5-codex-mini
+    opencode:    null
+    gemini-cli:  null
 
 budgets:
   per_task_warn_usd: 5
