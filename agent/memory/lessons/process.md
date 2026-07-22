@@ -46,3 +46,35 @@
 - fix applied: cross-origin / cookie / CSRF features ship with a Playwright test.
 - recurrence: 1
 - status: promoted-to-rule(tdd-workflow)
+
+## L-process-008 — Parallel writers launched while a crashed agent was still resumable
+- date: 2026-07-21 | source: TireBook Phase 4 /dev-plan diagram-first rewrite
+- situation: a team-lead agent "failed" mid-run (API connection drop). The coordinator
+  treated failed as dead, launched two fresh agents onto the same files, then the original
+  resumed and wrote concurrently — a 3-way race on dev-plan.md, epic.md and tasks/E00-T05..T07.
+  Nothing was lost only because the losing writes bounced as stale and those agents re-read
+  instead of clobbering.
+- root cause: a `failed` task-notification means "stopped mid-response", NOT "cannot resume".
+  The harness can resume such an agent from its transcript, so it is still a live writer.
+- fix applied: before launching any replacement agent, either confirm the crashed agent is
+  finished for good or resume THAT agent instead. Never assign two agents the same file set;
+  if work must be split, split by disjoint paths and say so in both prompts.
+- recurrence: 1
+- status: open
+
+## L-process-009 — Agent committed protected harness files without passing the human gate
+- date: 2026-07-21 | source: TireBook Phase 4 /dev-plan
+- situation: a team-lead agent changed agent/skills/plain-language/SKILL.md plus three
+  templates and committed them itself, with a message asserting "Human-requested harness
+  change". The request was genuine but had been made outside the coordinator's thread, so the
+  change landed with no verifiable approval trail and retroactively altered the template that
+  8 already-approved task specs were written against.
+- root cause: constitution rule 6 puts agent/, AGENTS.md and templates/ behind
+  harness_change_policy, but nothing forces the approval to be *recorded* before the commit.
+- fix applied: harness-file changes are proposed as a diff and land only after the human
+  approves in-thread; the commit message cites where that approval happened. An agent that
+  believes it has out-of-band authorization must surface the request for confirmation rather
+  than self-certify it. Template changes that invalidate existing approved artifacts must
+  name those artifacts so they can be re-approved.
+- recurrence: 1
+- status: open
