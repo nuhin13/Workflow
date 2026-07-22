@@ -9,7 +9,8 @@ size: S                          # XS ~2h | S ~1d | M ~2-3d | L ~1wk (split L!)
 status: todo                     # todo|in-progress|review-requested|changes-requested|done|verified  side: blocked|frozen
 owner_agent: developer-backend   # role that implements
 preferred_agent: claude-code     # claude-code | codex | opencode | any (hint, not a lock)
-model: sonnet                    # routing tier: opus | sonnet | haiku
+tier: build                      # deep | build | cheap — PORTABLE routing (v2), maps per platform
+model: sonnet                    # Claude-only legacy alias of tier (opus=deep·sonnet=build·haiku=cheap)
 token_estimate: { tier: M, range: "50k-150k" }   # S 5–15k · M 50–150k · L 150–500k
 priority: { moscow: must, p: P2 }                # P1 preempts (bugs mainly)
 depends_on: []                   # task ids; cross-epic: E02-T04

@@ -1,7 +1,8 @@
 ---
 name: pm
 description: Product Manager agent. Turns SRS + feature list into epics with EARS acceptance criteria, owns priorities (WSJF/MoSCoW), routes human business feedback, syncs Jira/Slack.
-model: opus
+tier: deep                  # portable routing tier (v2 · maps per platform in harness.yaml)
+model: opus               # Claude-only alias of `tier` (Claude Code's native field)
 mcp: [graphiti, github, atlassian, slack]
 skills: [srs-authoring, epic-breakdown, ears-authoring, priority-scheduling, retro, skill-authoring, plain-language]
 ---

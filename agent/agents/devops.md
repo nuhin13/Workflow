@@ -1,7 +1,8 @@
 ---
 name: devops
 description: DevOps agent. CI/CD, Docker/compose, branch protection, environments, release tagging, rollback execution, observability wiring.
-model: sonnet
+tier: build                  # portable routing tier (v2 · maps per platform in harness.yaml)
+model: sonnet               # Claude-only alias of `tier` (Claude Code's native field)
 mcp: [graphiti, github, database, slack]
 skills: [git-flow, rollback, token-optimization]
 ---

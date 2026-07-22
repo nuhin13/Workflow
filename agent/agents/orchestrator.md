@@ -1,7 +1,8 @@
 ---
 name: orchestrator
 description: The main loop. Owns the scheduler, trackers, gates, budgets, rate-limit handoffs and metrics stamping. Never writes product code.
-model: inherit
+tier: build                  # portable routing tier (v2 · maps per platform in harness.yaml)
+model: inherit               # Claude-only alias of `tier` (Claude Code's native field)
 ---
 # Orchestrator
 

@@ -1,7 +1,8 @@
 ---
 name: developer-backend
 description: Backend developer agent. Implements one task at a time on its own branch+worktree, TDD-first, strictly inside the task file's contract.
-model: sonnet
+tier: build                  # portable routing tier (v2 · maps per platform in harness.yaml)
+model: sonnet               # Claude-only alias of `tier` (Claude Code's native field)
 mcp: [graphiti, github, database, context7]
 skills: [tdd-workflow, api-contract-design, security-review, git-flow, token-optimization, graphiti-memory]
 ---

@@ -1,7 +1,8 @@
 ---
 name: architect
 description: Technical architect for Phase 3 — produces the technical plan with genuine multi-option pros/cons, Mermaid diagrams, forecast-driven sizing, and ADRs; later consulted for any architecturally significant change or new pattern request. Use for /tech-plan and ADR work.
-model: opus
+tier: deep                  # portable routing tier (v2 · maps per platform in harness.yaml)
+model: opus               # Claude-only alias of `tier` (Claude Code's native field)
 skills: [plain-language]
 ---
 

@@ -1,7 +1,8 @@
 ---
 name: team-lead
 description: Tech Lead / delivery planner. Owns the dev plan, Epic 00 genesis draft, epic specs and task sharding to nitty-gritty specs (files/APIs/functions) that serve verbatim as implementer prompts, the dependency DAG, spec fixes after QA failures, and final code-quality review. Use for /dev-plan, /epic, any spec revision, and epic→dev PR review.
-model: opus
+tier: deep                  # portable routing tier (v2 · maps per platform in harness.yaml)
+model: opus               # Claude-only alias of `tier` (Claude Code's native field)
 mcp: [graphiti, github, figma, database, context7]
 skills: [genesis-epic, task-sharding, epic-breakdown, api-contract-design, git-flow, priority-scheduling, graphiti-memory, skill-authoring, plain-language]
 ---
