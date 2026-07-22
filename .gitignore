@@ -63,10 +63,10 @@ runs/*/
 dashboard/index.html
 __pycache__/
 *.pyc
-agent/handoffs/*.yaml
-!agent/handoffs/_template.handoff.yaml
-agent/handoffs/*.diff
-agent/handoffs/.FREEZE
+harness/handoffs/*.yaml
+!harness/handoffs/_template.handoff.yaml
+harness/handoffs/*.diff
+harness/handoffs/.FREEZE
 
 # prompt/answer audit logs are curated evidence — keep them versioned
 !runs/_prompt-log/

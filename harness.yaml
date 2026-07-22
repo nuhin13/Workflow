@@ -1,5 +1,5 @@
 # harness.yaml — project topology & policy ("org code")
-# Read by the thin orchestrator scripts in agent/orchestrator/.
+# Read by the thin orchestrator scripts in harness/orchestrator/.
 version: 1
 project: "YourProject"           # set by /kickoff — keep in sync with memory/state.yaml
 template_repo: null              # set by /harness-sync setup — where harness updates
@@ -51,14 +51,14 @@ prerequisites:
 
 platforms:                      # fallback order for rate-limit handoff
   - name: claude-code
-    adapter: agent/adapters/run-claude.sh
+    adapter: harness/adapters/run-claude.sh
     freeze_threshold_pct: 80    # freeze + handoff at 80% of 5h window
     weekly_guard: true
   - name: codex
-    adapter: agent/adapters/run-codex.sh
+    adapter: harness/adapters/run-codex.sh
     freeze_threshold_pct: 80
   - name: opencode
-    adapter: agent/adapters/run-opencode.sh
+    adapter: harness/adapters/run-opencode.sh
     freeze_threshold_pct: 80
 
 model_tiers:                    # v2 · ADR-0001 D-6 — tiers are the portable unit.
@@ -94,13 +94,13 @@ paths:
   spec: spec/
   epics: epics/
   runs: runs/
-  handoffs: agent/handoffs/
-  rates: agent/rates/cost-config.yaml
+  handoffs: harness/handoffs/
+  rates: harness/rates/cost-config.yaml
   templates: templates/            # + epics/_templates/ for epic/task/tracker
   workspace: project/              # phase 0-4 artifacts (see project/README.md)
   state: memory/state.yaml         # pipeline position — resume point for any platform
-  lessons: agent/memory/lessons/
-  decisions: agent/memory/decisions/
+  lessons: harness/memory/lessons/
+  decisions: harness/memory/decisions/
 
 pipeline:                          # phase → driver skills (slash commands on Claude Code)
   business: [kickoff, brd, prd, features, forecast]
@@ -127,27 +127,27 @@ write_scopes:
     - memory/state.yaml
     - project/02-traceability/
     - project/open-questions.md
-    - agent/memory/lessons/
+    - harness/memory/lessons/
     - runs/
   product_code:      # developers' code surface — E00 genesis REPLACES this
     - src/
     - tests/
   analyst:     [docs/business/, project/00-business/, project/assets/]
   designer:    [project/01-design/, docs/design/, project/assets/design-imports/]
-  architect:   [project/03-technical/, agent/memory/decisions/]
+  architect:   [project/03-technical/, harness/memory/decisions/]
   pm:          [spec/, epics/, project/00-business/]
-  team-lead:   [project/04-plan/, epics/, spec/, agent/memory/decisions/]
+  team-lead:   [project/04-plan/, epics/, spec/, harness/memory/decisions/]
   developer-backend:  [product_code, epics/]   # epics/ = own task file status/checklist only
   developer-frontend: [product_code, epics/]
   qa:          [epics/, product_code]          # product_code = TESTS only (card rule)
   devops:      [.github/, infra/, docker/, Makefile, product_code]
   orchestrator: [memory/, epics/, dashboard/, runs/]
 
-# Who may change the HARNESS itself (agent/, AGENTS.md, CLAUDE.md, templates/,
+# Who may change the HARNESS itself (harness/, AGENTS.md, CLAUDE.md, templates/,
 # harness.yaml): only via the lesson->rule promotion ladder (skills/retro) or
 # skills/skill-authoring, with human approval. Product work never edits these.
 harness_change_policy:
-  protected: [agent/, AGENTS.md, CLAUDE.md, templates/, harness.yaml, epics/_templates/]
+  protected: [harness/, AGENTS.md, CLAUDE.md, templates/, harness.yaml, epics/_templates/]
   allowed_via: [skill-authoring, retro, lesson]
   requires: human_approval
 

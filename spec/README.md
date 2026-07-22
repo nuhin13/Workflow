@@ -4,7 +4,7 @@ Empty on purpose. The first act of the project is generating it.
 
 | File (to be created) | Source | Who |
 |---|---|---|
-| `srs.md` | `docs/business/BRD.md` (the business truth) | PM agent drafts per `agent/skills/srs-authoring` → HUMAN approves |
+| `srs.md` | `docs/business/BRD.md` (the business truth) | PM agent drafts per `harness/skills/srs-authoring` → HUMAN approves |
 | `feature-list.md` | derived from srs.md modules | PM agent |
 | `glossary.md` | BRD terms + domain language | PM agent |
 
@@ -17,4 +17,4 @@ Rules:
   references screens, it does not restate them.
 
 First command of the project (PM agent):
-`/epic-breakdown` after the SRS is approved — see `agent/workflows/epic-breakdown.md`.
+`/epic-breakdown` after the SRS is approved — see `harness/workflows/epic-breakdown.md`.

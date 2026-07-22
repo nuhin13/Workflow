@@ -44,16 +44,16 @@ shipped code                  every commit traces back to a BRD line
 | **Constitution** | `AGENTS.md` | 16 always-on rules every agent obeys every turn + the phased pipeline and ID conventions |
 | **Adapter** | `CLAUDE.md` (+ others) | Platform-specific glue pointing at AGENTS.md |
 | **Policy** | `harness.yaml` | Platforms, model tiers, budgets, WIP limit, human gates — "org code" |
-| **Roles** | `agent/agents/` | 10 role cards / subagents: pm, team-lead (delivery planner), orchestrator, qa, devops, developer-backend, developer-frontend + pipeline roles analyst, designer, architect. Each defines boundaries: what it may do, what it must hand off. Mirrored at `.claude/agents` (symlink) |
-| **Workflows** | `agent/workflows/` | 12 step-by-step processes: epic-breakdown, implement-task, qa-review, handoff-freeze/resume, retro, release, rollback triggers… Start with `_handoff_protocol.md` |
-| **Skills** | `agent/skills/` | 35 on-demand skills: 16 pipeline drivers (/kickoff /brd /prd /features /forecast /design /trace /tech-plan /dev-plan /epic /build /qa /checkpoint /status /question /lesson) + capability manuals (SRS/EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization…). Mirrored at `.claude/skills` (symlink); loaded only when needed |
+| **Roles** | `harness/agents/` | 10 role cards / subagents: pm, team-lead (delivery planner), orchestrator, qa, devops, developer-backend, developer-frontend + pipeline roles analyst, designer, architect. Each defines boundaries: what it may do, what it must hand off. Mirrored at `.claude/agents` (symlink) |
+| **Workflows** | `harness/workflows/` | 12 step-by-step processes: epic-breakdown, implement-task, qa-review, handoff-freeze/resume, retro, release, rollback triggers… Start with `_handoff_protocol.md` |
+| **Skills** | `harness/skills/` | 35 on-demand skills: 16 pipeline drivers (/kickoff /brd /prd /features /forecast /design /trace /tech-plan /dev-plan /epic /build /qa /checkpoint /status /question /lesson) + capability manuals (SRS/EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization…). Mirrored at `.claude/skills` (symlink); loaded only when needed |
 | **Pipeline artifacts** | `templates/` → `project/` | Phase 0–4 artifacts (BRD/PRD/features/forecast, design system + screens, traceability matrix, tech plan, dev plan) — each starts from its template (see `templates/README.md`) |
 | **Work items** | `epics/` | Epic dirs with `epic.md`, `tracker.md`, `tasks/*.md`, `metrics.csv`. Templates in `epics/_templates/` |
-| **Orchestrator** | `agent/orchestrator/` | `scheduler.py` (DAG + picker), `metrics_collect.py` / `metrics_report.py` (cost), `dashboard_build.py` (HTML board), `ratelimit_guard.py` (freeze trigger) |
-| **Adapters (exec)** | `agent/adapters/` | `run-claude.sh`, `run-codex.sh`, `run-opencode.sh` — same prompt in, session + cost JSON out into `runs/` |
-| **Handoffs** | `agent/handoffs/` | Freeze packets (YAML) for cross-platform resume |
-| **Memory** | `agent/memory/` + `memory/state.yaml` | `decisions/` (ADRs), `lessons/` (retro output), `graphiti/` (optional temporal knowledge graph); `memory/state.yaml` is the pipeline position any platform resumes from |
-| **Hooks** | `agent/hooks/` | Git hooks: strip AI co-author trailers, block direct pushes to main/development. Statusline script for rate-limit visibility |
+| **Orchestrator** | `harness/orchestrator/` | `scheduler.py` (DAG + picker), `metrics_collect.py` / `metrics_report.py` (cost), `dashboard_build.py` (HTML board), `ratelimit_guard.py` (freeze trigger) |
+| **Adapters (exec)** | `harness/adapters/` | `run-claude.sh`, `run-codex.sh`, `run-opencode.sh` — same prompt in, session + cost JSON out into `runs/` |
+| **Handoffs** | `harness/handoffs/` | Freeze packets (YAML) for cross-platform resume |
+| **Memory** | `harness/memory/` + `memory/state.yaml` | `decisions/` (ADRs), `lessons/` (retro output), `graphiti/` (optional temporal knowledge graph); `memory/state.yaml` is the pipeline position any platform resumes from |
+| **Hooks** | `harness/hooks/` | Git hooks: strip AI co-author trailers, block direct pushes to main/development. Statusline script for rate-limit visibility |
 | **Run logs** | `runs/<task-id>/` | Every headless run's session JSON + cost — the audit trail |
 
 ## 3. Project management (built in — no Jira needed)
@@ -126,9 +126,9 @@ file + git — never through chat history.
 
 | Platform | Reads the constitution via | Headless run |
 |---|---|---|
-| Claude Code | `CLAUDE.md` → `@AGENTS.md` | `agent/adapters/run-claude.sh <task-id> "<prompt>"` |
-| Codex CLI | `AGENTS.md` natively | `agent/adapters/run-codex.sh` (config: `agent/mcp/codex-config.example.toml`) |
-| OpenCode | `AGENTS.md` natively | `agent/adapters/run-opencode.sh` (config: `agent/mcp/opencode.example.json`) |
+| Claude Code | `CLAUDE.md` → `@AGENTS.md` | `harness/adapters/run-claude.sh <task-id> "<prompt>"` |
+| Codex CLI | `AGENTS.md` natively | `harness/adapters/run-codex.sh` (config: `harness/mcp/codex-config.example.toml`) |
+| OpenCode | `AGENTS.md` natively | `harness/adapters/run-opencode.sh` (config: `harness/mcp/opencode.example.json`) |
 | Cursor / other | `AGENTS.md` (open standard) | point it at the task file + AGENTS.md |
 
 Adapters capture session JSON + cost into `runs/<task-id>/` and append to the
@@ -138,7 +138,7 @@ epic's `metrics.csv` — so cross-platform spend stays comparable.
 
 ```
 Read AGENTS.md, then epics/E01-auth/tasks/E01-T03.md fully.
-Check agent/memory/lessons/ for the relevant area.
+Check harness/memory/lessons/ for the relevant area.
 Execute the task exactly per its checklist. Follow the git-flow skill:
 branch epic_01_task_03. Update frontmatter status + tracker as you go.
 ```
@@ -146,8 +146,8 @@ branch epic_01_task_03. Update frontmatter status + tracker as you go.
 ### Cross-platform handoff (rate limit / freeze)
 
 1. Statusline / `ratelimit_guard.py` detects ~80% of the platform window.
-2. Orchestrator runs `agent/workflows/handoff-freeze.md`: WIP-commit the
-   branch, write `agent/handoffs/<task-id>.yaml` from the template
+2. Orchestrator runs `harness/workflows/handoff-freeze.md`: WIP-commit the
+   branch, write `harness/handoffs/<task-id>.yaml` from the template
    (`next_step` and `last_test_status` are mandatory), set `status: frozen`.
 3. Next platform (fallback order in `harness.yaml: platforms`) runs
    `handoff-resume.md`: reads ONLY the packet + task file + AGENTS.md,
@@ -162,7 +162,7 @@ against single-model blind spots.
 `harness.yaml: model_tiers` — plan/review on the top tier (opus), default
 implementation on mid tier (sonnet), trivia (renames, boilerplate) on the
 cheap tier (haiku). Budgets warn at $5/task, $60/epic. Details:
-`agent/skills/token-optimization/SKILL.md`.
+`harness/skills/token-optimization/SKILL.md`.
 
 ## 5. The review chain (quality gates)
 
@@ -231,7 +231,7 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
 0. make hooks                      # install git hooks
    pip install -r requirements.txt # pyyaml for the scheduler
    git branch development main     # integration branch must exist
-   (.claude/skills and .claude/agents are already symlinked into agent/)
+   (.claude/skills and .claude/agents are already symlinked into harness/)
 1. Phase 0-3: /kickoff → /brd → /prd → /features → /forecast
    → /design → /trace → /tech-plan            → HUMAN approves each artifact
    PM agent: draft spec/srs.md from BRD/PRD (skills/srs-authoring)
@@ -256,7 +256,7 @@ state. That only works if every session follows the same ritual:
 1. `make validate` — never build on a broken DAG/frontmatter.
 2. Read the task file FULLY; find the first unchecked §12 item — that is
    your starting point (checklist = progress file; git log confirms it).
-3. Read the relevant `agent/memory/lessons/<area>.md`; Graphiti pull if
+3. Read the relevant `harness/memory/lessons/<area>.md`; Graphiti pull if
    connected (2 queries max, per skills/graphiti-memory).
 4. Resuming (frozen/blocked/changes-requested)? Re-run the last failing
    tests FIRST to re-anchor reality, then continue.
@@ -280,14 +280,14 @@ through the retro ladder — **never mid-epic, never without the human gate**:
 
 ```
 mistake observed
-  → LESSON  agent/memory/lessons/<area>.md   (retro writes; 1st occurrence)
+  → LESSON  harness/memory/lessons/<area>.md   (retro writes; 1st occurrence)
     → RULE  fold into SKILL.md / role card   (recurrence ≥2; drafted AS A
              DIFF at /retro; 🧍 human approves — skills are code)
-      → HOOK agent/hooks/ deterministic check (must-be-enforced tier)
+      → HOOK harness/hooks/ deterministic check (must-be-enforced tier)
 ```
 
 - **Adding a brand-new skill after an epic:** follow
-  `agent/skills/skill-authoring/SKILL.md` — create the folder, wire it into
+  `harness/skills/skill-authoring/SKILL.md` — create the folder, wire it into
   the role cards' `skills:` lists + the workflow step that uses it, update
   the §2 table here, PR with human approval. A skill that isn't wired into
   a role or workflow doesn't exist.
@@ -320,7 +320,7 @@ The price is ceremony (§7.1) — by design.
 Green before first feature epic:
 - [ ] git hooks installed (`make hooks`) and `development` branch exists
 - [ ] `.claude/skills` symlink (Claude Code) · statusline wired to
-      `agent/hooks/statusline-ratelimit.sh`
+      `harness/hooks/statusline-ratelimit.sh`
 - [ ] `.env` with MCP secrets (never committed); `/mcp` shows required
       servers healthy — degraded fallbacks per skills/mcp-connections
 - [ ] Figma URL pasted into `docs/design/README.md`

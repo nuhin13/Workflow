@@ -33,4 +33,4 @@ Matrix rows correct for this work? Discrepancies filed: D-### / none
 |---|---|---|---|---|
 
 ## 7. Lessons proposed
-Lesson (L-<area>-###) candidates for `agent/memory/lessons/`, if any.
+Lesson (L-<area>-###) candidates for `harness/memory/lessons/`, if any.

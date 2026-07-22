@@ -7,7 +7,7 @@ The Figma design is **law** for all UI work (the frontend equivalent of
   Claude-native via `/design` — tokens, components, HTML prototype)
 - **Access:** agents pull frames/tokens via the Figma MCP server declared in
   `.mcp.json` (local Dev-Mode server from the Figma desktop app, or the remote
-  `https://mcp.figma.com/mcp`). Setup: `agent/mcp/figma.md`.
+  `https://mcp.figma.com/mcp`). Setup: `harness/mcp/figma.md`.
 - **Fallback:** export key screens as PNGs into this folder if MCP is
   unavailable; name them `<screen>-<state>.png`.
 

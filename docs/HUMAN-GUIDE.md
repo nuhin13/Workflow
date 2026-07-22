@@ -44,7 +44,7 @@ Task/epic text report: `make metrics` (`make metrics-json` for automation).
 bad task merged → revert that one squash commit on the epic branch.
 bad epic in dev → revert its merge commit on dev.
 bad release → **redeploy the previous vX.Y.Z tag first**, then revert on main.
-Details: agent/skills/rollback/SKILL.md
+Details: harness/skills/rollback/SKILL.md
 
 ## Daily driving (three commands)
 `make status` — the board · `make next` — what runs now (add LAYER=frontend

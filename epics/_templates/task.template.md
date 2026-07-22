@@ -109,7 +109,7 @@ functions:
 > Check items off **as you complete them** and append the short commit hash
 > (`a1b2c3d`). Multiple items may share one commit; one item may list several
 > hashes; `(uncommitted)` only until the next commit — never hand off with it.
-> See `agent/workflows/_handoff_protocol.md` §3b.
+> See `harness/workflows/_handoff_protocol.md` §3b.
 - [ ] tests written FIRST and failing (red) per EARS/UC ids
 - [ ] <granular step>
 - [ ] <granular step>
@@ -155,7 +155,7 @@ functions:
 
 ## 18. Handoff (only if status: blocked or frozen — protocol §3/§3A)
 - What was tried / Why blocked / What's needed to unblock / Suggested next
-- (rate-limit freeze: packet at `agent/handoffs/<id>.yaml` is mandatory)
+- (rate-limit freeze: packet at `harness/handoffs/<id>.yaml` is mandatory)
 
 ## Open Questions
 > Agent appends a question on a real spec gap and STOPS (small ambiguities: simplest

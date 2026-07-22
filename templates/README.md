@@ -36,6 +36,6 @@ Templates that live elsewhere (single canonical home, do not duplicate here):
 | Feature epic | `epics/_templates/epic.template.md` |
 | Task spec | `epics/_templates/task.template.md` |
 | Epic tracker | `epics/_templates/tracker.template.md` |
-| ADR | `agent/memory/decisions/ADR-0000-template.md` |
-| Lesson entry | `agent/memory/lessons/_template.md` |
-| Rate-limit freeze handoff | `agent/handoffs/_template.handoff.yaml` |
+| ADR | `harness/memory/decisions/ADR-0000-template.md` |
+| Lesson entry | `harness/memory/lessons/_template.md` |
+| Rate-limit freeze handoff | `harness/handoffs/_template.handoff.yaml` |

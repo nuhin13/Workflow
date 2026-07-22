@@ -9,5 +9,5 @@ automatically. Open it in any browser.
 
 **What it does NOT cover.** It is read-only and generated — never edit
 `index.html` by hand (it is gitignored; the builder is
-`agent/orchestrator/dashboard_build.py`). Changing state happens in task
+`harness/orchestrator/dashboard_build.py`). Changing state happens in task
 files and `memory/state.yaml`, never here.

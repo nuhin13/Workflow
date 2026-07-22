@@ -3,7 +3,7 @@
 > This file is the single cross-tool entry point (the AGENTS.md open standard).
 > Claude Code, Codex CLI, OpenCode, Cursor and others read this file natively or via
 > a thin adapter (see CLAUDE.md). Keep it SHORT — it is loaded on every turn.
-> Everything detailed lives under `agent/` and is loaded on demand.
+> Everything detailed lives under `harness/` and is loaded on demand.
 
 ## What this repository is
 
@@ -12,13 +12,13 @@ builds products, not a product itself. The product under construction is
 defined by `docs/business/BRD.md` (business source of truth; `spec/srs.md`,
 once generated and approved, is canonical for build). The UI reference is the
 design canon in `docs/design/README.md` (Figma when linked). Work flows
-through a phased pipeline (skills in `agent/skills/`, `/name` on Claude Code):
+through a phased pipeline (skills in `harness/skills/`, `/name` on Claude Code):
 
 ```
 Phase 0 business   /kickoff /brd /prd /features /forecast → docs/business/BRD.md · project/00-business/
 Phase 1 design     /design                                → project/01-design/ (Figma is law when linked)
 Phase 2 trace      /trace                                 → project/02-traceability/matrix.md (kept live forever)
-Phase 3 tech plan  /tech-plan                             → project/03-technical/ · ADRs in agent/memory/decisions/
+Phase 3 tech plan  /tech-plan                             → project/03-technical/ · ADRs in harness/memory/decisions/
 Phase 4 dev plan   /dev-plan /epic                        → project/04-plan/ · spec/srs.md · epics/E<NN>/
 Phase 5 build loop /build → /qa → /checkpoint (per epic)  → QA-gated PRs ──▶ development ──▶ main
 ```
@@ -60,13 +60,13 @@ table.
 6. **Stay in scope.** Each task file lists `What NOT to do`. Respect it. Do not
    refactor unrelated code, do not upgrade dependencies, do not "improve" things
    outside the task. Each ROLE also has a declared write scope
-   (`harness.yaml: write_scopes`, validator-enforced); harness files (agent/,
+   (`harness.yaml: write_scopes`, validator-enforced); harness files (harness/,
    AGENTS.md, templates/…) change only via lesson promotion or
    skills/skill-authoring with human approval (`harness_change_policy`).
 7. **Log everything.** Every headless run is stored under `runs/<task_id>/`.
    Every completed task appends a row to its epic's `metrics.csv`.
 8. **Memory before work.** Before starting a task: read its task file fully,
-   check `agent/memory/lessons/` for the relevant area, and query Graphiti
+   check `harness/memory/lessons/` for the relevant area, and query Graphiti
    (if connected) for decisions touching the same files/APIs.
 9. **Commit style.** Conventional commits, message references the task id:
    `feat(E03-T07): add refresh-token endpoint`. No AI co-author trailers
@@ -78,7 +78,7 @@ table.
     blocked, frozen. Lanes (`layer:`): backend, frontend, cli, infra, docs,
     cross-cutting — parallel streams pull one lane via `make next LAYER=...`.
 12. **Peer review.** `reviewed_by` must be a DIFFERENT agent/model than
-    `executed_by` (see `agent/workflows/_handoff_protocol.md` §2), then the
+    `executed_by` (see `harness/workflows/_handoff_protocol.md` §2), then the
     QA gate, then human `verified`.
 13. **Foundational choices are HUMAN decisions.** Stack, language, framework,
     architecture style, datastore, queue, and auth strategy are chosen by the
@@ -106,19 +106,19 @@ table.
 | Need | Read |
 |---|---|
 | How the whole harness works (start here) | `docs/harness-guide.md` |
-| Your role & boundaries | `agent/agents/<role>.md` |
-| How to do a process (breakdown, retro, handoff…) | `agent/workflows/` (start: `_handoff_protocol.md`) |
-| A specific capability (git flow, EARS, contracts…) | `agent/skills/<skill>/SKILL.md` |
+| Your role & boundaries | `harness/agents/<role>.md` |
+| How to do a process (breakdown, retro, handoff…) | `harness/workflows/` (start: `_handoff_protocol.md`) |
+| A specific capability (git flow, EARS, contracts…) | `harness/skills/<skill>/SKILL.md` |
 | The business requirements (source of truth) | `docs/business/BRD.md` |
 | UI work — the Figma design (UI is law) | `docs/design/README.md` |
-| Project-wide decisions / lessons | `agent/memory/decisions/`, `agent/memory/lessons/` |
+| Project-wide decisions / lessons | `harness/memory/decisions/`, `harness/memory/lessons/` |
 | The human operator's playbook | `docs/HUMAN-GUIDE.md` |
 | Pipeline position / resume point | `memory/state.yaml` (then `/status`) |
 | Canonical artifact templates | `templates/` · `epics/_templates/` |
 | Product workspace (phase artifacts) | `project/00-business/ … 04-plan/` |
 | Epics & task specs (the work queue) | `epics/E<NN>/` |
 | Current work queue | `make next` (scheduler) |
-| External platforms (Figma, DB, Jira, Slack, Graphiti) | `agent/mcp/README.md` |
+| External platforms (Figma, DB, Jira, Slack, Graphiti) | `harness/mcp/README.md` |
 
 ## Project conventions (filled by Epic 00 — keep updated)
 
