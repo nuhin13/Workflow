@@ -3,7 +3,7 @@
 
 Usage:
   python3 harness/orchestrator/scheduler.py --validate
-  python3 harness/orchestrator/scheduler.py --next [--limit N] [--layer L] [--tight]
+  python3 harness/orchestrator/scheduler.py --next [--platform P] [--limit N] [--layer L] [--tight]
   python3 harness/orchestrator/scheduler.py --status
   python3 harness/orchestrator/scheduler.py --review-queue
 
@@ -24,6 +24,7 @@ except ImportError:
 
 sys.path.insert(0, os.path.dirname(__file__))
 from paths import ROOT, abspath, load_config, root_rel
+from dispatch_policy import PLATFORMS, TIERS, resolve_model
 
 MOSCOW = {"must": 0, "should": 1, "could": 2, "wont": 3}
 TIER = {"S": 0, "M": 1, "L": 2}
@@ -85,8 +86,9 @@ def load_active_epic():
     return str(current).strip() if current is not None and str(current).strip() else None
 
 
-def validate(epics, tasks):
+def validate(epics, tasks, cfg=None):
     errs = []
+    cfg = cfg or load_config()
     for tid, t in tasks.items():
         for d in deps(t):
             if d not in tasks and d not in epics:
@@ -95,6 +97,10 @@ def validate(epics, tasks):
             errs.append(f"{tid}: unknown status '{t.get('status')}'")
         if t.get("status") == "todo" and not (t.get("traces_to") or t.get("type") == "genesis"):
             errs.append(f"{tid}: missing traces_to (spec is law)")
+        tier = str(t.get("tier") or "")
+        if tier not in TIERS:
+            errs.append(f"{tid}: tier '{tier or '<missing>'}' must be "
+                        f"one of {sorted(TIERS)}")
     children = {k: [] for k in tasks}
     indeg = {k: 0 for k in tasks}
     for k, t in tasks.items():
@@ -112,6 +118,13 @@ def validate(epics, tasks):
     if seen != len(tasks):
         errs.append(f"dependency CYCLE among {len(tasks) - seen} task(s)")
     return errs, children
+
+
+def dispatch_count(pick_count, slots, limit=0):
+    if limit < 0:
+        raise ValueError("--limit cannot be negative")
+    requested = limit if limit else slots
+    return min(pick_count, slots, requested)
 
 
 def chain_len(tid, children, memo):
@@ -176,11 +189,14 @@ def main():
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--review-queue", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--platform", choices=sorted(PLATFORMS), default=None,
+                    help="active worker platform; required when tasks are dispatchable")
     ap.add_argument("--layer", default=None, help="backend|frontend|cli|infra|docs|cross-cutting")
     ap.add_argument("--tight", action="store_true", help="rate-limit window low: prefer small tasks")
     a = ap.parse_args()
     epics, tasks = load()
-    errs, children = validate(epics, tasks)
+    cfg = load_config()
+    errs, children = validate(epics, tasks, cfg)
 
     if a.status:
         show_status(epics, tasks); sys.exit(0)
@@ -215,18 +231,42 @@ def main():
         epics, tasks, children, active_epic=active_epic,
         layer=a.layer, tight=a.tight,
     )
-    wip = 3
-    cfg = load_config()
     wip = int(((cfg.get("scheduler") or {}).get("wip_limit_parallel_agents")) or 3)
     slots = max(0, wip - in_flight)
-    n = min(len(picks), a.limit or slots or 1)
-    result = [{"task": tid, "epic": tasks[tid]["_epic"], "layer": tasks[tid].get("layer", ""),
-               "model": tasks[tid].get("model", "sonnet"),
-               "owner": tasks[tid].get("owner_agent", "developer-backend"),
-               "preferred_agent": tasks[tid].get("preferred_agent", "any"),
-               "path": tasks[tid]["_path"]} for tid in picks[:n]]
+    try:
+        n = dispatch_count(len(picks), slots, a.limit)
+    except ValueError as e:
+        print(f"harness: {e}", file=sys.stderr)
+        sys.exit(2)
+
+    platform = a.platform or os.environ.get("HARNESS_PLATFORM")
+    if n and not platform:
+        print("harness: dispatchable tasks require --platform or "
+              "HARNESS_PLATFORM; no platform is the default", file=sys.stderr)
+        sys.exit(1)
+    result = []
+    for tid in picks[:n]:
+        task = tasks[tid]
+        tier = str(task.get("tier") or "")
+        try:
+            model = resolve_model(cfg, tier, platform)
+        except RuntimeError as e:
+            print(f"harness: {tid}: {e}", file=sys.stderr)
+            sys.exit(1)
+        result.append({
+            "task": tid,
+            "epic": task["_epic"],
+            "layer": task.get("layer", ""),
+            "platform": platform,
+            "tier": tier,
+            "model": model,
+            "owner": task.get("owner_agent", "developer-backend"),
+            "preferred_agent": task.get("preferred_agent", "any"),
+            "path": task["_path"],
+        })
     print(json.dumps({"active_epic": active_epic, "in_flight": in_flight,
-                      "wip_limit": wip, "next": result}, indent=2))
+                      "wip_limit": wip, "available_slots": slots,
+                      "next": result}, indent=2))
 
 
 if __name__ == "__main__":

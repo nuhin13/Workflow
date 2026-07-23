@@ -22,10 +22,10 @@ flowchart TB
 1. **Guard.** Read `workspace/state.yaml`. If a project is already set, STOP and
    ask — kickoff on a live project is destructive.
 
-2. **Prerequisites gate (hard-block · ADR-0001 D-5).** Both must exist before
-   anything else; there is no `--no-ui` escape. The gate checks *existence*,
-   not quality — a screenshot set is a legitimate UI reference.
-   - **BRD** at `workspace/docs/business/BRD.md` (real content, not the placeholder).
+2. **Prerequisites gate (hard-block · HADR-0001 D-5).** Both must be real,
+   human-approved entry artifacts before anything else; there is no `--no-ui`
+   escape. A screenshot set is legitimate, but placeholder text is not.
+   - **BRD** at `workspace/docs/business/BRD.md` (approved content, not the placeholder).
    - **UI reference** — any one accepted form
      (`harness.yaml: prerequisites.ui_reference_forms`):
 
@@ -37,9 +37,10 @@ flowchart TB
      | Stitch export | imported like an HTML prototype |
      | Screenshots | lowest fidelity; tokens inferred, gaps raised as `Q-###` |
 
-   Missing either → STOP and tell the human exactly what to supply.
+   Missing, placeholder, or unapproved either → STOP and tell the human
+   exactly what to supply.
 
-3. **Recommend a profile, human picks (rule 13 · ADR-0001 D-1..D-3).** Read the
+3. **Recommend a profile, human picks (rule 13 · HADR-0001 D-1..D-3).** Read the
    signals — team size · regulated domain? · money/PII handling? · forecast
    scale · integration count · expected lifetime — then recommend ONE profile
    with your reasons and STOP for the human to pick. Never auto-select.
@@ -53,7 +54,7 @@ flowchart TB
    | `medium` | real product · solo or 2–3 people · real users · not regulated · no high-stakes money/auth | TireBook (fuel logger) |
    | `large` | real product with several integrations or a broad surface · small team · light compliance | a SaaS wiring 3+ external APIs |
    | `extra-large` | serious money/auth/PII · staged releases · several devs in parallel · needs a `development` integration branch | a pre-enterprise payments app |
-   | `enterprise` | regulated (health/finance) · external audit · multi-team · every task independently QA'd, PRs mandatory | a bank / healthcare platform |
+   | `enterprise` | regulated (health/finance) · external audit · multi-team · strongest epic QA, PRs mandatory | a bank / healthcare platform |
 
    Each profile decides phases, human gates, review depth, git tiers, and QA
    depth (`harness.yaml: profiles`). The pick is recorded in `harness.yaml:

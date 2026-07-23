@@ -29,7 +29,7 @@ workspace/epics/E00-genesis/            stack · architecture · walking skeleto
         │  human decides ADRs (rule 13), exit gate locks E00
         ▼
 workspace/epics/E01…/tasks/*.md         sharded tasks (files, contracts, EARS, DoD)
-        │  make next → scheduler picks → agent implements on task branch
+        │  make next PLATFORM=… → scheduler resolves model → task branch
         ▼
 QA-gated PRs                  peer AI review (different model) + QA gate
         │  human gateway: epic → development, development → main
@@ -97,8 +97,8 @@ files:                  # the contract — rule 5
 
 ```
 make status     # per-epic progress board (counts per status)
-make next       # scheduler picks next task(s) — JSON with task/model/owner
-make next LAYER=frontend   # pull one lane only (parallel streams)
+make next PLATFORM=codex   # JSON with task/platform/tier/resolved model/owner
+make next PLATFORM=codex LAYER=frontend   # pull one lane only
 make review     # tasks waiting on peer/QA review
 make validate   # DAG sanity: unknown deps, cycles, missing traces_to
 make dashboard  # rebuild workspace/dashboard/index.html (cost + progress board)
@@ -160,9 +160,10 @@ against single-model blind spots.
 
 ### Model routing (cost control)
 
-`harness.yaml: model_tiers` — plan/review on the top tier (opus), default
-implementation on mid tier (sonnet), trivia (renames, boilerplate) on the
-cheap tier (haiku). Budgets warn at $5/task, $60/epic. Details:
+`harness.yaml: model_tiers` maps portable `deep`/`build`/`cheap` intent to
+an explicit model on the active platform. The scheduler and adapters stop when
+a mapping is unset; no CLI default or cross-vendor fallback is allowed.
+Budgets warn at $5/task, $60/epic. Details:
 `harness/skills/token-optimization/SKILL.md`.
 
 ## 5. The review chain (quality gates)
@@ -241,7 +242,7 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
 5. Genesis epic E00 consumes the accepted ADRs → walking skeleton built
    → HUMAN verifies the E00 exit gate
 6. Team Lead updates AGENTS.md "Project conventions" placeholders
-7. First feature wave: shard → make next → implement → review → merge
+7. First feature wave: shard → make next PLATFORM=… → implement → review → merge
 8. After each epic: /retro → lessons → promotions (HUMAN approves)
 ```
 

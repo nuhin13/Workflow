@@ -1,20 +1,23 @@
 # Platform adapters — one interface, many CLIs
 
-Each adapter: `run-<platform>.sh <TASK_ID> "<prompt>"` →
+Task mode: `run-<platform>.sh <TASK_ID> "<prompt>"`.
+Pipeline-role mode: `run-<platform>.sh <RUN_ID> "<prompt>" <role>` (for
+example, `run-claude.sh phase-design "/design" designer`). Each mode:
 1. runs the CLI headless, 2. saves the raw result to `workspace/runs/<TASK_ID>/`,
-3. stamps tokens+cost into the epic's `metrics.csv` via metrics_collect.py.
+3. resolves the portable tier to an explicit platform model and generates a
+   role-filtered MCP config;
+4. in task mode, stamps tokens, cost, and CLI exit code into the epic's
+   `metrics.csv` even when the CLI run fails. Role-mode phase runs keep their
+   audit files under `workspace/runs/<RUN_ID>/` without an epic metrics row.
 
-⚠️ **Model routing is advisory, not enforced.** No adapter passes a model
-flag — each CLI uses its own configured default. A task's `tier:`
-(`plan_review|implement|trivial`) and the legacy `model:` field record
-INTENT only; `harness.yaml → model_tiers` maps each tier to a per-platform
-model so that intent survives a platform switch. To actually bind a model,
-export the platform's flag var, e.g.
-`HARNESS_CLAUDE_FLAGS='--model opus'` or `HARNESS_CODEX_FLAGS='--model <id>'`.
-Note `model: opus` is Claude vocabulary and means nothing to codex/opencode —
-that is why `tier:` is the portable field.
+**Routing and MCP scope are enforced.** A task carries only `tier:
+deep|build|cheap`. Before launch, `dispatch_policy.py` resolves that tier
+through `harness.yaml: model_tiers`, passes the resulting model explicitly,
+and generates MCP configuration from the owner role's `mcp:` allowlist. An
+unset model mapping or unknown MCP server stops the run. The policy and
+generated MCP config are stored beside the raw result for audit.
 
-⚠️ CLI flags evolve fast. Each script marks the flags to VERIFY against the
+CLI flags evolve fast. Each script marks the flags to VERIFY against the
 tool's current `--help` before first use. Cost capture quality differs:
 - claude-code: authoritative `total_cost_usd` in result JSON ✅
 - codex: `codex exec --json` emits token_count JSONL events; the collector

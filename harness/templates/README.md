@@ -13,11 +13,10 @@ template; keep every section, write `N/A — reason` rather than deleting.
 |---|---|---|
 | `business/` | brd.md · prd.md · feature-list.md · business-forecast.md | /brd /prd /features /forecast (analyst) |
 | `design/` | design-system.md · screen-spec.md | /design (designer) |
-| `plan/` | tech-plan.md · dev-plan.md · traceability-matrix.md | /tech-plan /dev-plan /trace |
+| `plan/` | adr.md · tech-plan.md · dev-plan.md · traceability-matrix.md | /tech-plan /dev-plan /trace |
 | `epic/` | epic-00-skeleton.md · epic.template.md · task.template.md · tracker.template.md | /dev-plan /epic /task-sharding (team-lead) |
 | `process/` | handoff.md · discrepancy-note.md · open-questions.md · checkpoint.md · qa-report.md | every agent · /question /checkpoint /qa |
 
-**What it does NOT cover.** ADR and lesson templates keep their single homes
-next to their data (`harness/memory/decisions/ADR-0000-template.md`,
-`harness/memory/lessons/_template.md`), and the rate-limit freeze packet lives
+**What it does NOT cover.** The lesson template stays with reusable lessons
+(`harness/memory/lessons/_template.md`), and the rate-limit freeze packet lives
 with its handler (`harness/handoffs/_template.handoff.yaml`).

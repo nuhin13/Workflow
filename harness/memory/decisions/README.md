@@ -1,6 +1,8 @@
-# Decision Records (ADRs)
+# Harness Decision Records (HADRs)
 
-Every genesis decision and every architecture tradeoff lives here as an ADR.
-Decisions change ONLY via a new ADR that supersedes the old one — never edit
-history. Human approval required before status becomes `accepted`.
-Files: `ADR-0001-<slug>.md`, numbered, immutable once accepted.
+This directory records decisions about the reusable harness itself. Harness
+decisions use `HADR-NNNN` so they can never collide with a product's ADRs.
+They change only through a new superseding HADR with human approval.
+
+Product architecture decisions use `ADR-NNNN` and live in
+`workspace/plan/03-technical/decisions/`.

@@ -16,7 +16,7 @@ Complements scheduler.py --validate (DAG, statuses, traces_to presence) with:
 Exit 1 on errors; warnings don't fail the run.
 Usage: python3 harness/orchestrator/validate_harness.py [--strict]
 """
-import argparse, glob, os, re, sys
+import argparse, glob, json, os, re, sys
 
 try:
     import yaml
@@ -28,6 +28,7 @@ from paths import ROOT, abspath, load_config
 
 TASK_ID = re.compile(r"^E\d{2}-[TB]\d{2}$")
 EPIC_ID = re.compile(r"^E\d{2}$")
+QUESTION_ID = re.compile(r"^Q-\d{3}$")
 TRACE_ID = re.compile(
     r"^(BR-\d{3}|FR-\d{3}|FR-[A-Z0-9]+-\d{1,3}|NFR-[A-Z0-9]+-\d{1,3}|FT-\d{3}"
     r"|SCR-\d{3}|FC-\d{3}|ADR-\d{3,4}|UC-[\d.]+|EARS-[A-Z0-9]+-\d+|Module-\d+)$"
@@ -93,6 +94,13 @@ def check_pipeline_profiles(errs, warns):
     dependencies = cfg.get("phase_dependencies") or {}
     pipeline = cfg.get("pipeline") or {}
     profiles = cfg.get("profiles") or {}
+    review_modes = {
+        "self-review only",
+        "peer_on_code_light_on_docs",
+        "peer_on_all_code",
+        "peer_on_every_task",
+    }
+    qa_modes = {"epic_sweep_plus_high_risk"}
 
     if not order:
         errs.append("harness.yaml: phase_order must define the executable pipeline")
@@ -116,6 +124,17 @@ def check_pipeline_profiles(errs, warns):
                             "must appear earlier in phase_order")
 
     for profile, policy in profiles.items():
+        if not isinstance(policy, dict):
+            errs.append(f"harness.yaml: profile '{profile}' policy must be a mapping")
+            continue
+        review_mode = policy.get("review")
+        qa_mode = policy.get("qa")
+        if review_mode not in review_modes:
+            errs.append(f"harness.yaml: profile '{profile}' review '{review_mode}' is invalid; "
+                        "review controls peer depth and must not encode QA gates")
+        if qa_mode not in qa_modes:
+            errs.append(f"harness.yaml: profile '{profile}' qa '{qa_mode}' is invalid; "
+                        "QA is epic-wide plus high-risk tasks only")
         phases = policy.get("phases") if isinstance(policy, dict) else None
         if not isinstance(phases, list):
             errs.append(f"harness.yaml: profile '{profile}' phases must be an explicit list")
@@ -137,6 +156,38 @@ def check_pipeline_profiles(errs, warns):
             errs.append(f"harness.yaml: profile '{profile}' can build without srs_approval")
 
 
+def check_mcp_allowlists(errs, warns):
+    registry_path = os.path.join(ROOT, "harness", "mcp", "servers.json")
+    project_path = os.path.join(ROOT, ".mcp.json")
+    try:
+        with open(registry_path, encoding="utf-8") as f:
+            registry_data = json.load(f)
+        registry = registry_data.get("mcpServers") or {}
+    except (OSError, json.JSONDecodeError) as e:
+        errs.append(f"harness/mcp/servers.json: invalid MCP registry ({e})")
+        return
+    if not isinstance(registry, dict):
+        errs.append("harness/mcp/servers.json: mcpServers must be a mapping")
+        return
+    try:
+        with open(project_path, encoding="utf-8") as f:
+            project = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        errs.append(f".mcp.json: invalid fail-closed project config ({e})")
+        project = {}
+    if (project.get("mcpServers") or {}):
+        errs.append(".mcp.json: project scope must stay empty; adapters generate "
+                    "role-filtered configs from harness/mcp/servers.json")
+
+    for path in sorted(glob.glob(os.path.join(ROOT, "harness", "agents", "*.md"))):
+        if os.path.basename(path) == "README.md":
+            continue
+        data = frontmatter(path) or {}
+        unknown = sorted(set(data.get("mcp") or []) - set(registry))
+        if unknown:
+            errs.append(f"{os.path.relpath(path, ROOT)}: unknown MCP servers {unknown}")
+
+
 def check_epics_tasks(errs, warns):
     for ep in sorted(glob.glob(abspath("epics", "E*", "epic.md"))):
         rel = os.path.relpath(ep, ROOT)
@@ -153,6 +204,9 @@ def check_epics_tasks(errs, warns):
             tid = str(t.get("id") or "")
             if not TASK_ID.match(tid):
                 errs.append(f"{trel}: task id '{tid}' does not match E<NN>-T<MM> / E<NN>-B<MM>")
+            tier = str(t.get("tier") or "")
+            if tier not in ("deep", "build", "cheap"):
+                errs.append(f"{trel}: tier '{tier or '<missing>'}' must be deep|build|cheap")
             for ref in t.get("traces_to") or []:
                 if not TRACE_ID.match(str(ref)):
                     errs.append(f"{trel}: traces_to id '{ref}' outside the constitution's ID grammar")
@@ -170,23 +224,50 @@ def check_epics_tasks(errs, warns):
                 errs.append(f"{trel}: status '{t.get('status')}' but no reviewed_by recorded")
 
 
-def load_scopes():
+def check_state_schema(errs, warns):
+    """State keeps blocker references only; question details belong to the register."""
+    path = abspath("state")
     try:
-        cfg = yaml.safe_load(open(os.path.join(ROOT, "harness.yaml"), encoding="utf-8")) or {}
-    except (OSError, yaml.YAMLError):
-        return {}, [], []
+        with open(path, encoding="utf-8") as state_file:
+            state = yaml.safe_load(state_file) or {}
+    except (OSError, yaml.YAMLError) as error:
+        errs.append(f"{os.path.relpath(path, ROOT)}: missing or invalid state ({error})")
+        return
+    if not isinstance(state, dict):
+        errs.append(f"{os.path.relpath(path, ROOT)}: state must be a mapping")
+        return
+    blockers = state.get("blockers") or []
+    if not isinstance(blockers, list):
+        errs.append(f"{os.path.relpath(path, ROOT)}: blockers must be a list of Q-### IDs")
+        return
+    seen = set()
+    for blocker in blockers:
+        if not isinstance(blocker, str) or not QUESTION_ID.fullmatch(blocker):
+            errs.append(f"{os.path.relpath(path, ROOT)}: blocker {blocker!r} must be an "
+                        "ID-only Q-### entry; details belong in workspace/open-questions.md")
+            continue
+        if blocker in seen:
+            errs.append(f"{os.path.relpath(path, ROOT)}: duplicate blocker ID '{blocker}'")
+        seen.add(blocker)
+
+
+def load_scopes():
+    cfg = load_config()
     ws = cfg.get("write_scopes") or {}
     shared = list(ws.get("shared") or [])
-    product = list(ws.get("product_code") or [])
+    groups = {
+        name: list(ws.get(name) or [])
+        for name in ("product_code", "test_code")
+    }
     roles = {}
     for role, paths in ws.items():
-        if role in ("shared", "product_code"):
+        if role == "shared" or role in groups:
             continue
         expanded = []
         for p in paths or []:
-            expanded.extend(product if p == "product_code" else [p])
+            expanded.extend(groups[p] if p in groups else [p])
         roles[role] = expanded
-    return roles, shared, product
+    return roles, shared, groups
 
 
 def check_write_scopes(errs, warns):
@@ -251,6 +332,7 @@ README_DIRS = [
     "harness/memory/graphiti", "harness/mcp", "harness/rates", "harness/docs",
     "harness/templates", "workspace", "workspace/docs", "workspace/docs/business",
     "workspace/docs/design", "workspace/plan", "workspace/assets",
+    "workspace/plan/03-technical/decisions",
     "workspace/epics", "workspace/spec", "workspace/dashboard", "workspace/runs",
 ]
 
@@ -284,7 +366,8 @@ def main():
     args = ap.parse_args()
     errs, warns = [], []
     for check in (check_agents, check_skills, check_pipeline_profiles,
-                  check_epics_tasks, check_write_scopes, check_lessons,
+                  check_mcp_allowlists,
+                  check_epics_tasks, check_state_schema, check_write_scopes, check_lessons,
                   check_readmes, check_path_refs):
         check(errs, warns)
     for w in warns:

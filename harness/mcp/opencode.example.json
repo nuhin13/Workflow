@@ -1,5 +1,5 @@
 {
-  "$comment": "Merge into opencode.json (project or global). Verify the schema against current OpenCode docs.",
+  "$comment": "Manual interactive setup only; not role-isolated. Headless harness runs use run-opencode.sh and generated allowlists. Verify against current OpenCode docs.",
   "mcp": {
     "graphiti": { "type": "remote", "url": "http://localhost:8000/mcp/", "enabled": true },
     "github":   { "type": "remote", "url": "https://api.githubcopilot.com/mcp/", "enabled": true },

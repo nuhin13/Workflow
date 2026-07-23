@@ -32,7 +32,8 @@ DEFAULT_PATHS = {
     "rates": "harness/rates/cost-config.yaml",
     "templates": "harness/templates/",
     "lessons": "harness/memory/lessons/",
-    "decisions": "harness/memory/decisions/",
+    "decisions": "workspace/plan/03-technical/decisions/",
+    "harness_decisions": "harness/memory/decisions/",
 }
 
 

@@ -117,15 +117,40 @@ def load_state():
 
 
 def load_questions():
-    """Open questions from configured question register — Q-### heading lines."""
+    """Load open Q-### entries from the central Markdown register."""
     path = abspath("questions")
     if not os.path.isfile(path):
         return []
+    with open(path, encoding="utf-8") as question_file:
+        lines = question_file.read().splitlines()
     out = []
-    for line in open(path, encoding="utf-8"):
+    columns = None
+    for line in lines:
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        normalized = [cell.lower().replace(" ", "_") for cell in cells]
+        if "id" in normalized and "question" in normalized and "status" in normalized:
+            columns = normalized
+            continue
+        if columns and line.lstrip().startswith("|") and not all(
+                re.fullmatch(r":?-{3,}:?", cell) for cell in cells):
+            row = dict(zip(columns, cells))
+            qid = row.get("id", "")
+            if re.fullmatch(r"Q-\d{3}", qid) and row.get("status", "").lower() != "answered":
+                out.append({
+                    "id": qid,
+                    "question": row.get("question", ""),
+                    "blocks": row.get("blocks", ""),
+                    "status": row.get("status", ""),
+                })
+            continue
         m = re.match(r"[#*\-\s|]*\**\s*(Q-\d{3})\**\s*[—:\-|]?\s*(.*)", line)
         if m and "answered" not in line.lower():
-            out.append((m.group(1), m.group(2).strip().strip("|").strip()[:110]))
+            out.append({
+                "id": m.group(1),
+                "question": m.group(2).strip().strip("|").strip(),
+                "blocks": "",
+                "status": "open",
+            })
     return out
 
 
@@ -343,26 +368,38 @@ def phases_html(state):
     return "".join(chips)
 
 
-def blockers_html(state):
+def blockers_html(state, questions):
     blockers = state.get("blockers") or []
     if not blockers:
         return ""
+    by_id = {question["id"]: question for question in questions}
     items = []
-    for b in blockers:
-        if isinstance(b, dict):
-            items.append(f'<li><span class="qid">{html.escape(str(b.get("id") or "?"))}</span>'
-                         f'{html.escape(str(b.get("question") or ""))} '
-                         f'<span class="blocks">blocks {html.escape(str(b.get("blocks") or "—"))}</span></li>')
+    for blocker_id in blockers:
+        qid = str(blocker_id)
+        question = by_id.get(qid)
+        if question:
+            items.append(
+                f'<li><span class="qid">{html.escape(qid)}</span>'
+                f'{html.escape(question.get("question") or "")} '
+                f'<span class="blocks">blocks '
+                f'{html.escape(question.get("blocks") or "—")}</span></li>'
+            )
         else:
-            items.append(f"<li>{html.escape(str(b))}</li>")
+            items.append(
+                f'<li><span class="qid">{html.escape(qid)}</span>'
+                '<span class="blocks">missing from question register</span></li>'
+            )
     return f'<section class="panel"><h2>⛔ blockers</h2><ul>{"".join(items)}</ul></section>'
 
 
 def questions_html(questions):
     if not questions:
         return ""
-    items = "".join(f'<li><span class="qid">{html.escape(q)}</span>{html.escape(t)}</li>'
-                    for q, t in questions[:12])
+    items = "".join(
+        f'<li><span class="qid">{html.escape(question["id"])}</span>'
+        f'{html.escape(question.get("question") or "")}</li>'
+        for question in questions[:12]
+    )
     return f'<section class="panel"><h2>❓ open questions</h2><ul>{items}</ul></section>'
 
 
@@ -490,7 +527,7 @@ def main():
             .replace("@@EPICS_HTML@@", "".join(epic_html(e, warn) for e in epics) or "<p>No epics yet — run /epic-breakdown.</p>")
             .replace("@@MODEL_TABLE@@", table)
             .replace("@@PHASES@@", phases_html(state))
-            .replace("@@BLOCKERS@@", blockers_html(state))
+            .replace("@@BLOCKERS@@", blockers_html(state, questions))
             .replace("@@QUESTIONS@@", questions_html(questions))
             .replace("@@HISTORY@@", history_html(state))
             .replace("@@NAV@@", nav_html())

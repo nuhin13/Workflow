@@ -13,7 +13,7 @@ For codex, reads `codex exec --json` JSONL events and sums `last_token_usage`
 from token_count events. Codex does not emit authoritative cost, so cost_usd is
 left empty unless the result shape starts emitting it later.
 CSV: workspace/epics/<EPIC>/metrics.csv
-  ts,task_id,platform,model,input,output,cache_read,cache_creation,cost_usd,duration_s,session_id
+  ts,task_id,platform,model,input,output,cache_read,cache_creation,cost_usd,duration_s,session_id,exit_code
 """
 import argparse, csv, datetime, glob, json, os, sys
 
@@ -21,7 +21,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 from paths import ROOT, abspath, root_rel
 
 HEADER = ["ts", "task_id", "platform", "model", "input", "output",
-          "cache_read", "cache_creation", "cost_usd", "duration_s", "session_id"]
+          "cache_read", "cache_creation", "cost_usd", "duration_s",
+          "session_id", "exit_code"]
 
 
 def pick(d, *keys, default=0):
@@ -124,6 +125,26 @@ def epic_dir(task_id):
     return hits[0]
 
 
+def ensure_schema(path):
+    """Add newly introduced audit columns to an existing metrics CSV."""
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
+        return HEADER
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        old_header = list(reader.fieldnames or [])
+        rows = list(reader)
+    fieldnames = old_header + [name for name in HEADER if name not in old_header]
+    if fieldnames == old_header:
+        return fieldnames
+    tmp = path + ".schema.tmp"
+    with open(tmp, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+    os.replace(tmp, path)
+    return fieldnames
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--task", required=True)
@@ -131,11 +152,13 @@ def main():
     ap.add_argument("--result", required=True)
     ap.add_argument("--no-cost", action="store_true", help="log run without token/cost fields")
     ap.add_argument("--model", default="")
+    ap.add_argument("--exit-code", type=int, default=0)
     a = ap.parse_args()
 
     row = dict.fromkeys(HEADER, "")
     row.update(ts=datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-               task_id=a.task, platform=a.platform, model=a.model)
+               task_id=a.task, platform=a.platform, model=a.model,
+               exit_code=str(a.exit_code))
 
     if not a.no_cost:
         try:
@@ -146,9 +169,10 @@ def main():
         collect_json_usage(data, row, a.model)
 
     path = os.path.join(epic_dir(a.task), "metrics.csv")
-    new = not os.path.exists(path)
+    new = not os.path.exists(path) or os.path.getsize(path) == 0
+    fieldnames = ensure_schema(path)
     with open(path, "a", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=HEADER)
+        w = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
         if new:
             w.writeheader()
         w.writerow(row)

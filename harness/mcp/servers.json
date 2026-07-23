@@ -1,0 +1,41 @@
+{
+  "$comment": "Central MCP registry. Adapters select only servers listed by the dispatched role.",
+  "mcpServers": {
+    "graphiti": {
+      "type": "http",
+      "url": "http://localhost:8000/mcp/"
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "atlassian": {
+      "type": "sse",
+      "url": "https://mcp.atlassian.com/v1/sse"
+    },
+    "figma": {
+      "type": "http",
+      "url": "http://127.0.0.1:3845/mcp"
+    },
+    "database": {
+      "command": "npx",
+      "args": ["-y", "@bytebase/dbhub", "--transport", "stdio", "--dsn", "${HARNESS_DB_DSN}", "--readonly"],
+      "env": {}
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "slack-mcp-server@latest", "--transport", "stdio"],
+      "env": {
+        "SLACK_MCP_XOXP_TOKEN": "${SLACK_MCP_XOXP_TOKEN}"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  }
+}

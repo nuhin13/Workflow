@@ -7,12 +7,13 @@ URL), and the agent pulls the actual spec for that node.
 
 ## Setup (local Dev Mode server — recommended)
 1. Open the Figma **desktop** app → Preferences → enable **Dev Mode MCP Server**.
-2. It serves at `http://127.0.0.1:3845/mcp` (already wired in `.mcp.json`).
+2. It serves at `http://127.0.0.1:3845/mcp` (registered in
+   `harness/mcp/servers.json`).
 3. Requires a seat with Dev Mode access on the file.
 
 ## Remote alternative
 `https://mcp.figma.com/mcp` (OAuth) — works without the desktop app; capability
-set differs slightly. Swap the URL in `.mcp.json` if you prefer remote.
+set differs slightly. Swap the registry URL if you prefer remote.
 
 ## How agents should use it
 - Resolve the task's `ui_reference` node → fetch component structure, variables

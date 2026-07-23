@@ -10,7 +10,7 @@ implements API A". Agents query it before tasks, write episodes after.
 2. Needs an LLM key for entity extraction (e.g. `OPENAI_API_KEY` or other
    supported provider) — extraction is LLM-heavy; keep `SEMAPHORE_LIMIT`
    modest and don't ingest noise.
-3. Endpoint in `.mcp.json`: `http://localhost:8000/mcp/` (verify against the
+3. Endpoint in `harness/mcp/servers.json`: `http://localhost:8000/mcp/` (verify against the
    repo README for your version — the server is still marked experimental and
    transport/paths have evolved).
 

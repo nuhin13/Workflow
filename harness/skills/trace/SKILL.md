@@ -17,7 +17,7 @@ description: Build or verify the BRD↔feature↔UI↔epic↔test traceability m
    - Epic/task not tracing to any FT (except E00) · done/verified rows without listed tests
    - Content drift: screen spec vs prototype vs built UI; BRD/PRD statements contradicted
      by later artifacts.
-   - **Version staleness (v2 · ADR-0001 D-4):** read `workspace/state.yaml: artifacts`.
+   - **Version staleness (v2 · HADR-0001 D-4):** read `workspace/state.yaml: artifacts`.
      For each artifact whose `derived_from: {X: n}` cites a version older than X's
      current version, mark it **stale** and report it — a BRD bump to v3 flags every
      v2-derived PRD/design/epic without a human remembering. Stale ≠ wrong, but it

@@ -2,7 +2,8 @@
 
 Central register (`workspace/open-questions.md` in a live project). Every `Q-###` in any
 artifact is also indexed here by `/question`. Blocking questions also live in
-`workspace/state.yaml → blockers`.
+`workspace/state.yaml → blockers` as IDs only (for example, `[Q-001]`).
+Question text, ownership, status, and blocking targets live only in this register.
 
 | ID | Question | Raised in | Blocks | Options + recommendation | Status | Answer |
 |---|---|---|---|---|---|---|

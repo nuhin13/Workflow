@@ -4,12 +4,13 @@
 PY := python3
 SCHED := $(PY) harness/orchestrator/scheduler.py
 LAYER ?=
+PLATFORM ?=
 
 .PHONY: next status review validate dashboard metrics metrics-json hooks help
 
 # ── Harness / tracker ─────────────────────────────────────────────────────────
-next:        ## next executable task(s); make next LAYER=frontend
-	$(SCHED) --next $(if $(LAYER),--layer $(LAYER),)
+next:        ## next executable task(s); make next PLATFORM=codex LAYER=frontend
+	$(SCHED) --next $(if $(PLATFORM),--platform $(PLATFORM),) $(if $(LAYER),--layer $(LAYER),)
 status:      ## per-epic progress board
 	$(SCHED) --status
 review:      ## tasks waiting for peer/QA review

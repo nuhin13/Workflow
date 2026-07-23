@@ -18,7 +18,7 @@ profiles:
     human_gates: [srs_approval, foundational_decisions, dev_plan_approval, release]
     review:    self-review only
     git:       { tiers: [main, task], require_pr: false }
-    qa:        risky_tasks_only
+    qa:        epic_sweep_plus_high_risk
   medium:                        # real product, solo / small team (TireBook)
     phases:    [business, design, srs, traceability, tech_plan, dev_plan, build]
     human_gates: [scope, srs_approval, foundational_decisions, dev_plan_approval, db_schema_migration, auth_or_payment_code, release]
@@ -34,15 +34,15 @@ profiles:
   extra-large:                   # near-enterprise, staged releases
     phases:    [business, design, srs, traceability, tech_plan, dev_plan, build]
     human_gates: [scope, srs_approval, foundational_decisions, dev_plan_approval, feature_epic_breakdown, epic_to_dev_merge, dev_to_main_merge, db_schema_migration, auth_or_payment_code, new_dependency, secrets_or_env_change, release]
-    review:    peer_plus_qa_on_code
+    review:    peer_on_all_code
     git:       { tiers: [main, development, epic, task], require_pr: false }
-    qa:        every_code_task
+    qa:        epic_sweep_plus_high_risk
   enterprise:                    # regulated, multi-team, external audit
     phases:    [business, design, srs, traceability, tech_plan, dev_plan, build]
     human_gates: [srs_approval, foundational_decisions, dev_plan_approval, epic00_exit_review, feature_epic_breakdown, epic_to_dev_merge, dev_to_main_merge, db_schema_migration, new_dependency, secrets_or_env_change, auth_or_payment_code, delete_over_50_lines, release]
-    review:    peer_plus_independent_qa_every_task
+    review:    peer_on_every_task
     git:       { tiers: [main, development, epic, task], require_pr: true }
-    qa:        every_task
+    qa:        epic_sweep_plus_high_risk
 
 # BRD + a UI reference are ENTRY conditions, not phase outputs (v2 · ADR-0001 D-5).
 prerequisites:
@@ -108,7 +108,8 @@ paths:
   workspace: workspace/plan/       # phase 0-4 artifacts (see workspace/plan/README.md)
   state: workspace/state.yaml      # pipeline position — resume point for any platform
   lessons: harness/memory/lessons/
-  decisions: harness/memory/decisions/
+  decisions: workspace/plan/03-technical/decisions/
+  harness_decisions: harness/memory/decisions/
 
 phase_order: [business, design, srs, traceability, tech_plan, dev_plan, build]
 phase_dependencies:               # validator-enforced minimum executable path
@@ -150,14 +151,16 @@ write_scopes:
   product_code:      # developers' code surface — E00 genesis REPLACES this
     - src/
     - tests/
+  test_code:         # independent verification may add tests, never implementation
+    - tests/
   analyst:     [workspace/docs/business/, workspace/plan/00-business/, workspace/assets/]
   designer:    [workspace/plan/01-design/, workspace/docs/design/, workspace/assets/design-imports/]
-  architect:   [workspace/plan/03-technical/, harness/memory/decisions/]
+  architect:   [workspace/plan/03-technical/]
   pm:          [workspace/spec/, workspace/epics/, workspace/plan/00-business/]
-  team-lead:   [workspace/plan/04-dev/, workspace/epics/, workspace/spec/, harness/memory/decisions/]
+  team-lead:   [workspace/plan/04-dev/, workspace/epics/, workspace/spec/]
   developer-backend:  [product_code, workspace/epics/]   # epics = own task file status/checklist only
   developer-frontend: [product_code, workspace/epics/]
-  qa:          [workspace/epics/, product_code]          # product_code = TESTS only (card rule)
+  qa:          [workspace/epics/, test_code]
   devops:      [.github/, infra/, docker/, Makefile, product_code]
   orchestrator: [workspace/state.yaml, workspace/epics/, workspace/dashboard/, workspace/runs/]
 

@@ -3,7 +3,7 @@
 A **reusable template** for building products with AI agents.
 
 This repo is not a product. It is the **machine that builds products**.
-You give it an idea (or a BRD). It drives the idea to shipped code —
+You give it an approved BRD and UI reference. It drives those inputs to shipped code —
 through specs, design, plans, and QA-gated builds. A human approves
 every important step.
 
@@ -142,7 +142,7 @@ flowchart TB
     S --> R["References load even later<br>(skill's references/ folder)"]
 ```
 
-- **Where**: all 35 skills live in `harness/skills/<name>/SKILL.md`.
+- **Where**: all 37 skills live in `harness/skills/<name>/SKILL.md`.
 - **When**: a pipeline step starts (`/brd`, `/qa`, …) or a capability is
   needed (git-flow, TDD, EARS, rate-limit handoff).
 - **Who**: each agent card lists its `skills:` — its usual toolbox.
@@ -158,14 +158,14 @@ flowchart LR
     subgraph EVERY_SESSION["Read at every session start"]
         ST["workspace/state.yaml<br>phase · epics · blockers · history"]
     end
-    subgraph LONG_TERM["Long-term memory (harness/memory/)"]
+    subgraph LONG_TERM["Reusable harness memory (harness/memory/)"]
         LE["lessons/&lt;area&gt;.md<br>L-area-nnn"]
-        AD["decisions/<br>ADRs"]
+        AD["decisions/<br>HADRs"]
         GR["graphiti/<br>optional knowledge graph"]
     end
     W[Work happens] -->|after every stage| ST
     W -->|QA fail, surprise, rework| LE
-    W -->|accepted decision| AD
+    W -->|accepted harness decision| AD
     LE -->|"recurs twice → promoted"| RULE["rule in a SKILL.md<br>then a git hook"]
 ```
 
@@ -220,7 +220,7 @@ Daily driving needs three commands:
 | Command | Question it answers |
 |---|---|
 | `make status` | where are we? |
-| `make next` | what runs now? |
+| `make next PLATFORM=codex` | what runs now, with explicit model routing? |
 | `make review` | what waits for review? |
 
 ---
@@ -238,15 +238,17 @@ git remote add template <this-template-repo-url>   # for /harness-sync
 make validate                     # both validators must pass
 ```
 
-**Step 1 — drop in what you already have** (all optional)
+**Step 1 — prepare the required entry artifacts**
 
-| You have | Put it at |
+| Required input | Put it at |
 |---|---|
-| BRD | `workspace/docs/business/BRD.md` |
-| Figma design | paste the URL in `workspace/docs/design/README.md` |
-| SRS | `workspace/spec/srs.md` |
+| Approved, non-placeholder BRD | `workspace/docs/business/BRD.md` |
+| Approved UI reference (Figma, prototype, generated design, Stitch export, or screenshots) | record it in `workspace/docs/design/README.md` |
 
-**Step 2 — run the pipeline** (Claude Code shown; any platform works)
+An existing SRS may be placed at `workspace/spec/srs.md`, but it must still
+pass `/srs-authoring` review and the human SRS approval gate.
+
+**Step 2 — after both entry artifacts are approved, run the pipeline**
 
 ```
 /kickoff "<your product idea>"
@@ -285,8 +287,9 @@ The harness improves through a fixed ladder — never by drive-by edits:
 5. Every harness change must pass `make validate` (DAG + constitution
    checks: IDs, frontmatter, peer rule, dead paths, lesson files).
 
-Structural changes (new roles, new phases) go through an ADR in
+Structural changes (new roles, new phases) go through a HADR in
 `harness/memory/decisions/` like any other significant decision.
+Product ADRs live separately in `workspace/plan/03-technical/decisions/`.
 
 **Across repos** (template ↔ your project repos), `/harness-sync` moves
 improvements both ways — each direction human-gated:

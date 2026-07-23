@@ -1,4 +1,4 @@
-# ADR-NNNN — <decision title>
+# ADR-NNNN — <product decision title>
 - status: proposed            # proposed → (human chooses) → accepted | imposed | superseded-by: ADR-NNNN
 - date: <YYYY-MM-DD> | proposed_by: <agent role> | decided_by: ⏳ <human> (pending)
 - traces_to: [SRS-x.y, E00-Txx, docs/domain/...]

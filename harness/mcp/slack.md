@@ -6,7 +6,7 @@ already lives. Humans reply with feedback that the PM routes via
 `harness/workflows/inject-work.md`.
 
 ## Setup
-- The original reference Slack server was archived; `.mcp.json` wires a
+- The original reference Slack server was archived; the MCP registry uses a
   community server (`slack-mcp-server`) — **verify the package, pin a version,
   and review its scopes before first use.** Safer minimal alternative: a plain
   incoming-webhook script in `harness/adapters/` if you only need outbound

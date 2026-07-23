@@ -19,10 +19,12 @@
     the form (collected to local state) and document the gap in §15 Deviations + an Open
     Question — DO NOT silently omit visible fields.
 2. Verdict comment on the PR (📋 QA VERDICT format).
-3. APPROVE → orchestrator squash-merges to the epic branch, status → done,
-   stamps `reviewed_at/by` + `review_outcome`, removes worktree, stamps
-   metrics, Graphiti episode (VERIFIED_BY). Human batch sign-off later
-   flips done → verified.
+3. APPROVE:
+   - **High-risk task target:** orchestrator squash-merges to the epic branch,
+     status → done, stamps QA evidence, removes the worktree, and stamps
+     metrics. Human batch sign-off later flips done → verified.
+   - **Epic target:** write the epic QA report and proceed to `/checkpoint`;
+     task statuses and peer-review stamps remain unchanged.
    CHANGES → status → changes-requested with the ❌ evidence list; back to
    the SAME developer; on resume status → in-progress. 2nd rejection of the
    same task → escalate to team-lead (spec problem, not coding problem).

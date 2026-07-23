@@ -4,7 +4,8 @@
 DevOps tags releases — all auditable on GitHub.
 
 ## Setup
-- Remote (already in `.mcp.json`): `https://api.githubcopilot.com/mcp/`
+- Remote (registered in `harness/mcp/servers.json`):
+  `https://api.githubcopilot.com/mcp/`
   (OAuth on first use).
 - Alternative: self-host `ghcr.io/github/github-mcp-server` (Docker) with a
   fine-grained PAT limited to this repo (contents, pull-requests, issues).

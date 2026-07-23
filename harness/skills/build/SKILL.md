@@ -13,19 +13,21 @@ Before dispatch, require an approved SRS and a generated dev plan in
 different epic becomes current only through the previous epic's approved
 `/checkpoint`.
 
-1. **Pick.** `make next` (scheduler) lists unblocked tasks in pick order;
-   `make next LAYER=frontend` for one lane. Respect the WIP limit
+1. **Pick.** `make next PLATFORM=<platform>` lists unblocked tasks in pick
+   order; add `LAYER=frontend` for one lane. Respect the WIP limit
    (`harness.yaml: scheduler.wip_limit_parallel_agents`). Parallel tasks must
    not share files.
 2. **Dispatch.** For each picked task, follow
    `harness/workflows/implement-task.md`: branch `epic_<NN>_task_<MM>`, one
    worktree, the task spec is the complete prompt. Route by frontmatter:
    `owner_agent` (developer-backend / developer-frontend / devops),
-   `model` tier, `preferred_agent` platform — headless via
+   portable `tier` and `preferred_agent` hint. Select the active platform
+   explicitly (`make next PLATFORM=codex`); the scheduler resolves the model
+   through `harness.yaml: model_tiers` and stops on an unset mapping. Run headless via
    `harness/adapters/run-<platform>.sh` so cost + session land in `workspace/runs/` and
    `metrics.csv`.
 3. **Statuses.** `todo → in-progress` on start; the implementer finishes at
-   `review-requested` (never `done` — QA is the gate). Blocked → `blocked`
+   `review-requested` (never `done` — peer review is the task gate). Blocked → `blocked`
    with a Q-### in the spec and `state.yaml` blockers.
 4. **Peer review gates the task PR.** `reviewed_by` ≠ `executed_by`
    (`harness/workflows/_handoff_protocol.md` §2); merge into the epic branch on

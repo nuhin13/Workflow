@@ -7,7 +7,7 @@ Claude Code specifics for this repo:
 - **Skills & subagents are natively discoverable**: `.claude/skills` and
   `.claude/agents` are symlinks to `harness/skills/` and `harness/agents/` (the
   platform-neutral homes). Every skill is a slash command: pipeline drivers
-  (`/kickoff /brd /prd /features /forecast /design /trace /tech-plan
+  (`/kickoff /brd /prd /features /forecast /design /srs-authoring /trace /tech-plan
   /dev-plan /epic /build /qa /checkpoint /status /question /lesson`) plus
   capability skills (git-flow, ears-authoring, epic-breakdown, tdd-workflow,
   token-optimization, rate-limit-handoff, …).
@@ -18,11 +18,16 @@ Claude Code specifics for this repo:
   in one sentence, continue the pipeline (`/status` does this for you).
 - Run headless tasks via `harness/adapters/run-claude.sh <task-id> "<prompt>"`
   so cost + session JSON are captured into `workspace/runs/` and `metrics.csv`.
+  Pipeline roles needing MCP use
+  `run-claude.sh <phase-run-id> "<prompt>" <role>` for the same scoped policy
+  without an epic metrics row.
 - Settings this repo expects (see `harness/hooks/`):
   - `"includeCoAuthoredBy": false` (or `"attribution": {"commit": "", "pr": ""}`)
   - statusLine wired to `harness/hooks/statusline-ratelimit.sh` for rate-limit
     freeze detection (5-hour and weekly windows).
-- MCP servers for this project are declared in `.mcp.json` (project scope).
+- The MCP catalog lives in `harness/mcp/servers.json`; root `.mcp.json` is
+  intentionally empty. Headless adapters generate a role-filtered config and
+  launch Claude with `--strict-mcp-config`.
 - **Subagent frontmatter convention**: `name`, `description`, `model` are
   standard Claude Code fields. `tier:` (v2, `deep`/`build`/`cheap`) is the
   PORTABLE routing field — it maps to a model per platform in

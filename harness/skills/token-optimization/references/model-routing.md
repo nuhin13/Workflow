@@ -1,11 +1,12 @@
 # Model Routing (tiers from harness.yaml)
-- plan_review (opus-tier): epic breakdown, sharding, architecture, final
+- `deep`: epic breakdown, sharding, architecture, final
   review, retro synthesis — where wrong = expensive.
-- implement (sonnet-tier): default for coding tasks.
-- trivial (haiku-tier): renames, boilerplate, commit messages, summaries,
+- `build`: default for coding tasks against a written contract.
+- `cheap`: renames, boilerplate, commit messages, summaries,
   doc tweaks, exploration subagents.
-- The task's `model:` field is set at sharding; developers don't upgrade
-  themselves — if a task is too hard for its tier, that's an Open Question
-  (the spec was wrong, fix the spec).
-- Rough price anchor (verify harness/rates/cost-config.yaml): haiku ≈ ⅓ of
-  sonnet, sonnet ≈ ⅕ of opus per output token — tiering is the #1 lever.
+- The task's portable `tier:` is set at sharding. The scheduler resolves it
+  through `harness.yaml: model_tiers` for the explicit active platform.
+- Developers do not upgrade themselves. If a task is too hard for its tier,
+  raise an Open Question and fix the task spec.
+- Verify current prices in `harness/rates/cost-config.yaml`; vendor aliases
+  never belong in task frontmatter.

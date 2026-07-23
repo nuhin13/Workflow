@@ -5,7 +5,8 @@ to Jira issues and pulls human-filed bugs/features back into the harness
 (`harness/workflows/inject-work.md`).
 
 ## Setup (official Atlassian remote MCP)
-- Endpoint (already in `.mcp.json`): `https://mcp.atlassian.com/v1/sse`
+- Endpoint (registered in `harness/mcp/servers.json`):
+  `https://mcp.atlassian.com/v1/sse`
 - First use triggers OAuth in the browser; grant the minimal project scopes.
 - Self-hosted/DC or API-token setups: use the community `mcp-atlassian`
   (Docker) instead — verify image + scopes before use.

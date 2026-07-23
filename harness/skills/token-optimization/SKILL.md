@@ -12,9 +12,8 @@ runs) — so the biggest wins are in WHAT YOU READ and WHAT YOU KEEP.
    `cat` a tree. Read the task's `files:` list, not the repo.
 2. **context-pruning.md** — once a sub-goal closes, summarize and drop the
    raw content; keep decisions, not transcripts.
-3. **model-routing.md** — plan/review on the strong tier, implement on
-   sonnet-tier, trivia (renames, messages, summaries) on haiku-tier; the
-   task's `model:` field is the routing hint.
+3. **model-routing.md** — use portable `deep`, `build`, and `cheap` tiers;
+   the scheduler resolves the selected tier for the explicit active platform.
 4. **prompt-caching.md** — keep the stable prefix stable (AGENTS.md, role,
    skill) so cache reads (~10% of input price) do the work; don't reorder
    system content mid-session.

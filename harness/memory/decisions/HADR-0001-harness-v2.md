@@ -1,4 +1,4 @@
-# ADR-0001 — Harness v2: profiles, platform-agnostic tiers, layout
+# HADR-0001 — Harness v2: profiles, platform-agnostic tiers, layout
 
 - Status: **accepted** (human-approved in-thread, 2026-07-22)
 - Supersedes: — (first harness-level ADR)

@@ -11,7 +11,7 @@ native subagent. Other platforms read the cards as role prompts.
 Write boundaries live in `harness.yaml: write_scopes` and are enforced
 by `make validate`.
 
-**What it does NOT cover.** Runtime tool restriction — deliberately.
-Every role writes repo artifacts, so enforcement is: declared scopes +
-validator + peer review + QA + git hooks. Adding or merging a role is a
-harness change (ADR + human approval).
+**What it does NOT cover.** Product-specific responsibilities inside a task;
+those live in its spec. Write scopes are validator-enforced, and MCP access is
+filtered from each card's `mcp:` allowlist by the headless adapters. Adding or
+merging a role is a harness change (ADR + human approval).

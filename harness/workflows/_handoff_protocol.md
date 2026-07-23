@@ -26,7 +26,7 @@ Agent implements
   single-model blind spots. `reviewed_by` must differ from `executed_by`.
 - **Two distinct gates** (don't collapse them):
   1. **Per-task PEER review** — different model than the executor (rule 12).
-     Default Sonnet. Runs on every task before `done`.
+     Default `build` tier. Runs on every task before `done`.
   2. **Per-epic QA gate** — the independent merge gate, run ONCE when the epic
      is build-complete + all tasks peer-approved, BEFORE the epic→integration
      merge. **The human CHOOSES the QA model per epic** (Sonnet · Codex · other) —
@@ -87,7 +87,7 @@ executes `next_step` literally. The packet is the transfer unit.
 6. **Never silently change scope** — note in §4/§18; big growth = propose a
    new task.
 7. Non-obvious choices get a Decision record (one line minimum) in
-   `harness/memory/decisions/` so future agents don't re-litigate.
+   `workspace/plan/03-technical/decisions/` so future agents don't re-litigate.
 
 ## 5. Conflict & ambiguity resolution
 - **Small spec ambiguity:** pick the simplest interpretation that satisfies

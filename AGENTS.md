@@ -19,7 +19,7 @@ Phase 0 business   /kickoff /brd /prd /features /forecast → workspace/docs/bus
 Phase 1 design     /design                                → workspace/plan/01-design/ (Figma is law when linked)
 Required SRS gate  /srs-authoring                         → workspace/spec/srs.md (HUMAN approval)
 Phase 2 trace      /trace                                 → workspace/plan/02-traceability/matrix.md (kept live forever)
-Phase 3 tech plan  /tech-plan                             → workspace/plan/03-technical/ · ADRs in harness/memory/decisions/
+Phase 3 tech plan  /tech-plan                             → workspace/plan/03-technical/ · product ADRs in decisions/
 Phase 4 dev plan   /dev-plan /epic                        → workspace/plan/04-dev/ · workspace/epics/E<NN>/
 Phase 5 build loop /build → /qa → /checkpoint (per epic)  → QA-gated PRs ──▶ development ──▶ main
 ```
@@ -28,7 +28,7 @@ Phases run in order; a revisited phase must ripple (`/trace`) before work
 continues. PRD → `workspace/spec/srs.md` (EARS) is authored via skills/srs-authoring;
 once approved the SRS is canonical for build.
 
-**Profiles decide how much of this runs (v2 · ADR-0001).** `/kickoff` sets a
+**Profiles decide how much of this runs (v2 · HADR-0001).** `/kickoff` sets a
 `profile` (`small`/`medium`/`large`/`extra-large`/`enterprise`, human-picked)
 that selects which phases run, which human gates apply, how deep review goes,
 which git tiers exist, and QA depth (`harness.yaml: profiles`). Every profile
@@ -42,7 +42,7 @@ it drops.
 **IDs (traceability — never invent other formats):** `BR-###` business req ·
 `FR-###` product req (PRD) · `FR-<AREA>-NN` / `NFR-<AREA>-NN` SRS
 functional/non-functional req · `FT-###` feature · `SCR-###` screen · `FC-###` forecast
-assumption · `ADR-####` decision · `E<NN>` epic · `E<NN>-T<MM>` task
+assumption · `ADR-####` product decision · `HADR-####` harness decision · `E<NN>` epic · `E<NN>-T<MM>` task
 (`E<NN>-B<MM>` bug) · `Q-###` open question · `D-###` discrepancy ·
 `L-<area>-<nnn>` lesson · `EARS-<AREA>-n` acceptance criterion. Every artifact
 lists what it traces from/to; `workspace/plan/02-traceability/matrix.md` is the join
@@ -91,7 +91,8 @@ table.
 11. **Statuses & lanes.** Task statuses: todo → in-progress →
     review-requested → (changes-requested →) done → verified · side:
     blocked, frozen. Lanes (`layer:`): backend, frontend, cli, infra, docs,
-    cross-cutting — parallel streams pull one lane via `make next LAYER=...`.
+    cross-cutting — parallel streams pull one lane via
+    `make next PLATFORM=<platform> LAYER=...`.
 12. **Peer review.** `reviewed_by` must be a DIFFERENT agent/model than
     `executed_by` (see `harness/workflows/_handoff_protocol.md` §2), then the
     QA gate, then human `verified`.
@@ -126,25 +127,25 @@ table.
 | A specific capability (git flow, EARS, contracts…) | `harness/skills/<skill>/SKILL.md` |
 | The business requirements (source of truth) | `workspace/docs/business/BRD.md` |
 | UI work — the Figma design (UI is law) | `workspace/docs/design/README.md` |
-| Project-wide decisions / lessons | `harness/memory/decisions/`, `harness/memory/lessons/` |
+| Product decisions / harness lessons | `workspace/plan/03-technical/decisions/`, `harness/memory/lessons/` |
 | The human operator's playbook | `harness/docs/HUMAN-GUIDE.md` |
 | Pipeline position / resume point | `workspace/state.yaml` (then `/status`) |
 | Canonical artifact templates | `harness/templates/` · `harness/templates/epic/` |
 | Product workspace (phase artifacts) | `workspace/plan/00-business/ … 04-dev/` |
 | Epics & task specs (the work queue) | `workspace/epics/E<NN>/` |
-| Current work queue | `make next` (scheduler) |
+| Current work queue | `make next PLATFORM=codex` (scheduler; choose active platform) |
 | External platforms (Figma, DB, Jira, Slack, Graphiti) | `harness/mcp/README.md` |
 
 ## Project conventions (filled by Epic 00 — keep updated)
 
-- Stack: **⏳ AWAITING HUMAN — genesis epic presents options (ADR-0001)**
-- Architecture: **⏳ AWAITING HUMAN (ADR-0002)**
-- Methodology: **⏳ AWAITING HUMAN (ADR-0003)**
-- Third-party services: **⏳ AWAITING HUMAN (ADR-0004)**
+- Stack: **⏳ AWAITING HUMAN — `/tech-plan` presents options (ADR-0001)**
+- Architecture: **⏳ AWAITING HUMAN — `/tech-plan` (ADR-0002)**
+- Methodology: **⏳ AWAITING HUMAN — `/tech-plan` (ADR-0003)**
+- Third-party services: **⏳ AWAITING HUMAN — `/tech-plan` (ADR-0004)**
 - Naming & patterns: **⏳ genesis epic (workspace/epics/E00-genesis/conventions.md)**
 - Skeleton & maps: **⏳ genesis epic**
 - Design system: **⏳ genesis epic — Figma is the visual canon**
-- Auth/session strategy: **⏳ AWAITING HUMAN (ADR-0005+)**
+- Auth/session strategy: **⏳ AWAITING HUMAN — `/tech-plan` (ADR-0005+)**
 
 > Agents: when Epic 00 completes, the Team Lead replaces the placeholders above
 > with one-line summaries and links to the full decision records.

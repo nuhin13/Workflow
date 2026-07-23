@@ -61,5 +61,16 @@ class SchedulerActiveEpicTests(unittest.TestCase):
                 self.assertEqual("E07", scheduler.load_active_epic())
 
 
+class SchedulerWipTests(unittest.TestCase):
+    def test_limit_is_bounded_by_available_slots(self):
+        self.assertEqual(2, scheduler.dispatch_count(10, slots=2, limit=5))
+
+    def test_zero_slots_returns_no_work(self):
+        self.assertEqual(0, scheduler.dispatch_count(10, slots=0, limit=5))
+
+    def test_default_limit_uses_available_slots(self):
+        self.assertEqual(3, scheduler.dispatch_count(10, slots=3))
+
+
 if __name__ == "__main__":
     unittest.main()

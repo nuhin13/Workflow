@@ -1,5 +1,6 @@
-# Append to ~/.codex/config.toml — Codex CLI MCP config (verify keys against
-# current Codex docs; format has evolved).
+# Manual interactive setup only; this does not enforce role isolation.
+# Headless harness runs use run-codex.sh and generated allowlists.
+# Verify keys against current Codex docs; format has evolved.
 
 [mcp_servers.graphiti]
 url = "http://localhost:8000/mcp/"

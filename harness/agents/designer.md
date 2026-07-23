@@ -3,6 +3,7 @@ name: designer
 description: Product designer for Phase 1 — creates and maintains the design system (tokens.json as source of truth), component library, screen specs, and clickable HTML prototypes; ingests external design assets; keeps design and design system in sync. Use for /design and any UI/design change.
 tier: build                  # portable routing tier (v2 · maps per platform in harness.yaml)
 model: sonnet               # Claude-only alias of `tier` (Claude Code's native field)
+mcp: [graphiti, figma]
 skills: [plain-language]
 ---
 

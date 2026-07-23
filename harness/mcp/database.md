@@ -4,7 +4,7 @@
 plans, and verify migrations instead of hallucinating column names.
 
 ## Default: DBHub (universal, one server for many engines)
-Wired in `.mcp.json` as:
+Registered in `harness/mcp/servers.json` as:
     npx -y @bytebase/dbhub --transport stdio --dsn "${HARNESS_DB_DSN}" --readonly
 
 - Supports PostgreSQL, MySQL, MariaDB, SQL Server, SQLite via one DSN.

@@ -24,7 +24,8 @@ checkpoint.
 
 `new "…"`: next Q-### ID; add ONE row to the register with all fields above,
 and a back-link Q-### in the raising artifact (not a copy). If it blocks a
-task: task → `blocked`, mirror the ID into `state.yaml: blockers`.
+task: task → `blocked`, mirror the ID into `state.yaml: blockers` as a scalar
+entry (`- Q-###`).
 
 `answer Q-### "…"`: record the answer in the register, then **ripple it** —
 update every artifact that raised or depends on the question in the same commit

@@ -1,10 +1,12 @@
 ---
 name: qa-pr-review
-description: The QA agent's merge-gate review of task PRs - verify EARS + DoD with evidence, run tests, police scope, approve or request changes. Use for every task-branch PR review and re-review.
+description: Independent QA verification for the mandatory epic gate and high-risk task PRs only - verify EARS and DoD with evidence, run tests, police scope, approve or request changes. Ordinary task PRs use peer review without task-level QA.
 ---
-# QA PR Review (the gate)
+# QA PR Review (epic gate + high-risk tasks)
 
-A PR merges only on your APPROVE. Review = evidence, not vibes.
+An epic cannot reach checkpoint without QA approval. A task PR needs this QA
+approval only when it is high-risk (auth, payments, migrations, or security);
+ordinary task PRs merge after peer approval. Review = evidence, not vibes.
 
 ## Checklist (all must pass)
 1. **Scope**: diff touches ONLY the task's `files:` list (lockfiles ok).
@@ -48,8 +50,9 @@ CHANGES must be reproducible: file:line + expected vs actual.
 
 ## Rules
 - Failing tests / unticked DoD = automatic CHANGES, no exceptions.
-- PEER rule: you only review AFTER a peer (different model than executed_by)
-  has reviewed — and you must not be the implementer yourself (protocol §2).
+- PEER rule: task-level QA runs only AFTER a peer (different model than
+  `executed_by`) has reviewed. Epic QA independently re-verifies the merged
+  epic diff. QA must never be the implementer (protocol §2).
 - You never push fixes to the branch — the developer owns the code.
 - Two consecutive rejections of the same task → escalate to Team Lead
   (spec problem, not coding problem).

@@ -60,6 +60,7 @@ flow.
 
 ### Align QA task-gate ownership with the constitution
 
+- Status: **Resolved 2026-07-23**
 - File: `harness/skills/qa-pr-review/SKILL.md:3`
 - Issue: This makes QA the merge gate for every task PR, while the constitution
   and build flow say ordinary task PRs merge after peer review and only
@@ -67,9 +68,13 @@ flow.
 - Impact: Normal tasks can block waiting for unnecessary QA review, or agents
   can disagree about whether `done` is valid. The QA role, skill, and workflow
   should be reconciled to one rule.
+- Resolution: Ordinary tasks now merge after different-agent/model peer
+  review. Task-level QA is limited to auth, payments, migrations, and security;
+  independent QA remains mandatory once per epic before checkpoint.
 
 ### Resolve portable tiers instead of returning Claude aliases
 
+- Status: **Resolved 2026-07-23**
 - File: `harness/orchestrator/scheduler.py:188`
 - Issue: `make next` emits `model: sonnet` from the task or a hard-coded
   default and never resolves `tier` through `harness.yaml:model_tiers`.
@@ -77,9 +82,13 @@ flow.
   `tier: deep` task can run on the CLI default unless a human manually sets
   flags. This violates the platform-agnostic routing and no-silent-fallback
   rule.
+- Resolution: Tasks carry only `tier`. `make next` requires an active platform
+  when work is dispatchable, resolves the configured model, and fails on
+  missing mappings. Adapters pass that resolved model explicitly.
 
 ### Stamp metrics even when a CLI run fails
 
+- Status: **Resolved 2026-07-23**
 - File: `harness/adapters/run-codex.sh:8`
 - Issue: With `set -euo pipefail`, a non-zero `codex exec` exit stops the
   script at this pipeline, so `metrics_collect.py` is skipped for failed or
@@ -87,18 +96,25 @@ flow.
   adapters.
 - Impact: Failed runs can lack metrics. Capture the CLI exit code, run metrics
   collection, then return the original status.
+- Resolution: All adapters capture the CLI pipeline status, run metrics
+  collection unconditionally, record `exit_code`, and then return the original
+  CLI status. Existing metrics CSVs are migrated without losing rows.
 
 ### Enforce WIP limit even with --limit
 
+- Status: **Resolved 2026-07-23**
 - File: `harness/orchestrator/scheduler.py:186`
 - Issue: When `--limit` is provided, `n = min(len(picks), a.limit or slots or
   1)` ignores the available `slots`.
 - Impact: If three tasks are already in progress and someone runs
   `scheduler.py --next --limit 5`, it can return five more tasks despite the
   WIP limit. Treat `--limit` as an upper bound within `slots`, not an override.
+- Resolution: Dispatch count is now bounded by candidate count, remaining WIP
+  slots, and the optional limit. Zero slots always returns zero tasks.
 
 ### Keep QA out of product source write scope
 
+- Status: **Resolved 2026-07-23**
 - File: `harness.yaml:142`
 - Issue: Expanding `product_code` gives QA both `src/` and `tests/`, even
   though the QA card says it is read-only on product code and may write tests
@@ -106,9 +122,13 @@ flow.
 - Impact: A QA-owned task that lists `src/...` in `files.update` will pass
   `validate_harness.py`, enabling the verifier to edit implementation code it
   is supposed to independently judge.
+- Resolution: Added a separate `test_code` scope. QA expands to `tests/` plus
+  QA artifacts, while developer roles retain `product_code`; `src/` is no
+  longer valid for QA-owned tasks.
 
 ### Match write scopes on path boundaries
 
+- Status: **Resolved 2026-07-23**
 - File: `harness/orchestrator/validate_harness.py:158`
 - Issue: The prefix check allows any path that merely starts with an allowed
   string, so an allowlist entry like `src/` also permits `src-old/...`, and
@@ -116,9 +136,13 @@ flow.
 - Impact: Since this validator is the main write-scope enforcement, normalize
   paths and require either exact match or the next character after the allowed
   directory prefix to be `/`.
+- Resolution: Completed during the workspace structural migration.
+  `path_allowed()` normalizes repository paths and accepts only exact files or
+  true descendants of allowed directories.
 
 ### Avoid product ADR IDs that already exist
 
+- Status: **Resolved 2026-07-23**
 - File: `AGENTS.md:137`
 - Issue: The project conventions reserve `ADR-0001` for the product stack
   decision, but `harness/memory/decisions/ADR-0001-harness-v2.md` already
@@ -126,9 +150,13 @@ flow.
 - Impact: Genesis agents following this will link to or overwrite the harness
   ADR instead of creating a product stack ADR. Separate harness/product ADR
   namespaces or start product ADR numbering after the seed harness ADRs.
+- Resolution: Harness decisions now use `HADR-NNNN` under
+  `harness/memory/decisions/`. Product `ADR-NNNN` records start independently
+  under `workspace/plan/03-technical/decisions/`.
 
 ### Fix the BRD/UI bootstrap deadlock
 
+- Status: **Resolved 2026-07-23**
 - File: `workspace/docs/business/BRD.md:9`
 - Issue: This placeholder tells a fresh user to start with `/kickoff`, but
   `/kickoff` hard-blocks unless `workspace/docs/business/BRD.md` already contains a real
@@ -137,9 +165,13 @@ flow.
 - Impact: For the mandatory BRD and UI philosophy, the start docs should
   instruct importing and approving both artifacts before kickoff. Otherwise, a
   new project follows the docs into a stop condition.
+- Resolution: The BRD placeholder, business/design READMEs, root README, and
+  kickoff skill now consistently require a real approved BRD and one approved
+  UI reference before `/kickoff`.
 
 ### Do not re-decide tech-plan ADRs in Epic 00
 
+- Status: **Resolved 2026-07-23**
 - File: `harness/skills/genesis-epic/SKILL.md:32-37`
 - Issue: For profiles that run `/tech-plan`, stack, architecture, and security
   ADRs are already presented to the human and accepted before `/dev-plan`. This
@@ -148,9 +180,14 @@ flow.
 - Impact: This can duplicate or contradict ADRs and violates the "do not reopen
   without escalation" handoff rule. Pick one owner: tech-plan decides and E00
   implements, or E00 owns the decisions and tech-plan stays proposed.
+- Resolution: `/tech-plan` exclusively owns foundational product ADRs and the
+  domain model. Epic 00 consumes accepted decisions, maps consequences to
+  implementation tasks, and stops back to `/tech-plan` on any missing or
+  contested foundation.
 
 ### Actually enforce per-role MCP allowlists
 
+- Status: **Resolved 2026-07-23**
 - File: `harness/mcp/README.md:9-12`
 - Issue: The guide says role MCP allowlists are enforced at dispatch time, but
   the repo-level `.mcp.json` registers every server and the run adapters do not
@@ -158,11 +195,16 @@ flow.
 - Impact: On Claude project scope or copied Codex/OpenCode configs this gives
   roles schemas/tools outside their `mcp:` list, increasing token load and
   breaking least-privilege assumptions.
+- Resolution: The full catalog moved to `harness/mcp/servers.json`; root
+  `.mcp.json` is fail-closed. Dispatch generates role-filtered platform
+  configuration, adapters apply it, and validation rejects unknown role
+  servers or a non-empty root MCP scope.
 
 ## P3 Findings
 
 ### Keep blockers in one question schema
 
+- Status: **Resolved 2026-07-23**
 - File: `workspace/state.yaml:41`
 - Issue: `state.yaml` documents blockers as full `{id, blocks, question}`
   objects, while `/question` says state mirrors only the IDs and
@@ -170,6 +212,32 @@ flow.
 - Impact: Agents following both will duplicate question text into state and
   reintroduce the drift the question skill is trying to prevent. Make the state
   schema and dashboard agree on ID-only or object entries.
+- Resolution: `workspace/state.yaml` now stores only `Q-###` blocker IDs.
+  Validation rejects embedded objects, malformed IDs, and duplicates. The
+  dashboard joins those IDs to the authoritative question register for text
+  and blocking-target details.
+
+## Post-Resolution Review
+
+### Align profile QA policy fields
+
+- Status: **Resolved 2026-07-23**
+- File: `harness.yaml:39-45`
+- Issue: Extra-large and enterprise profiles encoded ordinary task QA in
+  `review`, contradicting their `epic_sweep_plus_high_risk` QA policy.
+- Resolution: `review` now describes peer-review depth only. QA remains the
+  epic sweep plus high-risk task gate, and profile validation rejects review
+  modes that reintroduce per-task QA.
+
+### Require task tier during adapter dispatch
+
+- Status: **Resolved 2026-07-23**
+- File: `harness/orchestrator/dispatch_policy.py:180`
+- Issue: A task without `tier` inherited its owner role's tier during direct
+  adapter dispatch.
+- Resolution: Task dispatch now requires a valid task-owned
+  `deep|build|cheap` tier and stops on missing or mistyped values. Role-tier
+  routing remains available only for explicit pipeline-role runs.
 
 ## Structural Recommendation
 

@@ -7,7 +7,7 @@ harness carries from epic to epic and project to project.
 | Folder | Question it answers | Written | Read |
 |---|---|---|---|
 | `lessons/` | what went wrong before? (`L-<area>-nnn`) | after QA fails / surprises (`/lesson`) | before planning or building in that area |
-| `decisions/` | why did we choose this? (ADRs) | when a decision is accepted | before touching what an ADR governs |
+| `decisions/` | why did the reusable harness change? (`HADR-*`) | when a harness decision is accepted | before changing governed harness policy |
 | `graphiti/` | what connects to what, over time? | after tasks/retros (optional MCP) | before tasks on shared files |
 
 Lessons compound: repeat twice → promoted to a rule in a SKILL.md →
