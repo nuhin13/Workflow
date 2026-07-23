@@ -1,6 +1,9 @@
 ---
 # ── identity & routing ──────────────────────────────────────────────
-id: E<NN>-T<MM>                  # immutable. Bugs: E<NN>-B<MM>
+id: E<NN>-T<MM>                  # immutable. Bugs: E<NN>-B<MM>. FILE: E<NN>-T<MM>-<slug>.md
+                                 # slug: lowercase-hyphenated, ≤4 words, names the DELIVERABLE
+                                 # not the activity; if scope changes so the slug lies, slug
+                                 # changes, ID never does.
 epic: E<NN>
 type: feature                    # feature | bug | genesis | chore
 title: <short imperative title>

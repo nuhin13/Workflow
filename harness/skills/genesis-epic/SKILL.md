@@ -19,7 +19,11 @@ is the baseline of the baseline — spend the budget here.
 Stack (+rationale) · monolith vs microservices · DDD/TDD/hybrid · folder
 structure · high-level design patterns · coding patterns · ENUM pattern ·
 naming conventions (vars/files/functions/branches) · route & navigation map ·
-feature-level DFDs · Dockerfile(s) + docker-compose + setup/shell scripts ·
+feature-level DFDs · **containerization (CONDITIONAL, v2 §10): if the tech plan
+declares a server / database / queue, a `docker-compose.yml` + per-service
+Dockerfile is a REQUIRED E00 deliverable and `docker compose up` must boot the
+stack; a client-only project (mobile/desktop) does NOT require Docker — CI uses
+the native toolchain)** · setup/shell scripts ·
 CI + branch protection · third-party services inventory · security baseline
 (authN/Z, input validation, secrets) · JWT/session strategy (TTLs, rotation,
 storage) · error envelope + pagination style · observability wiring.

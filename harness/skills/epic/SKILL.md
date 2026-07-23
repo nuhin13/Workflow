@@ -12,7 +12,8 @@ Argument: epic ID from the dev plan (default: first `todo` epic).
 2. Delegate to the **team-lead** agent, producing under `epics/E<NN>-<slug>/`:
    - `epic.md` from `epics/_templates/epic.template.md` — runnable flow, scope, Mermaid flow diagram,
      task table with dependencies + parallel lanes, integration task last.
-   - `tasks/E<NN>-T<MM>.md` from `epics/_templates/task.template.md`, EVERY section filled to the spec test
+   - `tasks/E<NN>-T<MM>-<slug>.md` from `epics/_templates/task.template.md` (slug = the
+     deliverable, lowercase-hyphenated ≤4 words; ID inside stays stable), EVERY section filled to the spec test
      ("could a stranger execute this from the file alone?"). Lanes share no files.
 3. Cross-check: epic covers its FTs fully (vs matrix); screens it touches are `approved`
    (else `/design SCR-###` first or D-###); no task requires an undecided ADR.
