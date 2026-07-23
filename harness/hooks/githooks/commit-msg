@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Harness commit-msg hook: strip AI attribution trailers + nudge task ids.
+MSG_FILE="$1"
+# 1. Strip co-author / generated-with trailers (any agent tool).
+sed -i.bak -E '/^[[:space:]]*Co-Authored-By:/Id; /Generated with \[?Claude Code\]?/Id; /^[[:space:]]*🤖/d' "$MSG_FILE" && rm -f "$MSG_FILE.bak"
+# 2. Nudge (warn, don't block): conventional type + task id expected.
+first_line=$(head -n1 "$MSG_FILE")
+if ! echo "$first_line" | grep -qE '^(feat|fix|test|chore|refactor|docs|wip|ci)(\([A-Z]?[0-9]{2}-[TB][0-9]{2}\))?: ' ; then
+  if ! echo "$first_line" | grep -qE '^(Merge|Revert)'; then
+    echo "harness: ⚠ commit message doesn't match 'type(E03-T07): summary'" >&2
+  fi
+fi
+# 3. Harness-change nudge (warn, don't block): protected paths should change
+# only via the lesson->rule ladder or skill-authoring, with human approval
+# (harness.yaml: harness_change_policy).
+if git diff --cached --name-only 2>/dev/null | grep -qE '^(harness/|AGENTS\.md|CLAUDE\.md|harness/templates/|harness\.yaml|harness/templates/epic/)'; then
+  case "$first_line" in
+    *lesson*|*skill*|*harness*|*retro*) : ;;
+    *) echo "harness: ⚠ this commit changes protected harness files — allowed only via lesson promotion / skill-authoring with human approval (harness.yaml: harness_change_policy)" >&2 ;;
+  esac
+fi
+exit 0

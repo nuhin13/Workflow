@@ -65,7 +65,7 @@ flowchart LR
         CL["CLAUDE.md<br>thin Claude adapter<br>(@AGENTS.md)"]
     end
 
-    subgraph ROLES["agent/agents/ — 10 roles"]
+    subgraph ROLES["harness/agents/ — 10 roles"]
         AN[analyst] --- DE[designer]
         AR[architect] --- TL[team-lead]
         DB[dev-backend] --- DF[dev-frontend]
@@ -81,9 +81,9 @@ flowchart LR
 ```
 
 - **Claude Code**: `.claude/agents` and `.claude/skills` are symlinks into
-  `agent/`. Agents become subagents. Skills become `/commands`. Native.
+  `harness/`. Agents become subagents. Skills become `/commands`. Native.
 - **Other platforms**: they read `AGENTS.md` and reach the same files by
-  path. Headless runs go through `agent/adapters/run-<platform>.sh`,
+  path. Headless runs go through `harness/adapters/run-<platform>.sh`,
   which logs cost + session JSON into `runs/` and `metrics.csv`.
 
 ---
@@ -137,11 +137,11 @@ flowchart TB
     T["Turn starts"] --> A["AGENTS.md loads<br>(always — it is small)"]
     A --> N{"Task needs a<br>capability?"}
     N -->|no| W[Just work]
-    N -->|yes| S["Load ONE skill<br>agent/skills/&lt;name&gt;/SKILL.md"]
+    N -->|yes| S["Load ONE skill<br>harness/skills/&lt;name&gt;/SKILL.md"]
     S --> R["References load even later<br>(skill's references/ folder)"]
 ```
 
-- **Where**: all 35 skills live in `agent/skills/<name>/SKILL.md`.
+- **Where**: all 35 skills live in `harness/skills/<name>/SKILL.md`.
 - **When**: a pipeline step starts (`/brd`, `/qa`, …) or a capability is
   needed (git-flow, TDD, EARS, rate-limit handoff).
 - **Who**: each agent card lists its `skills:` — its usual toolbox.
@@ -157,7 +157,7 @@ flowchart LR
     subgraph EVERY_SESSION["Read at every session start"]
         ST["memory/state.yaml<br>phase · epics · blockers · history"]
     end
-    subgraph LONG_TERM["Long-term memory (agent/memory/)"]
+    subgraph LONG_TERM["Long-term memory (harness/memory/)"]
         LE["lessons/&lt;area&gt;.md<br>L-area-nnn"]
         AD["decisions/<br>ADRs"]
         GR["graphiti/<br>optional knowledge graph"]
@@ -183,14 +183,14 @@ flowchart LR
 Two kinds. Both are files, so nothing is ever lost.
 
 **A. Phase / agent handoff** — every finished artifact ends with a
-Handoff block (`templates/handoff.md`): what was decided, what is open,
+Handoff block (`harness/templates/process/handoff.md`): what was decided, what is open,
 what the next stage must not change. The next agent reads it first.
 
 **B. Rate-limit handoff** — when a platform hits its usage window:
 
 ```mermaid
 flowchart LR
-    C1["Claude Code<br>at ~80% window"] -->|freeze| F["handoff packet<br>agent/handoffs/*.yaml<br>+ last green commit"]
+    C1["Claude Code<br>at ~80% window"] -->|freeze| F["handoff packet<br>harness/handoffs/*.yaml<br>+ last green commit"]
     F -->|resume| C2["Codex CLI"]
     C2 -->|if also limited| C3["OpenCode"]
 ```
@@ -277,14 +277,14 @@ The harness improves through a fixed ladder — never by drive-by edits:
 1. Something goes wrong → `/lesson` records it (`L-<area>-nnn`).
 2. It happens again → the lesson is **promoted** to a rule in the
    relevant `SKILL.md` (human approves — rules are code).
-3. Deterministic rules become git hooks in `agent/hooks/`.
+3. Deterministic rules become git hooks in `harness/hooks/`.
 4. New capability needed → `skills/skill-authoring` defines how to add
    a skill properly.
 5. Every harness change must pass `make validate` (DAG + constitution
    checks: IDs, frontmatter, peer rule, dead paths, lesson files).
 
 Structural changes (new roles, new phases) go through an ADR in
-`agent/memory/decisions/` like any other significant decision.
+`harness/memory/decisions/` like any other significant decision.
 
 **Across repos** (template ↔ your project repos), `/harness-sync` moves
 improvements both ways — each direction human-gated:
@@ -301,7 +301,7 @@ flowchart LR
 ```
 
 Each project keeps its own memory (`memory/state.yaml`,
-`agent/memory/`). Only *universal* lessons — rules that would help any
+`harness/memory/`). Only *universal* lessons — rules that would help any
 product — travel back to the template as inherited seeds. Project
 content (specs, state, product lessons) never leaves its repo.
 
@@ -318,15 +318,15 @@ fails if one is missing. The map below is the short version.
 | `AGENTS.md` | the constitution — 16 rules, IDs, pipeline (start here) |
 | `CLAUDE.md` | Claude Code adapter (`@AGENTS.md` + symlink notes) |
 | `harness.yaml` | policy: platforms, model tiers, budgets, human gates |
-| `agent/agents/` | 10 role cards / subagents |
-| `agent/skills/` | 35 skills (pipeline drivers + capabilities) |
-| `agent/workflows/` | 12 step-by-step processes |
-| `agent/orchestrator/` | scheduler, validators, metrics, dashboard |
-| `agent/adapters/` | run-claude.sh · run-codex.sh · run-opencode.sh |
-| `agent/hooks/` | git hooks + rate-limit statusline |
-| `agent/memory/` | lessons, ADRs, graphiti schema |
-| `agent/mcp/` | external platform guides (Figma, DB, Jira, Slack…) |
-| `templates/` | canonical artifact templates (see its README) |
+| `harness/agents/` | 10 role cards / subagents |
+| `harness/skills/` | 35 skills (pipeline drivers + capabilities) |
+| `harness/workflows/` | 12 step-by-step processes |
+| `harness/orchestrator/` | scheduler, validators, metrics, dashboard |
+| `harness/adapters/` | run-claude.sh · run-codex.sh · run-opencode.sh |
+| `harness/hooks/` | git hooks + rate-limit statusline |
+| `harness/memory/` | lessons, ADRs, graphiti schema |
+| `harness/mcp/` | external platform guides (Figma, DB, Jira, Slack…) |
+| `harness/templates/` | canonical artifact templates (see its README) |
 | `project/` | phase 0–4 artifacts of YOUR product |
 | `spec/` | the SRS — law once approved |
 | `epics/` | the work queue: epic + task specs |
