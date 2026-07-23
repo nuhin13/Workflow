@@ -13,7 +13,7 @@ fi
 # 3. Harness-change nudge (warn, don't block): protected paths should change
 # only via the lesson->rule ladder or skill-authoring, with human approval
 # (harness.yaml: harness_change_policy).
-if git diff --cached --name-only 2>/dev/null | grep -qE '^(harness/|AGENTS\.md|CLAUDE\.md|templates/|harness\.yaml|epics/_templates/)'; then
+if git diff --cached --name-only 2>/dev/null | grep -qE '^(harness/|AGENTS\.md|CLAUDE\.md|harness/templates/|harness\.yaml|harness/templates/epic/)'; then
   case "$first_line" in
     *lesson*|*skill*|*harness*|*retro*) : ;;
     *) echo "harness: ⚠ this commit changes protected harness files — allowed only via lesson promotion / skill-authoring with human approval (harness.yaml: harness_change_policy)" >&2 ;;

@@ -10,9 +10,9 @@ Argument: epic ID from the dev plan (default: first `todo` epic).
 1. Preconditions: E00 checkpoint approved (for E≥01); prior epic's checkpoint decision
    applied (remaps may have changed this epic — check dev-plan remap log). Read lessons.
 2. Delegate to the **team-lead** agent, producing under `epics/E<NN>-<slug>/`:
-   - `epic.md` from `epics/_templates/epic.template.md` — runnable flow, scope, Mermaid flow diagram,
+   - `epic.md` from `harness/templates/epic/epic.template.md` — runnable flow, scope, Mermaid flow diagram,
      task table with dependencies + parallel lanes, integration task last.
-   - `tasks/E<NN>-T<MM>-<slug>.md` from `epics/_templates/task.template.md` (slug = the
+   - `tasks/E<NN>-T<MM>-<slug>.md` from `harness/templates/epic/task.template.md` (slug = the
      deliverable, lowercase-hyphenated ≤4 words; ID inside stays stable), EVERY section filled to the spec test
      ("could a stranger execute this from the file alone?"). Lanes share no files.
 3. Cross-check: epic covers its FTs fully (vs matrix); screens it touches are `approved`

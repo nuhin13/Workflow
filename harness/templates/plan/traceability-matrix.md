@@ -21,7 +21,7 @@ Status: planned | designed | in-build | done | verified | shipped | drifted (has
 
 ## 3. Discrepancy notes
 Full notes in `project/02-traceability/discrepancies/D-###.md`
-(template: `templates/discrepancy-note.md`). Index:
+(template: `harness/templates/process/discrepancy-note.md`). Index:
 
 | ID | Between | Summary | Severity | Status |
 |---|---|---|---|---|

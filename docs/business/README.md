@@ -4,7 +4,7 @@
 (BR-### → FR → epic → task → test) starts from a single file.
 
 **How it works.** `/kickoff` captures the idea; `/brd` (analyst) writes
-`BRD.md` from `templates/brd.md`. Every business requirement gets a
+`BRD.md` from `harness/templates/business/brd.md`. Every business requirement gets a
 stable `BR-###`. Already have a BRD? Drop it in as `BRD.md` and run
 `/brd` to shape and ID it.
 

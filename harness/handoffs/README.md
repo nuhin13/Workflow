@@ -11,5 +11,5 @@ Real packets are gitignored (transient); only the template is tracked.
 Process: skills/rate-limit-handoff + workflows/handoff-freeze/resume.
 
 **What it does NOT cover.** Phase/agent handoffs — those are Handoff
-blocks written at the bottom of each artifact (`templates/handoff.md`),
+blocks written at the bottom of each artifact (`harness/templates/process/handoff.md`),
 not files here.

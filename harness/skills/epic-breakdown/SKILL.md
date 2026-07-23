@@ -7,7 +7,7 @@ description: Break an SRS + feature list into traceable, prioritized epics with 
 ## Inputs → Outputs
 In: `spec/srs.md`, `spec/feature-list.md`, the Figma design (docs/design/README.md).
 Out: one folder per epic `epics/E<NN>-<slug>/` containing `epic.md` (from
-`epics/_templates/epic.template.md`) and an empty `tasks/` + `tracker.md`.
+`harness/templates/epic/epic.template.md`) and an empty `tasks/` + `tracker.md`.
 
 ## Procedure
 1. Read the full SRS once. List every SRS ID. Anything non-atomic → propose a

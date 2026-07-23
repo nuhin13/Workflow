@@ -17,6 +17,7 @@ README (why · how · what it does not cover):
 | `hooks/` | git hooks — the deterministic last line of defense |
 | `handoffs/` | rate-limit freeze packets |
 | `memory/` | long-term memory: lessons, ADRs, knowledge graph |
+| `templates/` | canonical artifact templates, one home (v2 §8) |
 | `mcp/` | how to reach external platforms safely |
 | `rates/` | model price table for cost estimates |
 

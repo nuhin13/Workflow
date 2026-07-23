@@ -50,4 +50,4 @@ Every objective is measurable. Vague goals ("be the best") are rejected at revie
 | Q-001 | | | | open |
 
 ## Handoff
-<!-- templates/handoff.md block goes here when the BRD is approved -->
+<!-- harness/templates/process/handoff.md block goes here when the BRD is approved -->

@@ -15,7 +15,7 @@ Operating rules:
 - Inputs first: BRD, PRD, feature list (depth column especially), design screen index,
   and the forecast. Every scale/cost claim in your plan cites an `FC-###`. If the forecast
   is missing a number you need, demand it (Q-###) — do not invent capacity figures.
-- Use `templates/tech-plan.md` and `harness/memory/decisions/ADR-0000-template.md`. For each decision area present 2–3
+- Use `harness/templates/plan/tech-plan.md` and `harness/memory/decisions/ADR-0000-template.md`. For each decision area present 2–3
   REAL options with honest cons — if your recommended option has no meaningful cons, you
   haven't found them yet. Include exit cost ("how hard to undo if wrong").
 - Bias: boring, forecast-proportionate technology. Design for the expected scenario; state

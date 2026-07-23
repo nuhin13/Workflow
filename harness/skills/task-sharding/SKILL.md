@@ -12,7 +12,7 @@ execute it without improvising — and a human can read it in 2 minutes.
    one mergeable unit of value, ~½–1 agent-session of work
    (token_estimate tier S ≈5–15k, M ≈50–150k, L ≈150–500k; L tasks should
    usually be split).
-2. For each task, fill EVERY section of `epics/_templates/task.template.md`:
+2. For each task, fill EVERY section of `harness/templates/epic/task.template.md`:
    - `files: create/update` — exact paths. The diff may not exceed this list.
    - `api_contracts:` — per skills/api-contract-design (method, request &
      response schemas, status codes, pagination, required fields, validation).

@@ -183,7 +183,7 @@ flowchart LR
 Two kinds. Both are files, so nothing is ever lost.
 
 **A. Phase / agent handoff** — every finished artifact ends with a
-Handoff block (`templates/handoff.md`): what was decided, what is open,
+Handoff block (`harness/templates/process/handoff.md`): what was decided, what is open,
 what the next stage must not change. The next agent reads it first.
 
 **B. Rate-limit handoff** — when a platform hits its usage window:
@@ -326,7 +326,7 @@ fails if one is missing. The map below is the short version.
 | `harness/hooks/` | git hooks + rate-limit statusline |
 | `harness/memory/` | lessons, ADRs, graphiti schema |
 | `harness/mcp/` | external platform guides (Figma, DB, Jira, Slack…) |
-| `templates/` | canonical artifact templates (see its README) |
+| `harness/templates/` | canonical artifact templates (see its README) |
 | `project/` | phase 0–4 artifacts of YOUR product |
 | `spec/` | the SRS — law once approved |
 | `epics/` | the work queue: epic + task specs |

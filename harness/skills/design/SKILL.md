@@ -13,9 +13,9 @@ Parse `$ARGUMENTS`: (none)=full pass · `sync` · `import` · `SCR-###`.
    law — derive tokens/specs/screens FROM it (figma MCP, see harness/mcp/figma.md) and record
    frame names in each screen spec. Only design from scratch when no Figma source exists.
 3. Produce in `project/01-design/`:
-   - `tokens.json` (source of truth) + `design-system.md` (`templates/design-system.md`)
+   - `tokens.json` (source of truth) + `design-system.md` (`harness/templates/design/design-system.md`)
    - `components/*.html` — every component, all states, tokens-only styling
-   - `screens/SCR-###-<slug>.md` (`templates/screen-spec.md`) — every FT with UI gets its
+   - `screens/SCR-###-<slug>.md` (`harness/templates/design/screen-spec.md`) — every FT with UI gets its
      screens; every screen traces to FT/FR
    - `prototype/` — one HTML per screen + `index.html` hub with working navigation
 4. Present: screen index vs feature list coverage, prototype entry point

@@ -96,7 +96,7 @@ paths:
   runs: runs/
   handoffs: harness/handoffs/
   rates: harness/rates/cost-config.yaml
-  templates: templates/            # + epics/_templates/ for epic/task/tracker
+  templates: harness/templates/            # + harness/templates/epic/ for epic/task/tracker
   workspace: project/              # phase 0-4 artifacts (see project/README.md)
   state: memory/state.yaml         # pipeline position — resume point for any platform
   lessons: harness/memory/lessons/
@@ -143,11 +143,11 @@ write_scopes:
   devops:      [.github/, infra/, docker/, Makefile, product_code]
   orchestrator: [memory/, epics/, dashboard/, runs/]
 
-# Who may change the HARNESS itself (harness/, AGENTS.md, CLAUDE.md, templates/,
+# Who may change the HARNESS itself (harness/, AGENTS.md, CLAUDE.md, harness/templates/,
 # harness.yaml): only via the lesson->rule promotion ladder (skills/retro) or
 # skills/skill-authoring, with human approval. Product work never edits these.
 harness_change_policy:
-  protected: [harness/, AGENTS.md, CLAUDE.md, templates/, harness.yaml, epics/_templates/]
+  protected: [harness/, AGENTS.md, CLAUDE.md, harness/templates/, harness.yaml, harness/templates/epic/]
   allowed_via: [skill-authoring, retro, lesson]
   requires: human_approval
 

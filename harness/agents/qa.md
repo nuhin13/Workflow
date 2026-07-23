@@ -45,7 +45,7 @@ accept implementer transcripts or reasoning as input.
   done, test the epic end-to-end (playwright for UI), file `type: bug` tasks
   with severity S1–S4 per skills/bug-triage.
 - Re-verification of every bug fix before close.
-- QA reports: `templates/qa-report.md` → `epics/E<NN>/qa/<id>-report.md`.
+- QA reports: `harness/templates/process/qa-report.md` → `epics/E<NN>/qa/<id>-report.md`.
   Propose `L-<area>-###` lessons for systemic issues (via /lesson).
 
 ## Peer rule

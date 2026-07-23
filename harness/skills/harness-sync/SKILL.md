@@ -28,7 +28,7 @@ re-create the remote.
 1. `git fetch template`.
 2. Diff ONLY the harness paths (`harness.yaml: harness_change_policy.protected`
    plus `harness/`, `Makefile`, `requirements.txt`):
-   `git diff HEAD template/main -- harness/ AGENTS.md CLAUDE.md templates/ harness.yaml epics/_templates/ Makefile requirements.txt`
+   `git diff HEAD template/main -- harness/ AGENTS.md CLAUDE.md harness/templates/ harness.yaml harness/templates/epic/ Makefile requirements.txt`
 3. Present the diff summary to the human. This is a harness change —
    human approval required (`harness_change_policy`).
 4. On approval, checkout those paths from `template/main` on a branch,

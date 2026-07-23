@@ -73,7 +73,7 @@ table.
    refactor unrelated code, do not upgrade dependencies, do not "improve" things
    outside the task. Each ROLE also has a declared write scope
    (`harness.yaml: write_scopes`, validator-enforced); harness files (harness/,
-   AGENTS.md, templates/…) change only via lesson promotion or
+   AGENTS.md, harness/templates/…) change only via lesson promotion or
    skills/skill-authoring with human approval (`harness_change_policy`).
 7. **Log everything.** Every headless run is stored under `runs/<task_id>/`.
    Every completed task appends a row to its epic's `metrics.csv`.
@@ -101,7 +101,7 @@ table.
     decision + consequences and only THEN proceeds. Implementation choices
     *within* an accepted ADR are the agent's to make.
 14. **Templates always, plainly.** Every pipeline artifact starts from its
-    file in `templates/` (epics/tasks: `epics/_templates/`). Keep every
+    file in `harness/templates/` (epics/tasks: `harness/templates/epic/`). Keep every
     section; write `N/A — reason` rather than deleting. Human-facing documents
     follow skills/plain-language: short sentences, simple words, visuals over
     prose.
@@ -126,7 +126,7 @@ table.
 | Project-wide decisions / lessons | `harness/memory/decisions/`, `harness/memory/lessons/` |
 | The human operator's playbook | `docs/HUMAN-GUIDE.md` |
 | Pipeline position / resume point | `memory/state.yaml` (then `/status`) |
-| Canonical artifact templates | `templates/` · `epics/_templates/` |
+| Canonical artifact templates | `harness/templates/` · `harness/templates/epic/` |
 | Product workspace (phase artifacts) | `project/00-business/ … 04-plan/` |
 | Epics & task specs (the work queue) | `epics/E<NN>/` |
 | Current work queue | `make next` (scheduler) |

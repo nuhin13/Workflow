@@ -67,7 +67,7 @@ flowchart TB
 5. **Initialize.**
    - Create the `project/00-business/ … 04-plan/` dirs the chosen profile's
      phases need, `project/assets/design-imports/`, and
-     `project/open-questions.md` (from `templates/open-questions.md`).
+     `project/open-questions.md` (from `harness/templates/process/open-questions.md`).
    - Fill `memory/state.yaml`: project name/one-liner/started, `profile`,
      `phase: business`, business `in-progress`, the artifact versions
      (`brd: {version: N}`, `ui: {version: N, source: <form>}`), history entry

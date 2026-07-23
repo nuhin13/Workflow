@@ -35,8 +35,8 @@ TRACE_ID = re.compile(
 # paths — files under project/, spec/, epics/E* and docs/domain/ are pipeline
 # OUTPUTS that legitimately don't exist in the pristine template.
 PATH_REF = re.compile(
-    r"`((?:harness/(?:skills|workflows|agents|memory|adapters|hooks|mcp|orchestrator)|"
-    r"templates|epics/_templates|memory)/[A-Za-z0-9_./-]+)`"
+    r"`((?:harness/(?:skills|workflows|agents|memory|adapters|hooks|mcp|orchestrator|templates)|"
+    r"memory|epics/_templates)/[A-Za-z0-9_./-]+)`"
 )
 
 
@@ -177,7 +177,7 @@ README_DIRS = [
     "harness/orchestrator", "harness/adapters", "harness/hooks", "harness/handoffs",
     "harness/memory", "harness/memory/lessons", "harness/memory/decisions",
     "harness/memory/graphiti", "harness/mcp", "harness/rates",
-    "templates", "project", "epics", "memory", "spec",
+    "harness/templates", "project", "epics", "memory", "spec",
     "docs", "docs/business", "dashboard", "runs",
 ]
 

@@ -6,7 +6,7 @@ description: Build or verify the BRD↔feature↔UI↔epic↔test traceability m
 # /trace — traceability matrix
 
 1. First run: create `project/02-traceability/matrix.md` from
-   `templates/traceability-matrix.md` and `discrepancies/` dir.
+   `harness/templates/plan/traceability-matrix.md` and `discrepancies/` dir.
 2. **Index:** scan all artifacts (business docs, design screens, epics/tasks, tests) for
    IDs and Traces-from/to declarations; rebuild §1 rows and per-row status.
 3. **Verify (reverse checks):**
@@ -21,7 +21,7 @@ description: Build or verify the BRD↔feature↔UI↔epic↔test traceability m
      MUST be re-reviewed against the new source version before the next gate.
 4. **Resolve:** mechanical/unambiguous fixes → apply to ALL linked artifacts in the same
    commit and log in §4 (Change ripples). Judgment calls → `D-###` note
-   (`templates/discrepancy-note.md`), linked from BOTH artifacts and indexed in §3;
+   (`harness/templates/process/discrepancy-note.md`), linked from BOTH artifacts and indexed in §3;
    high-severity D-### also goes to `state.yaml` blockers.
 5. Report: rows added/updated, gaps found, fixes applied, D-### filed. Commit
    `trace: <summary>`. If this was the Phase 2 gate, set `phase: tech-plan`.

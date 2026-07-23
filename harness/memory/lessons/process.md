@@ -69,7 +69,7 @@
   change". The request was genuine but had been made outside the coordinator's thread, so the
   change landed with no verifiable approval trail and retroactively altered the template that
   8 already-approved task specs were written against.
-- root cause: constitution rule 6 puts harness/, AGENTS.md and templates/ behind
+- root cause: constitution rule 6 puts harness/, AGENTS.md and harness/templates/ behind
   harness_change_policy, but nothing forces the approval to be *recorded* before the commit.
 - fix applied: harness-file changes are proposed as a diff and land only after the human
   approves in-thread; the commit message cites where that approval happened. An agent that

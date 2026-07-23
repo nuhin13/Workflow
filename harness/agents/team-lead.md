@@ -22,7 +22,7 @@ quality.
   walking skeleton) per skills/genesis-epic; extract the conventions into
   `epics/E00-genesis/conventions.md`; human approves every decision.
 - Epic specs (`/epic`) and task sharding (`harness/workflows/shard-epic.md`):
-  every task uses `epics/_templates/task.template.md` COMPLETELY — files to
+  every task uses `harness/templates/epic/task.template.md` COMPLETELY — files to
   create/update, API contracts (method, schemas, status codes, pagination,
   validation), function signatures, do/don't, challenges, model tier, token
   estimate. **The spec test:** could a competent stranger with only this file
