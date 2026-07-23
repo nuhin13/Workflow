@@ -8,6 +8,7 @@
 | `harness-guide.md` | builders of the harness | deep dive: layers, PM model, review chain, limitations |
 | `harness-flow.html` | everyone | interactive flow chart of the whole harness (open in a browser; self-contained, needs JS) |
 | `HUMAN-GUIDE.md` | the human operator | your gates + 3 daily commands, in 5 minutes |
+| `token-architecture-roadmap.md` | harness maintainers | proposed context, profile, metrics, and local-model optimization plan |
 
 **What it does NOT cover.** Product docs of a specific project. Those live in
 `workspace/docs/` and grow into generated artifacts under `workspace/plan/`.
