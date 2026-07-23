@@ -59,8 +59,8 @@ coverage/
 .coverage
 
 # Harness
-runs/*/
-dashboard/index.html
+workspace/runs/*/
+workspace/dashboard/index.html
 __pycache__/
 *.pyc
 harness/handoffs/*.yaml
@@ -69,8 +69,8 @@ harness/handoffs/*.diff
 harness/handoffs/.FREEZE
 
 # prompt/answer audit logs are curated evidence — keep them versioned
-!runs/_prompt-log/
-!runs/_prompt-log/**
+!workspace/runs/_prompt-log/
+!workspace/runs/_prompt-log/**
 
 # Playwright
 test-results/

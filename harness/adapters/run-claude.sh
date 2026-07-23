@@ -3,7 +3,8 @@
 set -euo pipefail
 TASK="${1:?task id}"; PROMPT="${2:?prompt}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"; cd "$ROOT"
-TS=$(date -u +%Y%m%dT%H%M%SZ); OUT="runs/$TASK/$TS-claude.json"; mkdir -p "runs/$TASK"
+RUNS_DIR="$(python3 harness/orchestrator/paths.py runs)"
+TS=$(date -u +%Y%m%dT%H%M%SZ); OUT="$RUNS_DIR/$TASK/$TS-claude.json"; mkdir -p "$RUNS_DIR/$TASK"
 # VERIFY flags: `claude --help`. Permission mode is conservative by default;
 # export HARNESS_CLAUDE_FLAGS='--permission-mode acceptEdits' to loosen.
 claude -p "$PROMPT" --output-format json ${HARNESS_CLAUDE_FLAGS:-} | tee "$OUT" >/dev/null

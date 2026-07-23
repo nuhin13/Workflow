@@ -26,7 +26,7 @@ Say it to the PM agent (or run /inject-work). It routes:
 - a project-wide rule → constitution edit + ADR (you approve)
 In-progress tasks are never silently edited — new work enters as new tasks.
 
-## Reading the dashboard (dashboard/index.html)
+## Reading the dashboard (workspace/dashboard/index.html)
 Rebuild: `make dashboard`
 - top strip: total cost, tokens, tasks done, open bugs
 - per-epic card: progress bar by status, **cost vs budget bar** (turns coral

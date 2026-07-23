@@ -42,7 +42,7 @@ flowchart TB
 Two layers, one rule: **every arrow ends at a human gate before it moves on.**
 
 Prefer it visual and interactive? Open
-[`docs/harness-flow.html`](docs/harness-flow.html) in a browser — the full
+[`harness/docs/harness-flow.html`](harness/docs/harness-flow.html) in a browser — the full
 flow chart of the harness, one self-contained file.
 
 ---
@@ -84,7 +84,7 @@ flowchart LR
   `harness/`. Agents become subagents. Skills become `/commands`. Native.
 - **Other platforms**: they read `AGENTS.md` and reach the same files by
   path. Headless runs go through `harness/adapters/run-<platform>.sh`,
-  which logs cost + session JSON into `runs/` and `metrics.csv`.
+  which logs cost + session JSON into `workspace/runs/` and `metrics.csv`.
 
 ---
 
@@ -155,7 +155,7 @@ flowchart TB
 ```mermaid
 flowchart LR
     subgraph EVERY_SESSION["Read at every session start"]
-        ST["memory/state.yaml<br>phase · epics · blockers · history"]
+        ST["workspace/state.yaml<br>phase · epics · blockers · history"]
     end
     subgraph LONG_TERM["Long-term memory (harness/memory/)"]
         LE["lessons/&lt;area&gt;.md<br>L-area-nnn"]
@@ -168,7 +168,7 @@ flowchart LR
     LE -->|"recurs twice → promoted"| RULE["rule in a SKILL.md<br>then a git hook"]
 ```
 
-- **Session tracking**: `memory/state.yaml` is the single resume point.
+- **Session tracking**: `workspace/state.yaml` is the single resume point.
   Any platform, any session: read state → announce position → continue.
   `/status` does this and refreshes the dashboard.
 - **Lessons compound**: every mistake becomes a lesson. A lesson that
@@ -206,7 +206,7 @@ threshold, work freezes into a packet and the next platform in
 One static HTML file. No server, no login, no dependency.
 
 ```bash
-make dashboard          # rebuild → dashboard/index.html
+make dashboard          # rebuild → workspace/dashboard/index.html
 ```
 
 It shows: pipeline phases · every epic and task with status, worker →
@@ -241,9 +241,9 @@ make validate                     # both validators must pass
 
 | You have | Put it at |
 |---|---|
-| BRD | `docs/business/BRD.md` |
-| Figma design | paste the URL in `docs/design/README.md` |
-| SRS | `spec/srs.md` |
+| BRD | `workspace/docs/business/BRD.md` |
+| Figma design | paste the URL in `workspace/docs/design/README.md` |
+| SRS | `workspace/spec/srs.md` |
 
 **Step 2 — run the pipeline** (Claude Code shown; any platform works)
 
@@ -266,7 +266,7 @@ and tells you the single next action.
 
 **Your job as the human**: answer batched questions, pick the stack,
 approve checkpoints. Everything else is the machine's job.
-Full playbook: [`docs/HUMAN-GUIDE.md`](docs/HUMAN-GUIDE.md).
+Full playbook: [`harness/docs/HUMAN-GUIDE.md`](harness/docs/HUMAN-GUIDE.md).
 
 ---
 
@@ -300,7 +300,7 @@ flowchart LR
     P1 -.->|"/harness-sync promote<br>(universal lessons → PR)"| T
 ```
 
-Each project keeps its own memory (`memory/state.yaml`,
+Each project keeps its own memory (`workspace/state.yaml`,
 `harness/memory/`). Only *universal* lessons — rules that would help any
 product — travel back to the template as inherited seeds. Project
 content (specs, state, product lessons) never leaves its repo.
@@ -326,15 +326,16 @@ fails if one is missing. The map below is the short version.
 | `harness/hooks/` | git hooks + rate-limit statusline |
 | `harness/memory/` | lessons, ADRs, graphiti schema |
 | `harness/mcp/` | external platform guides (Figma, DB, Jira, Slack…) |
+| `harness/docs/` | harness guide, human guide, visual flow |
 | `harness/templates/` | canonical artifact templates (see its README) |
-| `project/` | phase 0–4 artifacts of YOUR product |
-| `spec/` | the SRS — law once approved |
-| `epics/` | the work queue: epic + task specs |
-| `memory/state.yaml` | pipeline position — the resume point |
-| `dashboard/` | the PM console (generated) |
-| `runs/` | headless run logs — the audit trail |
-| `docs/` | harness guide (deep dive) · human guide · design canon |
+| `workspace/docs/` | product BRD and design canon |
+| `workspace/plan/` | phase 0–4 artifacts of YOUR product |
+| `workspace/spec/` | the SRS — law once approved |
+| `workspace/epics/` | the work queue: epic + task specs |
+| `workspace/state.yaml` | pipeline position — the resume point |
+| `workspace/dashboard/` | the PM console (generated) |
+| `workspace/runs/` | headless run logs — the audit trail |
 
-Deep dive: [`docs/harness-guide.md`](docs/harness-guide.md) ·
+Deep dive: [`harness/docs/harness-guide.md`](harness/docs/harness-guide.md) ·
 Constitution: [`AGENTS.md`](AGENTS.md) ·
-Human playbook: [`docs/HUMAN-GUIDE.md`](docs/HUMAN-GUIDE.md)
+Human playbook: [`harness/docs/HUMAN-GUIDE.md`](harness/docs/HUMAN-GUIDE.md)

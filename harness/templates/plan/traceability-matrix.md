@@ -20,7 +20,7 @@ Status: planned | designed | in-build | done | verified | shipped | drifted (has
 - Orphans found go to §3 as discrepancies
 
 ## 3. Discrepancy notes
-Full notes in `project/02-traceability/discrepancies/D-###.md`
+Full notes in `workspace/plan/02-traceability/discrepancies/D-###.md`
 (template: `harness/templates/process/discrepancy-note.md`). Index:
 
 | ID | Between | Summary | Severity | Status |

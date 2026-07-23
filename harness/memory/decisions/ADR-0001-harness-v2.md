@@ -35,7 +35,7 @@ them so v2 execution has a verifiable approval trail (L-process-009).
 - Folders move `agent/` → `harness/` in a later, atomic migration step; this
   ADR does not perform the move.
 - BRD + a UI reference are entry conditions; `/kickoff` refuses without both.
-- Versions are first-class in `memory/state.yaml` (`derived_from`), so a BRD
+- Versions are first-class in `workspace/state.yaml` (`derived_from`), so a BRD
   bump marks downstream artifacts stale via `/trace`.
 
 ## Rollout

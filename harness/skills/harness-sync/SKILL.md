@@ -37,7 +37,7 @@ re-create the remote.
 5. `make validate` must pass. Commit `chore(harness): pull template updates
    <template-sha>`, PR into `development` as usual.
 
-Never pull `project/`, `spec/`, `epics/E*`, `docs/business/`, `memory/` —
+Never pull live project content from `workspace/` or product code from `src/` —
 those are THIS project's content, not the template's.
 
 ## promote — send a universal lesson back to the template

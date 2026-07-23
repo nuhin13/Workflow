@@ -7,7 +7,7 @@
 
 E00 exists to make every later epic identical in shape. Anything two implementers could do
 two different ways gets decided HERE, once. `conventions.md` (§3 extracted to
-`epics/E00-genesis/conventions.md`) is quoted verbatim in every task spec.
+`workspace/epics/E00-genesis/conventions.md`) is quoted verbatim in every task spec.
 
 ## 1. Project structure
 Full tree with a one-line purpose per directory — where EVERY kind of code goes:

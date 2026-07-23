@@ -2,8 +2,8 @@
 """the harness metrics collector — append one run's tokens+cost to its epic CSV.
 
 Usage:
-  python3 metrics_collect.py --task E03-T07 --platform claude-code --result runs/E03-T07/x.json
-  python3 metrics_collect.py --task E03-T07 --platform codex --result runs/E03-T07/x.jsonl
+  python3 metrics_collect.py --task E03-T07 --platform claude-code --result workspace/runs/E03-T07/x.json
+  python3 metrics_collect.py --task E03-T07 --platform codex --result workspace/runs/E03-T07/x.jsonl
 
 For claude-code, reads the `claude -p --output-format json` result message:
 `total_cost_usd` is the AUTHORITATIVE cost (do NOT sum raw per-turn
@@ -12,12 +12,14 @@ probed defensively because shapes vary across CLI versions.
 For codex, reads `codex exec --json` JSONL events and sums `last_token_usage`
 from token_count events. Codex does not emit authoritative cost, so cost_usd is
 left empty unless the result shape starts emitting it later.
-CSV: epics/<EPIC>/metrics.csv
+CSV: workspace/epics/<EPIC>/metrics.csv
   ts,task_id,platform,model,input,output,cache_read,cache_creation,cost_usd,duration_s,session_id
 """
 import argparse, csv, datetime, glob, json, os, sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(__file__))
+from paths import ROOT, abspath, root_rel
+
 HEADER = ["ts", "task_id", "platform", "model", "input", "output",
           "cache_read", "cache_creation", "cost_usd", "duration_s", "session_id"]
 
@@ -116,9 +118,9 @@ def collect_json_usage(data, row, model_arg):
 
 def epic_dir(task_id):
     eid = task_id.split("-")[0]
-    hits = glob.glob(os.path.join(ROOT, "epics", eid + "-*")) + glob.glob(os.path.join(ROOT, "epics", eid))
+    hits = glob.glob(abspath("epics", eid + "-*")) + glob.glob(abspath("epics", eid))
     if not hits:
-        sys.exit(f"harness: no epics/{eid}-* folder for task {task_id}")
+        sys.exit(f"harness: no configured epics folder for {eid} (task {task_id})")
     return hits[0]
 
 
@@ -150,7 +152,7 @@ def main():
         if new:
             w.writeheader()
         w.writerow(row)
-    print(f"harness: metrics → {os.path.relpath(path, ROOT)} "
+    print(f"harness: metrics → {root_rel(path)} "
           f"(cost={row['cost_usd'] or 'n/a'} model={row['model'] or 'n/a'})")
 
 

@@ -1,7 +1,7 @@
 # The Agentic Harness — How It Works
 
 > Complete operating manual for this repository's multi-agent development
-> harness. Read this once, then drive with `docs/HUMAN-GUIDE.md` (the 5-minute
+> harness. Read this once, then drive with `harness/docs/HUMAN-GUIDE.md` (the 5-minute
 > human playbook) and `AGENTS.md` (the constitution, loaded on every agent turn).
 
 ---
@@ -19,16 +19,16 @@ share one project wiki (this repo) and one law book (`AGENTS.md`), and who can
 be swapped mid-task without losing work.
 
 ```
-docs/business/BRD.md          the business truth (what & why)
+workspace/docs/business/BRD.md          the business truth (what & why)
         │  PM agent drafts, human approves
         ▼
-spec/srs.md                   the build truth ("spec is law")
+workspace/spec/srs.md                   the build truth ("spec is law")
         │  /epic-breakdown (PM) — human approves the epic map
         ▼
-epics/E00-genesis/            stack · architecture · walking skeleton
+workspace/epics/E00-genesis/            stack · architecture · walking skeleton
         │  human decides ADRs (rule 13), exit gate locks E00
         ▼
-epics/E01…/tasks/*.md         sharded tasks (files, contracts, EARS, DoD)
+workspace/epics/E01…/tasks/*.md         sharded tasks (files, contracts, EARS, DoD)
         │  make next → scheduler picks → agent implements on task branch
         ▼
 QA-gated PRs                  peer AI review (different model) + QA gate
@@ -47,14 +47,15 @@ shipped code                  every commit traces back to a BRD line
 | **Roles** | `harness/agents/` | 10 role cards / subagents: pm, team-lead (delivery planner), orchestrator, qa, devops, developer-backend, developer-frontend + pipeline roles analyst, designer, architect. Each defines boundaries: what it may do, what it must hand off. Mirrored at `.claude/agents` (symlink) |
 | **Workflows** | `harness/workflows/` | 12 step-by-step processes: epic-breakdown, implement-task, qa-review, handoff-freeze/resume, retro, release, rollback triggers… Start with `_handoff_protocol.md` |
 | **Skills** | `harness/skills/` | 35 on-demand skills: 16 pipeline drivers (/kickoff /brd /prd /features /forecast /design /trace /tech-plan /dev-plan /epic /build /qa /checkpoint /status /question /lesson) + capability manuals (SRS/EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization…). Mirrored at `.claude/skills` (symlink); loaded only when needed |
-| **Pipeline artifacts** | `harness/templates/` → `project/` | Phase 0–4 artifacts (BRD/PRD/features/forecast, design system + screens, traceability matrix, tech plan, dev plan) — each starts from its template (see `harness/templates/README.md`) |
-| **Work items** | `epics/` | Epic dirs with `epic.md`, `tracker.md`, `tasks/*.md`, `metrics.csv`. Templates in `harness/templates/epic/` |
+| **Product inputs** | `workspace/docs/` | Human-approved BRD and design reference. These are entry conditions for kickoff |
+| **Pipeline artifacts** | `harness/templates/` → `workspace/plan/` | Generated phase 0–4 artifacts (PRD/features/forecast, design system + screens, traceability matrix, tech plan, dev plan) — each starts from its template (see `harness/templates/README.md`) |
+| **Work items** | `workspace/epics/` | Epic dirs with `epic.md`, `tracker.md`, `tasks/*.md`, `metrics.csv`. Templates in `harness/templates/epic/` |
 | **Orchestrator** | `harness/orchestrator/` | `scheduler.py` (DAG + picker), `metrics_collect.py` / `metrics_report.py` (cost), `dashboard_build.py` (HTML board), `ratelimit_guard.py` (freeze trigger) |
-| **Adapters (exec)** | `harness/adapters/` | `run-claude.sh`, `run-codex.sh`, `run-opencode.sh` — same prompt in, session + cost JSON out into `runs/` |
+| **Adapters (exec)** | `harness/adapters/` | `run-claude.sh`, `run-codex.sh`, `run-opencode.sh` — same prompt in, session + cost JSON out into `workspace/runs/` |
 | **Handoffs** | `harness/handoffs/` | Freeze packets (YAML) for cross-platform resume |
-| **Memory** | `harness/memory/` + `memory/state.yaml` | `decisions/` (ADRs), `lessons/` (retro output), `graphiti/` (optional temporal knowledge graph); `memory/state.yaml` is the pipeline position any platform resumes from |
+| **Memory** | `harness/memory/` + `workspace/state.yaml` | `decisions/` (ADRs), `lessons/` (retro output), `graphiti/` (optional temporal knowledge graph); `workspace/state.yaml` is the pipeline position any platform resumes from |
 | **Hooks** | `harness/hooks/` | Git hooks: strip AI co-author trailers, block direct pushes to main/development. Statusline script for rate-limit visibility |
-| **Run logs** | `runs/<task-id>/` | Every headless run's session JSON + cost — the audit trail |
+| **Run logs** | `workspace/runs/<task-id>/` | Every headless run's session JSON + cost — the audit trail |
 
 ## 3. Project management (built in — no Jira needed)
 
@@ -100,7 +101,7 @@ make next       # scheduler picks next task(s) — JSON with task/model/owner
 make next LAYER=frontend   # pull one lane only (parallel streams)
 make review     # tasks waiting on peer/QA review
 make validate   # DAG sanity: unknown deps, cycles, missing traces_to
-make dashboard  # rebuild dashboard/index.html (cost + progress board)
+make dashboard  # rebuild workspace/dashboard/index.html (cost + progress board)
 make metrics    # token + cost report per task/epic from metrics.csv
 ```
 
@@ -131,13 +132,13 @@ file + git — never through chat history.
 | OpenCode | `AGENTS.md` natively | `harness/adapters/run-opencode.sh` (config: `harness/mcp/opencode.example.json`) |
 | Cursor / other | `AGENTS.md` (open standard) | point it at the task file + AGENTS.md |
 
-Adapters capture session JSON + cost into `runs/<task-id>/` and append to the
+Adapters capture session JSON + cost into `workspace/runs/<task-id>/` and append to the
 epic's `metrics.csv` — so cross-platform spend stays comparable.
 
 ### The standard task prompt (any platform)
 
 ```
-Read AGENTS.md, then epics/E01-auth/tasks/E01-T03.md fully.
+Read AGENTS.md, then workspace/epics/E01-auth/tasks/E01-T03.md fully.
 Check harness/memory/lessons/ for the relevant area.
 Execute the task exactly per its checklist. Follow the git-flow skill:
 branch epic_01_task_03. Update frontmatter status + tracker as you go.
@@ -222,7 +223,7 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
    but you (or the orchestrator agent) launch them; there is no background
    daemon moving work between platforms.
 8. **Learning curve.** 16 rules, 10 roles, 12 workflows, 35 skills. Newcomers:
-   read this doc + `docs/HUMAN-GUIDE.md`, ignore the rest until a workflow
+   read this doc + `harness/docs/HUMAN-GUIDE.md`, ignore the rest until a workflow
    points at it.
 
 ## 8. Bootstrap sequence for a NEW project
@@ -234,7 +235,7 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
    (.claude/skills and .claude/agents are already symlinked into harness/)
 1. Phase 0-3: /kickoff → /brd → /prd → /features → /forecast
    → /design → /trace → /tech-plan            → HUMAN approves each artifact
-   PM agent: draft spec/srs.md from BRD/PRD (skills/srs-authoring)
+   PM agent: draft workspace/spec/srs.md from BRD/PRD (skills/srs-authoring)
                                               → HUMAN approves
 2. /dev-plan → master epic map                → HUMAN approves
 3. Genesis epic E00: agent presents stack/architecture options with pros+cons
@@ -244,7 +245,7 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
 6. After each epic: /retro → lessons → promotions (HUMAN approves)
 ```
 
-Paste the Figma URL into `docs/design/README.md` before any frontend epic.
+Paste the Figma URL into `workspace/docs/design/README.md` before any frontend epic.
 
 ## 9. Session rituals (per agent session — any platform)
 
@@ -305,7 +306,7 @@ mistake observed
 | Cross-PLATFORM portability | ✅ 30+ tools (templates) | partial | – | ✅ AGENTS.md + adapters + freeze/resume packets |
 | Progress artifact for fresh context | tasks.md | stories | progress file + feature list + git | ✅ task §12 live checklist + tracker + packet |
 | Independent AI review gate | – | QA agent | verify with browser tools | ✅ peer (different MODEL) + QA gate + human gate |
-| Cost/token accounting | – | – | – | ✅ runs/ + metrics.csv + dashboard + budgets |
+| Cost/token accounting | – | – | – | ✅ workspace/runs/ + metrics.csv + dashboard + budgets |
 | Self-improvement loop | – | – | – | ✅ retro ladder lesson→rule→hook |
 | Rate-limit resilience | – | – | compaction + artifacts | ✅ freeze packets + platform fallback |
 
@@ -323,8 +324,8 @@ Green before first feature epic:
       `harness/hooks/statusline-ratelimit.sh`
 - [ ] `.env` with MCP secrets (never committed); `/mcp` shows required
       servers healthy — degraded fallbacks per skills/mcp-connections
-- [ ] Figma URL pasted into `docs/design/README.md`
-- [ ] `spec/srs.md` approved; `make validate` green
+- [ ] Figma URL pasted into `workspace/docs/design/README.md`
+- [ ] `workspace/spec/srs.md` approved; `make validate` green
 - [ ] E00 exit gate: ADRs accepted, CI green, walking skeleton seen live
 - [ ] Branch protection on `main` + `development` (PR + CI required)
 

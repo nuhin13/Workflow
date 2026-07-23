@@ -13,11 +13,11 @@ Claude Code specifics for this repo:
   token-optimization, rate-limit-handoff, …).
   On Windows checkouts without symlink support: `git config core.symlinks
   true` before cloning, or copy the two directories.
-- **Session start ritual** (constitution rule 15): read `memory/state.yaml`,
+- **Session start ritual** (constitution rule 15): read `workspace/state.yaml`,
   skim `harness/memory/lessons/` for the area you'll touch, announce position
   in one sentence, continue the pipeline (`/status` does this for you).
 - Run headless tasks via `harness/adapters/run-claude.sh <task-id> "<prompt>"`
-  so cost + session JSON are captured into `runs/` and `metrics.csv`.
+  so cost + session JSON are captured into `workspace/runs/` and `metrics.csv`.
 - Settings this repo expects (see `harness/hooks/`):
   - `"includeCoAuthoredBy": false` (or `"attribution": {"commit": "", "pr": ""}`)
   - statusLine wired to `harness/hooks/statusline-ratelimit.sh` for rate-limit

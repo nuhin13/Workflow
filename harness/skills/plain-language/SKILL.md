@@ -1,6 +1,6 @@
 ---
 name: plain-language
-description: Write every human-facing document in simple, friendly English — short sentences, common words, and DIAGRAM-FIRST (Mermaid, never ASCII art or arrow-strings — a hard rule for plans/epics/ADRs/guides, a value test for task specs). Apply when writing or revising any README, guide, BRD/PRD, dev plan, epic/task spec, checkpoint, QA report, or handoff a human will read. Also usable as a rewrite pass - /plain-language <file>.
+description: Write every human-facing document in simple, friendly English — short sentences, common words, and DIAGRAM-FIRST (Mermaid, never ASCII art or arrow-strings — a hard rule for plans, epics, ADRs, and guides; a value test for task specs). Apply when writing or revising any README, guide, BRD/PRD, dev plan, epic/task spec, checkpoint, QA report, or handoff a human will read. Also usable as a rewrite pass - /plain-language <file>.
 ---
 
 # plain-language — docs a human can actually read

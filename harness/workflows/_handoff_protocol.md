@@ -5,7 +5,7 @@
 > rate-limited, and must let a different CLI pick up cleanly.
 
 ## 1. Core principle
-**No agent is special.** A task file + the spec/architecture docs contain
+**No agent is special.** A task file plus the spec and architecture docs contain
 everything needed to execute. Any agent that can read markdown and write code
 can pick up any `todo` task whose dependencies are met. Handoffs happen
 through the task file + git (+ the handoff packet for freezes) — **never
@@ -93,7 +93,7 @@ executes `next_step` literally. The packet is the transfer unit.
 - **Small spec ambiguity:** pick the simplest interpretation that satisfies
   the acceptance criteria, note the assumption in §15 Deviations, flag for
   review. Don't stall on small ambiguities.
-- **Real spec gap / contradiction:** `spec/srs.md` wins on *what*; the
+- **Real spec gap / contradiction:** `workspace/spec/srs.md` wins on *what*; the
   genesis/architecture decisions win on *how*. Still unclear → Open
   Questions + `status: blocked`; human decides.
 - **Two agents touched the same files:** the depends/blocks graph should

@@ -28,4 +28,4 @@ Operating rules:
 - §5 of the plan must end in concrete conventions Epic 00 can encode verbatim.
 - Later in the project: when an implementer or the team-lead requests a new pattern or dependency, you
   approve/reject it against the ADRs, recording the outcome as an ADR when significant.
-- Finish with a Handoff block; update `memory/state.yaml`.
+- Finish with a Handoff block; update `workspace/state.yaml`.

@@ -39,7 +39,7 @@ description: <what it does + WHEN to use — the trigger phrases matter;
 4. Claude Code native discovery: skills are exposed via the
    `.claude/skills` symlink (`ln -s ../harness/skills .claude/skills`) — a new
    folder is picked up automatically; no extra step.
-5. Update the skill count/table in `docs/harness-guide.md` §2.
+5. Update the skill count/table in `harness/docs/harness-guide.md` §2.
 6. Commit as `chore(harness): add skill <name>` — 🧍 human approves the PR
    (constitution: skill edits are human-gated).
 

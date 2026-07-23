@@ -3,7 +3,8 @@
 set -euo pipefail
 TASK="${1:?task id}"; PROMPT="${2:?prompt}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"; cd "$ROOT"
-TS=$(date -u +%Y%m%dT%H%M%SZ); OUT="runs/$TASK/$TS-codex.jsonl"; mkdir -p "runs/$TASK"
+RUNS_DIR="$(python3 harness/orchestrator/paths.py runs)"
+TS=$(date -u +%Y%m%dT%H%M%SZ); OUT="$RUNS_DIR/$TASK/$TS-codex.jsonl"; mkdir -p "$RUNS_DIR/$TASK"
 # VERIFY flags: `codex exec --help` (sandbox/model flags evolve).
 codex exec --json ${HARNESS_CODEX_FLAGS:-} "$PROMPT" 2>&1 | tee "$OUT" >/dev/null
 python3 harness/orchestrator/metrics_collect.py --task "$TASK" --platform codex --result "$OUT"

@@ -10,7 +10,7 @@ input, same output, no LLM.
 |---|---|---|
 | `scheduler.py` | `make next/status/review/validate` | task DAG, statuses, pick order, WIP + file-collision guard |
 | `validate_harness.py` | `make validate` | constitution checks: IDs, frontmatter, peer rule, write scopes, dead paths |
-| `metrics_collect.py` | (adapters call it) | append run usage to `epics/*/metrics.csv` |
+| `metrics_collect.py` | (adapters call it) | append run usage to `workspace/epics/*/metrics.csv` |
 | `metrics_report.py` | `make metrics` | cost per task/epic + budget warnings |
 | `dashboard_build.py` | `make dashboard` | the PM console (one static HTML) |
 | `ratelimit_guard.py` | statusline/hooks | freeze at the rate-limit threshold |

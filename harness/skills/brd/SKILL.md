@@ -5,14 +5,14 @@ description: Create or revise the Business Requirements Document from its templa
 
 # /brd — business requirements document
 
-1. Read `memory/state.yaml` and `project/00-business/idea.md` (plus existing BRD if
+1. Read `workspace/state.yaml` and `workspace/plan/00-business/idea.md` (plus existing BRD if
    revising).
-2. Delegate to the **analyst** agent: produce/revise `docs/business/BRD.md` from
+2. Delegate to the **analyst** agent: produce/revise `workspace/docs/business/BRD.md` from
    `harness/templates/business/brd.md`, following its interrogation rules. Pass along `$ARGUMENTS` and the
    idea file.
 3. Present the human: the executive summary, the objectives table, the out-of-scope list,
    and any batched blocking questions. Apply answers; non-blocking questions become Q-###
-   in `project/open-questions.md`.
+   in `workspace/open-questions.md`.
 4. On approval mark the BRD `approved` with its Handoff block; update state + history;
    commit `business: BRD`. If the BRD changed after later phases exist, run `/trace` to
    ripple.

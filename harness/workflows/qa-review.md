@@ -6,7 +6,7 @@
    `executed_by` (protocol §2); peer notes in the tracker Review log.
 1. QA applies skills/qa-pr-review fully; runs the suite itself.
 1a. Frontend tasks (`ui_reference` set): QA verifies **UI fidelity** vs the Figma
-    frame (docs/design/README.md — the design is law) — boot the web app dev
+    frame (workspace/docs/design/README.md — the design is law) — boot the web app dev
     server, screenshot the built route, compare to the Figma frame at the same
     viewport for layout/chrome/structure/icons/copy/hover, confirm design
     tokens + the global base. Mismatch (not a logged §15 deviation) = CHANGES.

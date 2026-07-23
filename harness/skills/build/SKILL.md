@@ -5,7 +5,7 @@ description: Execute the current epic's task specs — pick unblocked tasks via 
 
 # /build — execute task specs
 
-Argument: an epic (`E<NN>`, default: `current_epic` from `memory/state.yaml`)
+Argument: an epic (`E<NN>`, default: `current_epic` from `workspace/state.yaml`)
 or a single task (`E<NN>-T<MM>`).
 
 1. **Pick.** `make next` (scheduler) lists unblocked tasks in pick order;
@@ -17,7 +17,7 @@ or a single task (`E<NN>-T<MM>`).
    worktree, the task spec is the complete prompt. Route by frontmatter:
    `owner_agent` (developer-backend / developer-frontend / devops),
    `model` tier, `preferred_agent` platform — headless via
-   `harness/adapters/run-<platform>.sh` so cost + session land in `runs/` and
+   `harness/adapters/run-<platform>.sh` so cost + session land in `workspace/runs/` and
    `metrics.csv`.
 3. **Statuses.** `todo → in-progress` on start; the implementer finishes at
    `review-requested` (never `done` — QA is the gate). Blocked → `blocked`
@@ -26,7 +26,7 @@ or a single task (`E<NN>-T<MM>`).
    (`harness/workflows/_handoff_protocol.md` §2); merge into the epic branch on
    approval → `done`. High-risk tasks (auth, payments, migrations, security)
    additionally get `/qa E<NN>-T<MM>` before merging (constitution rule 3).
-5. **Track.** Update `memory/state.yaml` (task statuses, history) and the
+5. **Track.** Update `workspace/state.yaml` (task statuses, history) and the
    epic tracker. When all tasks are `done`: `/qa E<NN>` (epic sweep) →
    `/checkpoint E<NN>`.
 

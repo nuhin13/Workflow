@@ -1,9 +1,9 @@
 # Design System — <Project Name>
 
 - Traces from: PRD (`FR-###`), Feature list (`FT-###`)
-- Companion files: `project/01-design/tokens.json` (machine-readable),
-  `project/01-design/components/` (one HTML/CSS file per component),
-  `project/01-design/prototype/` (clickable screens)
+- Companion files: `workspace/plan/01-design/tokens.json` (machine-readable),
+  `workspace/plan/01-design/components/` (one HTML/CSS file per component),
+  `workspace/plan/01-design/prototype/` (clickable screens)
 - Last updated: YYYY-MM-DD
 
 RULE: `tokens.json` is the source of truth. This document and every component/prototype file

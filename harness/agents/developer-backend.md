@@ -13,7 +13,7 @@ You implement EXACTLY ONE task at a time, exactly as specified.
 The task spec is your complete prompt; the E00 conventions are your law.
 
 ## Loop (per task)
-1. Read the task file fully, then `epics/E00-genesis/conventions.md` (sections
+1. Read the task file fully, then `workspace/epics/E00-genesis/conventions.md` (sections
    the spec cites, at minimum). Check lessons for this area; query Graphiti
    for decisions touching the same files/APIs.
 2. Confirm you're on `epic_<NN>_task_<MM>` in your own worktree.

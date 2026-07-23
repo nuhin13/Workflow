@@ -24,7 +24,7 @@ files: { create: [], update: [] }  # MANDATORY mirror of §5 — the scheduler's
                                    # parallel-collision guard reads this
 feature_flags: []                # flags this task introduces/toggles
 ui_reference: n/a                # REQUIRED if layer: frontend — Figma frame(s) this builds
-                                 # (link or frame name; see docs/design/README.md — UI is law)
+                                 # (link or frame name; see workspace/docs/design/README.md — UI is law)
 # ── audit trail (agents stamp these) ────────────────────────────────
 started_at:
 completed_at:
@@ -92,7 +92,7 @@ functions:
 (If none: "No new functions.")
 
 ## 9. UI changes
-- **Design source:** Figma frame `<link/name>` (see docs/design/README.md)
+- **Design source:** Figma frame `<link/name>` (see workspace/docs/design/README.md)
 - Surface: requester 🟦 / agent 🟩 / manager·admin 🟪 / widget ⬜ — route per routes doc
 - Translate layout + composition + copy; values from design tokens, never
   inline-copied styles
@@ -141,7 +141,7 @@ functions:
 ## 16. Definition of Done
 - [ ] All §14 criteria pass via tests named by EARS/FR id
 - [ ] **UI fidelity** (frontend tasks only — N/A if no `ui_reference`): per
-      [docs/design/README.md](../../docs/design/README.md) (UI is law) — the
+      [workspace/docs/design/README.md](../../docs/design/README.md) (UI is law) — the
       built page matches its `ui_reference` Figma frame in **layout, chrome (Nav/Footer),
       component structure, iconography, copy, and hover/focus states** — not just
       colors/fonts. Reuse shared primitives, consume design tokens (never inline hex), and

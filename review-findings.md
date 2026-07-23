@@ -14,7 +14,7 @@ flow.
 
 - File: `harness.yaml:106`
 - Issue: For any run that reaches `/dev-plan` or `/epic`, downstream specs
-  require `spec/srs.md` and SRS IDs (`FR-<AREA>-NN` / `UC-*`) as the canonical
+  require `workspace/spec/srs.md` and SRS IDs (`FR-<AREA>-NN` / `UC-*`) as the canonical
   build law, but this pipeline jumps from `/features` to `/forecast` and never
   invokes `srs-authoring` or a human SRS approval.
 - Impact: A project following the documented flow can enter planning with no
@@ -28,14 +28,14 @@ flow.
   in the repo and `make next` can dispatch a later epic before the current epic
   has passed `/qa` and `/checkpoint`.
 - Impact: This bypasses the per-epic human gate documented in `/checkpoint`.
-  The picker needs to read `memory/state.yaml: current_epic` or accept an
+  The picker needs to read `workspace/state.yaml: current_epic` or accept an
   explicit epic/task filter before returning work.
 
 ### Make lighter profiles executable
 
 - File: `harness.yaml:17-23`
 - Issue: If `small` is selected, the configured path jumps from `design`
-  straight to `build` even though `/build` only consumes generated epics/tasks.
+  straight to `build` even though `/build` only consumes generated epic/task specs.
   `medium` and `large` include `/dev-plan` but omit the `tech_plan` that
   `/dev-plan` declares as a precondition.
 - Impact: These profiles can be chosen at kickoff and then dead-end or skip
@@ -98,7 +98,7 @@ flow.
 - File: `harness/orchestrator/validate_harness.py:158`
 - Issue: The prefix check allows any path that merely starts with an allowed
   string, so an allowlist entry like `src/` also permits `src-old/...`, and
-  `project/00-business/` permits `project/00-business-backup/...`.
+  `workspace/plan/00-business/` permits `workspace/plan/00-business-backup/...`.
 - Impact: Since this validator is the main write-scope enforcement, normalize
   paths and require either exact match or the next character after the allowed
   directory prefix to be `/`.
@@ -115,9 +115,9 @@ flow.
 
 ### Fix the BRD/UI bootstrap deadlock
 
-- File: `docs/business/BRD.md:9`
+- File: `workspace/docs/business/BRD.md:9`
 - Issue: This placeholder tells a fresh user to start with `/kickoff`, but
-  `/kickoff` hard-blocks unless `docs/business/BRD.md` already contains a real
+  `/kickoff` hard-blocks unless `workspace/docs/business/BRD.md` already contains a real
   BRD. The design README similarly says the Figma URL can be unset for
   `/design`, even though kickoff requires a UI reference.
 - Impact: For the mandatory BRD and UI philosophy, the start docs should
@@ -149,10 +149,10 @@ flow.
 
 ### Keep blockers in one question schema
 
-- File: `memory/state.yaml:41`
+- File: `workspace/state.yaml:41`
 - Issue: `state.yaml` documents blockers as full `{id, blocks, question}`
   objects, while `/question` says state mirrors only the IDs and
-  `project/open-questions.md` is the only authoritative text.
+  `workspace/open-questions.md` is the only authoritative text.
 - Impact: Agents following both will duplicate question text into state and
   reintroduce the drift the question skill is trying to prevent. Make the state
   schema and dashboard agree on ID-only or object entries.
@@ -162,7 +162,7 @@ flow.
 ### Reduce root-directory spread
 
 - Files: `harness.yaml:92-103`, `AGENTS.md:12-131`,
-  `docs/harness-guide.md:22-57`
+  `harness/docs/harness-guide.md:22-57`
 - Issue: The root directory is wider than it needs to be. Product-instance
   artifacts are spread across several top-level folders:
   - `docs/`
@@ -178,8 +178,9 @@ flow.
   multi-project reuse less clean.
 - Constraint: These folders are currently "needed" because `harness.yaml`,
   `AGENTS.md`, skills, validators, dashboard scripts, scheduler scripts, and
-  adapters all reference them as canonical paths. They should not be moved until
-  those references are made configurable or updated together.
+  adapters all referenced them as canonical paths. A proper migration must make
+  executable code read these paths from `harness.yaml` and update docs/templates
+  together.
 
 ### Recommended target structure
 
@@ -273,5 +274,6 @@ The efficient structure is:
   artifacts.
 - `src/` for product source code.
 
-This should be treated as a dedicated migration, not a quick cleanup, because
-path assumptions are currently spread across docs and executable scripts.
+Implementation note: this migration has now been applied by moving project
+artifacts into `workspace/`, moving harness guides into `harness/docs/`, and
+adding a shared orchestrator path resolver backed by `harness.yaml: paths`.

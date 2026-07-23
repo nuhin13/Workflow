@@ -8,7 +8,7 @@ project:
   profile: null         # small|medium|large|extra-large|enterprise (set by /kickoff · ADR-0001)
 
 # Artifact versions are first-class (v2 · ADR-0001 D-4). `-vN` files on disk
-# (e.g. docs/business/BRD-v2.md, current pointer = BRD.md). `derived_from`
+# (e.g. workspace/docs/business/BRD-v2.md, current pointer = BRD.md). `derived_from`
 # lets /trace compute staleness: bump the BRD to v3 and every artifact derived
 # from v2 is marked stale automatically instead of a human remembering.
 artifacts:

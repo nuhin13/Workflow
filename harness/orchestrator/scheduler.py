@@ -7,7 +7,7 @@ Usage:
   python3 harness/orchestrator/scheduler.py --status
   python3 harness/orchestrator/scheduler.py --review-queue
 
-Reads epics/*/epic.md + epics/*/tasks/*.md (YAML frontmatter).
+Reads the configured epics path + tasks/*.md (YAML frontmatter).
 Statuses: todo → in-progress → review-requested → (changes-requested →)
 done → verified · side: blocked, frozen.
 Pick order: P1 bugs → MoSCoW → parent-epic WSJF → critical path → (--tight)
@@ -20,7 +20,9 @@ try:
 except ImportError:
     sys.exit("harness: pip install pyyaml (see requirements.txt)")
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(__file__))
+from paths import ROOT, abspath, load_config, root_rel
+
 MOSCOW = {"must": 0, "should": 1, "could": 2, "wont": 3}
 TIER = {"S": 0, "M": 1, "L": 2}
 DONE = {"done", "verified"}
@@ -51,7 +53,7 @@ def deps(t):
 
 def load():
     epics, tasks = {}, {}
-    for ep in sorted(glob.glob(os.path.join(ROOT, "epics", "E*", "epic.md"))):
+    for ep in sorted(glob.glob(abspath("epics", "E*", "epic.md"))):
         fm = frontmatter(ep)
         eid = str(fm.get("id") or os.path.basename(os.path.dirname(ep)).split("-")[0])
         fm.setdefault("wsjf", (fm.get("priority") or {}).get("wsjf", 0))
@@ -59,7 +61,7 @@ def load():
         for tp in sorted(glob.glob(os.path.join(os.path.dirname(ep), "tasks", "*.md"))):
             t = frontmatter(tp)
             tid = str(t.get("id") or os.path.splitext(os.path.basename(tp))[0])
-            t["_path"], t["_epic"], t["id"] = os.path.relpath(tp, ROOT), eid, tid
+            t["_path"], t["_epic"], t["id"] = root_rel(tp), eid, tid
             t.setdefault("status", "todo")
             tasks[tid] = t
     return epics, tasks
@@ -177,11 +179,8 @@ def main():
 
     picks, in_flight = ready(epics, tasks, children, layer=a.layer, tight=a.tight)
     wip = 3
-    try:
-        cfg = yaml.safe_load(open(os.path.join(ROOT, "harness.yaml"), encoding="utf-8")) or {}
-        wip = int(((cfg.get("scheduler") or {}).get("wip_limit_parallel_agents")) or 3)
-    except OSError:
-        pass
+    cfg = load_config()
+    wip = int(((cfg.get("scheduler") or {}).get("wip_limit_parallel_agents")) or 3)
     slots = max(0, wip - in_flight)
     n = min(len(picks), a.limit or slots or 1)
     result = [{"task": tid, "epic": tasks[tid]["_epic"], "layer": tasks[tid].get("layer", ""),

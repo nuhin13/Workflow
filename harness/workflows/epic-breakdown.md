@@ -8,7 +8,7 @@ locked decisions, never against assumptions. If E00 isn't done, stop.
    constraints) + the accepted ADRs. These bound every epic.
 2. Apply skills/epic-breakdown → draft feature epics from the SRS modules
    (E00 already exists). Each maps ~1:1 to a module; honor every dated,
-   human-approved amendment at the top of spec/srs.md — amendments can
+   human-approved amendment at the top of workspace/spec/srs.md — amendments can
    REMOVE modules from scope; never re-include removed scope silently.
 3. Score every epic (skills/priority-scheduling: WSJF + MoSCoW + depends_on)
    and mark the wedge ★.
@@ -19,6 +19,6 @@ locked decisions, never against assumptions. If E00 isn't done, stop.
    and the wedge, with a one-line rationale per epic and an explicit "defer
    for now" list. Do NOT pick a fixed number; let the graph decide (often
    3–6). Tighter waves = faster feedback.
-6. Write epics/README.md map table + the proposed wave. 🧍 HUMAN GATE:
+6. Write workspace/epics/README.md map table + the proposed wave. 🧍 HUMAN GATE:
    approve the map, the scores, AND the first wave before any sharding.
 7. Seed Graphiti: Epic nodes + DEPENDS_ON edges.

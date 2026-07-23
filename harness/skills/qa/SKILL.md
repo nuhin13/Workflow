@@ -13,7 +13,7 @@ task-level QA is on-demand — required for high-risk tasks.
    spec path(s), conventions.md path, matrix path, repo. Do NOT pass implementer transcripts,
    this session's reasoning, or completion reports (the agent reads those last, itself).
 2. The qa agent follows its protocol (run the flow → test the tests → audit vs spec →
-   trace) and writes `epics/E<NN>/qa/<id>-report.md`.
+   trace) and writes `workspace/epics/E<NN>/qa/<id>-report.md`.
 3. **On PASS / PASS-WITH-NOTES:** status → `done`; minor findings become tracked notes
    (follow-ups in the epic or Q-###/D-###). Epic-level pass → proceed to `/checkpoint`.
 4. **On FAIL:** status → `changes-requested`. Route findings to the **team-lead**: spec defect →

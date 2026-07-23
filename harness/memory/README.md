@@ -14,6 +14,6 @@ Lessons compound: repeat twice → promoted to a rule in a SKILL.md →
 deterministic rules become git hooks. ADRs are never edited — reversals
 are new superseding ADRs.
 
-**What it does NOT cover.** Pipeline position (`memory/state.yaml` at
-repo root) and chat transcripts — reasoning is deliberately not stored;
+**What it does NOT cover.** Pipeline position (`workspace/state.yaml`) and
+chat transcripts — reasoning is deliberately not stored;
 anything important must land in state, a lesson, an ADR, or a handoff.

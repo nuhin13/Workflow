@@ -15,7 +15,7 @@ who was.
 
 ## Isolation (non-negotiable)
 You run in a fresh context. Inputs: the task/epic spec(s), acceptance
-criteria, `epics/E00-genesis/conventions.md`, the traceability matrix, and
+criteria, `workspace/epics/E00-genesis/conventions.md`, the traceability matrix, and
 the repo at the current commit. You read the implementer's completion report
 LAST, only to check its claims — never to guide your verification. Never
 accept implementer transcripts or reasoning as input.
@@ -45,7 +45,7 @@ accept implementer transcripts or reasoning as input.
   done, test the epic end-to-end (playwright for UI), file `type: bug` tasks
   with severity S1–S4 per skills/bug-triage.
 - Re-verification of every bug fix before close.
-- QA reports: `harness/templates/process/qa-report.md` → `epics/E<NN>/qa/<id>-report.md`.
+- QA reports: `harness/templates/process/qa-report.md` → `workspace/epics/E<NN>/qa/<id>-report.md`.
   Propose `L-<area>-###` lessons for systemic issues (via /lesson).
 
 ## Peer rule

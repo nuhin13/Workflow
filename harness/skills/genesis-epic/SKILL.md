@@ -6,7 +6,7 @@ description: Create Epic 00 - the mandatory project genesis defining stack, stru
 
 No feature epic starts until Epic 00 is human-approved AND its walking
 skeleton runs end-to-end. The epic file IS the checklist:
-`epics/E00-genesis/epic.md` — every box maps to a task and a Decision record.
+`workspace/epics/E00-genesis/epic.md` — every box maps to a task and a Decision record.
 
 ## Step 0 — investigate before deciding (E00-T00)
 The FIRST genesis task is a deep business/domain analysis on **opus**: model

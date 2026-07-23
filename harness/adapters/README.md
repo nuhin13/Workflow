@@ -1,7 +1,7 @@
 # Platform adapters — one interface, many CLIs
 
 Each adapter: `run-<platform>.sh <TASK_ID> "<prompt>"` →
-1. runs the CLI headless, 2. saves the raw result to `runs/<TASK_ID>/`,
+1. runs the CLI headless, 2. saves the raw result to `workspace/runs/<TASK_ID>/`,
 3. stamps tokens+cost into the epic's `metrics.csv` via metrics_collect.py.
 
 ⚠️ **Model routing is advisory, not enforced.** No adapter passes a model

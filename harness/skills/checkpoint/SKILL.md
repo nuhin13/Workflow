@@ -10,7 +10,7 @@ PASS/PASS-WITH-NOTES — a FAIL cannot reach checkpoint. This is the
 `harness.yaml: human_gates.epic_to_dev_merge` gate: the epic branch merges to
 `development` only after the human approves here.
 
-1. Prepare `epics/E<NN>/checkpoint.md` from `harness/templates/process/checkpoint.md`:
+1. Prepare `workspace/epics/E<NN>/checkpoint.md` from `harness/templates/process/checkpoint.md`:
    copy-paste demo commands (verify they work NOW, from clean start), what shipped
    (FT-###s), QA summary + link, honest remap proposal for remaining epics (informed by
    lessons + QA findings — "no change" is a valid proposal), batched open questions with

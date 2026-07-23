@@ -23,7 +23,7 @@ After every epic (mandatory), after any rollback/incident, or on demand.
      (e.g. commit-msg format, protected-path guard)
 4. Estimation calibration: if actual tokens >1.5× estimate on a tier twice,
    adjust the tier guidance in task-sharding.
-5. Write the retro summary into `epics/E<NN>/retro.md`; add Lesson nodes to
+5. Write the retro summary into `workspace/epics/E<NN>/retro.md`; add Lesson nodes to
    Graphiti (`LEARNED_FROM` → tasks/bugs); post RETRO digest to Slack.
 
 ## Rules

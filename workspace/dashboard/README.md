@@ -1,4 +1,4 @@
-# dashboard/ — the PM console (generated)
+# workspace/dashboard/ — the PM console (generated)
 
 **Why this exists.** You should see epic/task status, owners, blockers,
 questions, and costs without opening twenty files or paying for a tool.
@@ -10,4 +10,4 @@ automatically. Open it in any browser.
 **What it does NOT cover.** It is read-only and generated — never edit
 `index.html` by hand (it is gitignored; the builder is
 `harness/orchestrator/dashboard_build.py`). Changing state happens in task
-files and `memory/state.yaml`, never here.
+files and `workspace/state.yaml`, never here.

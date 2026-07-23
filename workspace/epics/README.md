@@ -1,17 +1,17 @@
-# epics/ — the work queue
+# workspace/epics/ — the work queue
 
 **Why this exists.** Work must be schedulable by a script, not by vibes.
 Every epic is a folder `E<NN>-<slug>/` with `epic.md`, `tasks/*.md`
 (YAML frontmatter the scheduler reads), QA reports, and a checkpoint.
 
-**What it does NOT cover.** Phase 0–4 artifacts (`project/`) and the SRS
-(`spec/`). Templates live in `_harness/templates/` — the task template's
+**What it does NOT cover.** Phase 0–4 artifacts (`workspace/plan/`) and the SRS
+(`workspace/spec/`). Templates live in `harness/templates/` — the task template's
 `files:` mirror is mandatory (collision guard).
 
 # Master Epic Map
 
 > Empty until the PM agent runs `/epic-breakdown` against the approved
-> `spec/srs.md` and the HUMAN approves the map (constitution rule 4 +
+> `workspace/spec/srs.md` and the HUMAN approves the map (constitution rule 4 +
 > `harness.yaml: human_gates.feature_epic_breakdown`).
 >
 > **Wave model:** Epic 00 (genesis) is built, reviewed and LOCKED at its exit
@@ -24,5 +24,5 @@ Every epic is a folder `E<NN>-<slug>/` with `epic.md`, `tasks/*.md`
 | E00 | Genesis (stack · architecture · skeleton) | — | — | — | todo |
 | …  | *(PM fills via /epic-breakdown)* | | | | |
 
-Templates: `_harness/templates/epic.template.md`, `_harness/templates/task.template.md`,
-`_harness/templates/tracker.template.md`.
+Templates: `harness/templates/epic/epic.template.md`, `harness/templates/epic/task.template.md`,
+`harness/templates/epic/tracker.template.md`.

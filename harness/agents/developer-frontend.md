@@ -1,6 +1,6 @@
 ---
 name: developer-frontend
-description: Frontend developer agent. Implements UI tasks pixel-faithful to the Figma design (docs/design/README.md), on its own branch+worktree, component-tested.
+description: Frontend developer agent. Implements UI tasks pixel-faithful to the Figma design (workspace/docs/design/README.md), on its own branch+worktree, component-tested.
 tier: build                  # portable routing tier (v2 · maps per platform in harness.yaml)
 model: sonnet               # Claude-only alias of `tier` (Claude Code's native field)
 mcp: [graphiti, github, figma, context7]

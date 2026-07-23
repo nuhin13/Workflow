@@ -23,7 +23,8 @@ try:
 except ImportError:
     sys.exit("harness: pip install pyyaml (see requirements.txt)")
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(__file__))
+from paths import ROOT, abspath
 
 TASK_ID = re.compile(r"^E\d{2}-[TB]\d{2}$")
 EPIC_ID = re.compile(r"^E\d{2}$")
@@ -32,11 +33,13 @@ TRACE_ID = re.compile(
     r"|SCR-\d{3}|FC-\d{3}|ADR-\d{3,4}|UC-[\d.]+|EARS-[A-Z0-9]+-\d+|Module-\d+)$"
 )
 # repo-relative path references worth existence-checking. Only STATIC harness
-# paths — files under project/, spec/, epics/E* and docs/domain/ are pipeline
+# paths — generated workspace files are pipeline
 # OUTPUTS that legitimately don't exist in the pristine template.
 PATH_REF = re.compile(
-    r"`((?:harness/(?:skills|workflows|agents|memory|adapters|hooks|mcp|orchestrator|templates)|"
-    r"memory|epics/_templates)/[A-Za-z0-9_./-]+)`"
+    r"`((?:harness/(?:docs|skills|workflows|agents|memory|adapters|hooks|mcp|orchestrator|templates|rates)"
+    r"/[A-Za-z0-9_./-]+)|workspace/(?:state\.yaml|README\.md|docs/README\.md|assets/README\.md"
+    r"|docs/business/(?:README\.md|BRD\.md)|docs/design/README\.md|spec/README\.md"
+    r"|epics/README\.md|runs/README\.md|dashboard/README\.md|plan/README\.md))`"
 )
 
 
@@ -84,7 +87,7 @@ def check_skills(errs, warns):
 
 
 def check_epics_tasks(errs, warns):
-    for ep in sorted(glob.glob(os.path.join(ROOT, "epics", "E*", "epic.md"))):
+    for ep in sorted(glob.glob(abspath("epics", "E*", "epic.md"))):
         rel = os.path.relpath(ep, ROOT)
         fm = frontmatter(ep) or {}
         eid = str(fm.get("id") or "")
@@ -139,7 +142,7 @@ def check_write_scopes(errs, warns):
     roles, shared, _ = load_scopes()
     if not roles:
         return
-    for tp in sorted(glob.glob(os.path.join(ROOT, "epics", "E*", "tasks", "*.md"))):
+    for tp in sorted(glob.glob(abspath("epics", "E*", "tasks", "*.md"))):
         trel = os.path.relpath(tp, ROOT)
         t = frontmatter(tp) or {}
         owner = str(t.get("owner_agent") or "")
@@ -155,9 +158,27 @@ def check_write_scopes(errs, warns):
         allowed = roles[owner] + shared
         for path in paths:
             p = str(path)
-            if not any(p.startswith(a.rstrip("/")) or p == a for a in allowed):
+            if not any(path_allowed(p, a) for a in allowed):
                 errs.append(f"{trel}: '{p}' is outside {owner}'s write_scopes "
                             f"(harness.yaml guardrail)")
+
+
+def clean_repo_path(path):
+    p = os.path.normpath(str(path).replace("\\", "/"))
+    while p.startswith("./"):
+        p = p[2:]
+    return "" if p == "." else p
+
+
+def path_allowed(path, allowed):
+    p = clean_repo_path(path)
+    a_raw = str(allowed)
+    a = clean_repo_path(a_raw)
+    if not a:
+        return False
+    if a_raw.endswith("/"):
+        return p == a or p.startswith(a + "/")
+    return p == a
 
 
 def check_lessons(errs, warns):
@@ -176,9 +197,10 @@ README_DIRS = [
     "harness", "harness/agents", "harness/skills", "harness/workflows",
     "harness/orchestrator", "harness/adapters", "harness/hooks", "harness/handoffs",
     "harness/memory", "harness/memory/lessons", "harness/memory/decisions",
-    "harness/memory/graphiti", "harness/mcp", "harness/rates",
-    "harness/templates", "project", "epics", "memory", "spec",
-    "docs", "docs/business", "dashboard", "runs",
+    "harness/memory/graphiti", "harness/mcp", "harness/rates", "harness/docs",
+    "harness/templates", "workspace", "workspace/docs", "workspace/docs/business",
+    "workspace/docs/design", "workspace/plan", "workspace/assets",
+    "workspace/epics", "workspace/spec", "workspace/dashboard", "workspace/runs",
 ]
 
 

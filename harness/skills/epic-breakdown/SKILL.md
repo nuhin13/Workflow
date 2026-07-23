@@ -5,8 +5,8 @@ description: Break an SRS + feature list into traceable, prioritized epics with 
 # Epic Breakdown
 
 ## Inputs → Outputs
-In: `spec/srs.md`, `spec/feature-list.md`, the Figma design (docs/design/README.md).
-Out: one folder per epic `epics/E<NN>-<slug>/` containing `epic.md` (from
+In: `workspace/spec/srs.md`, `workspace/spec/feature-list.md`, the Figma design (workspace/docs/design/README.md).
+Out: one folder per epic `workspace/epics/E<NN>-<slug>/` containing `epic.md` (from
 `harness/templates/epic/epic.template.md`) and an empty `tasks/` + `tracker.md`.
 
 ## Procedure
@@ -23,7 +23,7 @@ Out: one folder per epic `epics/E<NN>-<slug>/` containing `epic.md` (from
    risks, and UI surface (which Figma screens it owns).
 5. Coverage check: every SRS-3.x functional id appears in exactly one epic's
    traces_to (NFRs may repeat). Orphans or doubles = fix before proceeding.
-6. Output an epic map table (id, title, wsjf, depends) into `epics/README.md`
+6. Output an epic map table (id, title, wsjf, depends) into `workspace/epics/README.md`
    and present to the human for approval.
 
 ## Hard rules

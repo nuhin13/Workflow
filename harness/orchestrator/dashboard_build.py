@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 """the harness dashboard builder — one static HTML file, zero dependencies to view.
 
-  python3 harness/orchestrator/dashboard_build.py        # → dashboard/index.html
+  python3 harness/orchestrator/dashboard_build.py        # → workspace/dashboard/index.html
 
-Reads epics/*/epic.md, epics/*/tasks/*.md, epics/*/metrics.csv and renders:
+Reads configured epic/task specs and metrics.csv files, then renders:
 project totals, per-epic progress + token/cost (vs budget), per-model spend.
-Serve it from anywhere (it's just a file):  python3 -m http.server -d dashboard
+Serve it from anywhere (it's just a file):  python3 -m http.server -d workspace/dashboard
 """
 import csv, datetime, glob, html, os, re, sys
 try:
     import yaml
 except ImportError:
     sys.exit("harness: pip install pyyaml (see requirements.txt)")
+
+sys.path.insert(0, os.path.dirname(__file__))
+from paths import ROOT, abspath, href_from, load_config, root_rel
 from metrics_report import ACTIVE_STATUSES, add_row, empty_bucket, estimate_cost, load_rates, task_estimate
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 STATUS_ORDER = ["verified", "done", "review-requested", "changes-requested", "in-progress", "frozen", "blocked", "todo"]
 COLORS = {"verified": "#34D399", "done": "#2DD4BF", "review-requested": "#7DD3FC",
           "changes-requested": "#FBBF24", "in-progress": "#8B7CF6",
@@ -37,16 +39,12 @@ def fnum(v):
 
 
 def load():
-    cfg = {}
-    try:
-        cfg = yaml.safe_load(open(os.path.join(ROOT, "harness.yaml"), encoding="utf-8")) or {}
-    except OSError:
-        pass
+    cfg = load_config()
     warn = fnum((cfg.get("budgets") or {}).get("per_epic_warn_usd")) or 60.0
     project = cfg.get("project") or os.path.basename(ROOT)
     rate_models, rate_aliases = load_rates()
     epics = []
-    for d in sorted(glob.glob(os.path.join(ROOT, "epics", "E*"))):
+    for d in sorted(glob.glob(abspath("epics", "E*"))):
         ep_md = os.path.join(d, "epic.md")
         if not os.path.isfile(ep_md):
             continue
@@ -73,7 +71,7 @@ def load():
             bucket["executed_by"] = str(t.get("executed_by") or "")
             bucket["reviewed_by"] = str(t.get("reviewed_by") or "")
             bucket["deps"] = ", ".join(str(x) for x in (t.get("depends_on") or []))
-            bucket["href"] = "../" + os.path.relpath(tp, ROOT)
+            bucket["href"] = href_from("dashboard", tp)
             task_usage[tid] = bucket
             task_rows.append(bucket)
         cost = toks = 0.0
@@ -96,7 +94,7 @@ def load():
                     models[r["model"]] = models.get(r["model"], 0.0) + c
         for task in task_rows:
             task["missing_usage"] = task["runs"] == 0 and task.get("status") in ACTIVE_STATUSES
-        qa_reports = ["../" + os.path.relpath(q, ROOT)
+        qa_reports = [href_from("dashboard", q)
                       for q in sorted(glob.glob(os.path.join(d, "qa", "*.md")))]
         checkpoint = os.path.join(d, "checkpoint.md")
         epics.append(dict(id=eid, dir=os.path.basename(d),
@@ -104,23 +102,23 @@ def load():
                           status=e.get("status", "todo"),
                           wsjf=e.get("wsjf", ""), counts=counts, bugs=bugs_open,
                           cost=cost, tokens=toks, models=models, tasks=task_rows,
-                          href="../" + os.path.relpath(ep_md, ROOT),
+                          href=href_from("dashboard", ep_md),
                           qa_reports=qa_reports,
-                          checkpoint=("../" + os.path.relpath(checkpoint, ROOT))
+                          checkpoint=href_from("dashboard", checkpoint)
                                       if os.path.isfile(checkpoint) else None))
     return project, warn, epics
 
 
 def load_state():
     try:
-        return yaml.safe_load(open(os.path.join(ROOT, "memory", "state.yaml"), encoding="utf-8")) or {}
+        return yaml.safe_load(open(abspath("state"), encoding="utf-8")) or {}
     except (OSError, yaml.YAMLError):
         return {}
 
 
 def load_questions():
-    """Open questions from project/open-questions.md — Q-### heading lines."""
-    path = os.path.join(ROOT, "project", "open-questions.md")
+    """Open questions from configured question register — Q-### heading lines."""
+    path = abspath("questions")
     if not os.path.isfile(path):
         return []
     out = []
@@ -378,21 +376,29 @@ def history_html(state):
 
 
 NAV_LINKS = [
-    ("state", "memory/state.yaml"), ("BRD", "docs/business/BRD.md"),
-    ("PRD", "project/00-business/prd.md"), ("features", "project/00-business/feature-list.md"),
-    ("design", "project/01-design/design-system.md"), ("matrix", "project/02-traceability/matrix.md"),
-    ("tech plan", "project/03-technical/tech-plan.md"), ("dev plan", "project/04-plan/dev-plan.md"),
-    ("SRS", "spec/srs.md"), ("questions", "project/open-questions.md"),
-    ("lessons", "harness/memory/lessons"), ("ADRs", "harness/memory/decisions"),
+    ("state", ("state",)),
+    ("BRD", ("business_docs", "BRD.md")),
+    ("PRD", ("workspace", "00-business", "prd.md")),
+    ("features", ("workspace", "00-business", "feature-list.md")),
+    ("design", ("workspace", "01-design", "design-system.md")),
+    ("matrix", ("workspace", "02-traceability", "matrix.md")),
+    ("tech plan", ("workspace", "03-technical", "tech-plan.md")),
+    ("dev plan", ("workspace", "04-dev", "dev-plan.md")),
+    ("SRS", ("spec", "srs.md")),
+    ("questions", ("questions",)),
+    ("lessons", ("lessons",)),
+    ("ADRs", ("decisions",)),
 ]
 
 
 def nav_html():
     out = []
-    for label, rel in NAV_LINKS:
-        exists = os.path.exists(os.path.join(ROOT, rel))
+    for label, parts in NAV_LINKS:
+        target = abspath(*parts)
+        rel = root_rel(target)
+        exists = os.path.exists(target)
         mark = "" if exists else " ⬜"
-        out.append(f'<a href="../{rel}" title="{rel}">{html.escape(label)}{mark}</a>')
+        out.append(f'<a href="{html.escape(href_from("dashboard", target))}" title="{html.escape(rel)}">{html.escape(label)}{mark}</a>')
     return "".join(out)
 
 
@@ -484,10 +490,10 @@ def main():
             .replace("@@HISTORY@@", history_html(state))
             .replace("@@NAV@@", nav_html())
             .replace("@@TS@@", datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%MZ")))
-    out = os.path.join(ROOT, "dashboard", "index.html")
+    out = abspath("dashboard", "index.html")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     open(out, "w", encoding="utf-8").write(page)
-    print(f"harness: dashboard → {os.path.relpath(out, ROOT)} "
+    print(f"harness: dashboard → {root_rel(out)} "
           f"(${cost:.2f}, {len(epics)} epics, {tasks} tasks)")
 
 

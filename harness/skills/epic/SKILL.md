@@ -9,7 +9,7 @@ Argument: epic ID from the dev plan (default: first `todo` epic).
 
 1. Preconditions: E00 checkpoint approved (for E≥01); prior epic's checkpoint decision
    applied (remaps may have changed this epic — check dev-plan remap log). Read lessons.
-2. Delegate to the **team-lead** agent, producing under `epics/E<NN>-<slug>/`:
+2. Delegate to the **team-lead** agent, producing under `workspace/epics/E<NN>-<slug>/`:
    - `epic.md` from `harness/templates/epic/epic.template.md` — runnable flow, scope, Mermaid flow diagram,
      task table with dependencies + parallel lanes, integration task last.
    - `tasks/E<NN>-T<MM>-<slug>.md` from `harness/templates/epic/task.template.md` (slug = the

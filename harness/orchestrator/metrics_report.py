@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Summarize task-level and epic-level token/cost usage from metrics.csv files.
 
-Reads epics/*/metrics.csv rows written by harness/orchestrator/metrics_collect.py.
+Reads configured epic metrics.csv rows written by harness/orchestrator/metrics_collect.py.
 Task totals are grouped by task_id; epic totals are grouped by the metrics file's
 epic folder. If cost_usd is missing but token counts and a known model are present,
 an estimated cost is calculated from harness/rates/cost-config.yaml.
@@ -19,7 +19,9 @@ try:
 except ImportError:
     yaml = None
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(__file__))
+from paths import ROOT, abspath
+
 ACTIVE_STATUSES = {"in-progress", "review-requested", "changes-requested", "done", "verified"}
 
 
@@ -53,7 +55,7 @@ def kfmt(n):
 def load_rates():
     if yaml is None:
         return {}, {}
-    path = os.path.join(ROOT, "harness", "rates", "cost-config.yaml")
+    path = abspath("rates")
     try:
         data = yaml.safe_load(open(path, encoding="utf-8")) or {}
     except OSError:
@@ -161,7 +163,7 @@ def task_estimate(task):
 def load_task_index():
     tasks = {}
     epics = {}
-    for epic_path in sorted(glob.glob(os.path.join(ROOT, "epics", "E*", "epic.md"))):
+    for epic_path in sorted(glob.glob(abspath("epics", "E*", "epic.md"))):
         epic_dir = os.path.basename(os.path.dirname(epic_path))
         epic_id = epic_dir.split("-")[0]
         epic = epics.setdefault(epic_id, empty_bucket(epic_id))
@@ -181,7 +183,7 @@ def collect():
     tasks, epics = load_task_index()
     row_count = 0
 
-    for path in sorted(glob.glob(os.path.join(ROOT, "epics", "E*", "metrics.csv"))):
+    for path in sorted(glob.glob(abspath("epics", "E*", "metrics.csv"))):
         epic_dir = os.path.basename(os.path.dirname(path))
         epic_id = epic_dir.split("-")[0]
         epic = epics.setdefault(epic_id, empty_bucket(epic_id))
@@ -271,7 +273,7 @@ def main():
 
     if row_count == 0:
         print("harness: no metrics rows yet")
-        print("hint: run tasks through harness/adapters/run-*.sh or backfill epics/<E>/metrics.csv")
+        print("hint: run tasks through harness/adapters/run-*.sh or backfill workspace/epics/<E>/metrics.csv")
         task_rows = [row for row in task_rows if row.get("missing_usage")]
         if task_rows:
             print()

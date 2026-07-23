@@ -19,9 +19,10 @@ README (why · how · what it does not cover):
 | `memory/` | long-term memory: lessons, ADRs, knowledge graph |
 | `templates/` | canonical artifact templates, one home (v2 §8) |
 | `mcp/` | how to reach external platforms safely |
+| `docs/` | human and builder guides for operating the harness |
 | `rates/` | model price table for cost estimates |
 
-**What it does NOT cover.** Product artifacts (`project/`, `spec/`,
-`epics/`, `src/`) and pipeline position (`memory/state.yaml`). Changing
+**What it does NOT cover.** Product artifacts (`workspace/plan/`, `workspace/spec/`,
+`workspace/epics/`, `src/`) and pipeline position (`workspace/state.yaml`). Changing
 files here follows `harness.yaml: harness_change_policy` — lesson
 promotion or skill-authoring, with human approval.

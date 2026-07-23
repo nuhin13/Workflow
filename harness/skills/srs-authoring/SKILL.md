@@ -1,13 +1,13 @@
 ---
 name: srs-authoring
-description: Draft spec/srs.md from the BRD - atomic testable requirements with stable ids, module structure, NFRs, use cases, amendment protocol. Use for the first act of the project (BRD to SRS), for any SRS amendment, and whenever a requirement is untestable or two requirements conflict.
+description: Draft workspace/spec/srs.md from the BRD - atomic testable requirements with stable ids, module structure, NFRs, use cases, amendment protocol. Use for the first act of the project (BRD to SRS), for any SRS amendment, and whenever a requirement is untestable or two requirements conflict.
 ---
 # SRS Authoring (BRD → the law)
 
 The SRS is the single build truth (constitution rule 1). It restates the BRD
 in atomic, testable, id-stable form — it never invents scope.
 
-## Structure of spec/srs.md
+## Structure of workspace/spec/srs.md
 1. **Header**: version, date, BRD version it derives from, approval line.
 2. **Amendments block** (top of file, newest first): `AMD-<n> · date ·
    what changed · why · approved by`. Amendments are the ONLY way the SRS
@@ -36,6 +36,6 @@ meaning breaks the whole chain — hence amendments-only.
 ## Definition of done (before requesting human approval)
 - Every BRD in-scope module + requirement is covered; nothing added.
 - Ids atomic, unique, stable; priorities carried over.
-- NFRs quantified. Glossary terms defined (spec/glossary.md).
+- NFRs quantified. Glossary terms defined (workspace/spec/glossary.md).
 - feature-list.md derived (one line per FR, grouped by module).
 - 🧍 HUMAN approves → SRS becomes law; /epic-breakdown may run.

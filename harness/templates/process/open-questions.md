@@ -1,8 +1,8 @@
 # Open Questions — <Project Name>
 
-Central register (`project/open-questions.md` in a live project). Every `Q-###` in any
+Central register (`workspace/open-questions.md` in a live project). Every `Q-###` in any
 artifact is also indexed here by `/question`. Blocking questions also live in
-`memory/state.yaml → blockers`.
+`workspace/state.yaml → blockers`.
 
 | ID | Question | Raised in | Blocks | Options + recommendation | Status | Answer |
 |---|---|---|---|---|---|---|

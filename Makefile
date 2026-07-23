@@ -17,7 +17,7 @@ review:      ## tasks waiting for peer/QA review
 validate:    ## DAG + frontmatter + constitution sanity
 	$(SCHED) --validate
 	$(PY) harness/orchestrator/validate_harness.py
-dashboard:   ## rebuild dashboard/index.html
+dashboard:   ## rebuild workspace/dashboard/index.html
 	$(PY) harness/orchestrator/dashboard_build.py
 metrics:     ## summarize task/epic token+cost usage from metrics.csv
 	$(PY) harness/orchestrator/metrics_report.py

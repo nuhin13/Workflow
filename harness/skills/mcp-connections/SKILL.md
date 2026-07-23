@@ -22,5 +22,5 @@ others requires orchestrator/human approval.
 4. **Evidence into the task**: copy the few relevant facts (token names,
    column types, issue ids) into the task Run Log; don't re-fetch per turn.
 5. **Failure**: one retry, then fall back (gh CLI for github; screenshots in
-   exported PNGs in docs/design/ for figma; file memory for graphiti) and note the degradation.
+   exported PNGs in workspace/docs/design/ for figma; file memory for graphiti) and note the degradation.
    Never guess data an MCP would have given you.

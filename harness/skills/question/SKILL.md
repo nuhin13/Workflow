@@ -5,8 +5,8 @@ description: Register, list, or answer open questions (Q-###) in the ONE central
 
 # /question — open-question register
 
-**One source of truth (v2 · §5).** `project/open-questions.md` is the ONLY
-authoritative register. `memory/state.yaml: blockers` mirrors *only the IDs*
+**One source of truth (v2 · §5).** `workspace/open-questions.md` is the ONLY
+authoritative register. `workspace/state.yaml: blockers` mirrors *only the IDs*
 of blocking questions (so the scheduler can pause tasks); it never holds the
 question text. The artifact that raised a question links to its Q-### — it does
 not restate it. This kills the v1 drift where the same question lived in three
@@ -18,7 +18,7 @@ Every entry carries: `id`, `raised-in`, `blocks` (task/artifact or "—"),
 clear by), `options + recommendation` (mandatory — agents propose, humans
 dispose), `status` (open | answered).
 
-`list` (default): show `project/open-questions.md` — blocking first, each with
+`list` (default): show `workspace/open-questions.md` — blocking first, each with
 its recommendation, owner, and due-point. Remind which are batched for the next
 checkpoint.
 

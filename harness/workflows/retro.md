@@ -4,5 +4,5 @@
 2. Apply skills/retro: lessons written, recurrences incremented, promotion
    ladder proposals (lesson→rule→hook) drafted as diffs.
 3. 🧍 HUMAN GATE: approve/reject each promotion diff (skills are code).
-4. Estimation calibration; epics/E<NN>/retro.md summary; Graphiti Lesson
+4. Estimation calibration; workspace/epics/E<NN>/retro.md summary; Graphiti Lesson
    nodes; Slack RETRO digest.

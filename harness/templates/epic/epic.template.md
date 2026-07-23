@@ -9,7 +9,7 @@ depends_on: []              # other epic ids
 traces_to: []               # SRS Module / FR prefixes this epic covers (e.g. [Module-1, FR-AUTH])
 external_services: []
 ui_surface: []              # requester | agent | manager | admin | widget
-design_reference: docs/design/README.md   # UI (Figma) is law — required if ui_surface is non-empty
+design_reference: workspace/docs/design/README.md   # UI (Figma) is law — required if ui_surface is non-empty
 ---
 # E<NN> · <epic title>
 
@@ -32,7 +32,7 @@ Tables/columns this epic introduces (high level — tasks carry migrations).
 Endpoints this epic owns (high level — tasks carry full contracts).
 
 ## UI screens
-Which Figma screens this epic implements (see docs/design/README.md). Map each
+Which Figma screens this epic implements (see workspace/docs/design/README.md). Map each
 screen → route → Figma frame so every frontend task inherits an exact
 `ui_reference`. The design is **law**: built pages must match the Figma frame
 in layout, chrome, structure, icons, copy, and hover/focus (not just

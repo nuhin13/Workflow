@@ -6,7 +6,7 @@ description: Run Phase 3 via the architect agent — technical plan with real mu
 # /tech-plan — technical planning
 
 1. Preconditions: Phase 0 artifacts + design + verified matrix. Read all Handoff blocks.
-2. Delegate to the **architect** agent: produce `project/03-technical/tech-plan.md` from
+2. Delegate to the **architect** agent: produce `workspace/plan/03-technical/tech-plan.md` from
    `harness/templates/plan/tech-plan.md` (decision areas, 2–3 real options each with honest cons and
    exit costs, FC-### citations for all sizing, Mermaid diagrams, recommendation each).
 3. Present decisions to the human ONE AREA AT A TIME: options table + diagram +

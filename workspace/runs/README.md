@@ -1,10 +1,10 @@
-# runs/ — the audit trail
+# workspace/runs/ — the audit trail
 
 **Why this exists.** "What exactly did the agent do and what did it
 cost?" must be answerable later, per task.
 
 **How it works.** Every headless run through `harness/adapters/run-*.sh`
-writes `runs/<task-id>/` — session JSON + cost — and appends a row to
+writes `workspace/runs/<task-id>/` — session JSON + cost — and appends a row to
 the epic's `metrics.csv`. `make metrics` and the dashboard read those
 rows.
 

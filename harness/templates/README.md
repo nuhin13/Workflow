@@ -3,7 +3,7 @@
 **Why this exists.** One folder, one place to look, one place to update.
 Same-shaped artifacts every time: agents parse them, humans skim them, nothing
 important gets silently dropped. v1 split templates across `templates/` and
-`epics/_templates/` for no principled reason — v2 merges them here, sorted by
+`workspace/epics/_templates/` for no principled reason — v2 merges them here, sorted by
 pipeline stage.
 
 **How it works.** Constitution rule 14: every pipeline artifact starts from its
