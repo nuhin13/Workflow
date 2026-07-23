@@ -39,12 +39,26 @@ flowchart TB
 
    Missing either → STOP and tell the human exactly what to supply.
 
-3. **Recommend a profile, human picks (rule 13 · ADR-0001 D-1..D-3).** From
-   signals — team size, regulated domain, money handling, forecast scale,
-   integration count — recommend ONE of `small | medium | large |
-   extra-large | enterprise` with your reasons, then STOP for the human to
-   pick. Each profile decides phases, human gates, review depth, git tiers,
-   and QA depth (`harness.yaml: profiles`). Never auto-select silently.
+3. **Recommend a profile, human picks (rule 13 · ADR-0001 D-1..D-3).** Read the
+   signals — team size · regulated domain? · money/PII handling? · forecast
+   scale · integration count · expected lifetime — then recommend ONE profile
+   with your reasons and STOP for the human to pick. Never auto-select.
+
+   **Decision guide** (pick the row where any strong signal fits; when torn,
+   go one level lighter — escalating later is cheap, un-baking ceremony is not):
+
+   | Profile | Pick when… | Example |
+   |---|---|---|
+   | `small` | throwaway / spike / demo / internal tool · 1 person · no external users · < 1 week | a proof-of-concept UI |
+   | `medium` | real product · solo or 2–3 people · real users · not regulated · no high-stakes money/auth | TireBook (fuel logger) |
+   | `large` | real product with several integrations or a broad surface · small team · light compliance | a SaaS wiring 3+ external APIs |
+   | `extra-large` | serious money/auth/PII · staged releases · several devs in parallel · needs a `development` integration branch | a pre-enterprise payments app |
+   | `enterprise` | regulated (health/finance) · external audit · multi-team · every task independently QA'd, PRs mandatory | a bank / healthcare platform |
+
+   Each profile decides phases, human gates, review depth, git tiers, and QA
+   depth (`harness.yaml: profiles`). The pick is recorded in `harness.yaml:
+   profile` + `state.yaml`. Escalating up mid-project is allowed (record it
+   like an ADR); a downgrade must state the verification it drops.
 
 4. **Capture the idea.** From `$ARGUMENTS` or by asking (ONE batched round):
    working name, one-liner, target users, the problem, known constraints,
