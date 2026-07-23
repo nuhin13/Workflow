@@ -8,6 +8,11 @@ description: Execute the current epic's task specs — pick unblocked tasks via 
 Argument: an epic (`E<NN>`, default: `current_epic` from `workspace/state.yaml`)
 or a single task (`E<NN>-T<MM>`).
 
+Before dispatch, require an approved SRS and a generated dev plan in
+`workspace/state.yaml`. The scheduler dispatches only `current_epic`; a
+different epic becomes current only through the previous epic's approved
+`/checkpoint`.
+
 1. **Pick.** `make next` (scheduler) lists unblocked tasks in pick order;
    `make next LAYER=frontend` for one lane. Respect the WIP limit
    (`harness.yaml: scheduler.wip_limit_parallel_agents`). Parallel tasks must

@@ -11,7 +11,7 @@ It is kept apart from `harness/`, which is the reusable engine.
 | `state.yaml` | Pipeline position: phase, epics, task statuses, blockers, history |
 | `docs/` | Product-facing business and design source documents |
 | `spec/` | Approved SRS and glossary; canonical build law once generated |
-| `plan/` | Phase 0-4 generated planning artifacts |
+| `plan/` | Phase 0-4 generated planning artifacts (the SRS gate lives in `spec/`) |
 | `epics/` | Epic and task queue consumed by the scheduler |
 | `runs/` | Headless run logs and cost/session audit trail |
 | `dashboard/` | Generated PM console |

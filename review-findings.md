@@ -12,6 +12,7 @@ flow.
 
 ### Add the SRS gate before planning
 
+- Status: **Resolved 2026-07-23**
 - File: `harness.yaml:106`
 - Issue: For any run that reaches `/dev-plan` or `/epic`, downstream specs
   require `workspace/spec/srs.md` and SRS IDs (`FR-<AREA>-NN` / `UC-*`) as the canonical
@@ -20,9 +21,14 @@ flow.
 - Impact: A project following the documented flow can enter planning with no
   canonical SRS. Task `traces_to` becomes unverifiable and `/epic-breakdown`
   can block.
+- Resolution: Added `srs` to the validator-enforced phase order, wired
+  `srs-authoring` as its driver, required `srs_approval` for every profile,
+  recorded SRS approval/version in state, and made trace/dev-plan/epic stop on
+  an unapproved SRS.
 
 ### Keep scheduler scoped to the active epic
 
+- Status: **Resolved 2026-07-23**
 - File: `harness/orchestrator/scheduler.py:111`
 - Issue: When more than one epic has `todo` tasks, `ready()` scans every task
   in the repo and `make next` can dispatch a later epic before the current epic
@@ -30,9 +36,13 @@ flow.
 - Impact: This bypasses the per-epic human gate documented in `/checkpoint`.
   The picker needs to read `workspace/state.yaml: current_epic` or accept an
   explicit epic/task filter before returning work.
+- Resolution: `make next` now reads the configured state file and filters
+  candidates to `current_epic`. It stops if task specs exist without a valid
+  active epic. Unit tests cover multi-epic selection and global WIP counting.
 
 ### Make lighter profiles executable
 
+- Status: **Resolved 2026-07-23**
 - File: `harness.yaml:17-23`
 - Issue: If `small` is selected, the configured path jumps from `design`
   straight to `build` even though `/build` only consumes generated epic/task specs.
@@ -41,6 +51,10 @@ flow.
 - Impact: These profiles can be chosen at kickoff and then dead-end or skip
   foundational choices. Either include the required phases or define separate
   lightweight build/dev-plan skills for them.
+- Resolution: Every profile now preserves the minimum executable phase spine:
+  business, design, approved SRS, traceability, technical decisions, dev plan,
+  and build. A validator checks phase ordering, dependencies, SRS driver
+  presence, and the SRS approval gate for all build-capable profiles.
 
 ## P2 Findings
 

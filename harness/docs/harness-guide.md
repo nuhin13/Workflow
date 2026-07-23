@@ -20,10 +20,10 @@ be swapped mid-task without losing work.
 
 ```
 workspace/docs/business/BRD.md          the business truth (what & why)
-        │  PM agent drafts, human approves
+        │  /design → /srs-authoring → human approves the SRS
         ▼
 workspace/spec/srs.md                   the build truth ("spec is law")
-        │  /epic-breakdown (PM) — human approves the epic map
+        │  /trace → /tech-plan → /dev-plan — human gates each contract
         ▼
 workspace/epics/E00-genesis/            stack · architecture · walking skeleton
         │  human decides ADRs (rule 13), exit gate locks E00
@@ -46,7 +46,7 @@ shipped code                  every commit traces back to a BRD line
 | **Policy** | `harness.yaml` | Platforms, model tiers, budgets, WIP limit, human gates — "org code" |
 | **Roles** | `harness/agents/` | 10 role cards / subagents: pm, team-lead (delivery planner), orchestrator, qa, devops, developer-backend, developer-frontend + pipeline roles analyst, designer, architect. Each defines boundaries: what it may do, what it must hand off. Mirrored at `.claude/agents` (symlink) |
 | **Workflows** | `harness/workflows/` | 12 step-by-step processes: epic-breakdown, implement-task, qa-review, handoff-freeze/resume, retro, release, rollback triggers… Start with `_handoff_protocol.md` |
-| **Skills** | `harness/skills/` | 35 on-demand skills: 16 pipeline drivers (/kickoff /brd /prd /features /forecast /design /trace /tech-plan /dev-plan /epic /build /qa /checkpoint /status /question /lesson) + capability manuals (SRS/EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization…). Mirrored at `.claude/skills` (symlink); loaded only when needed |
+| **Skills** | `harness/skills/` | 37 on-demand skills, including pipeline drivers (/kickoff /brd /prd /features /forecast /design /srs-authoring /trace /tech-plan /dev-plan /epic /build /qa /checkpoint /status /question /lesson) and capability manuals (EARS authoring, TDD, git-flow, task-sharding, API contracts, security review, rate-limit handoff, token optimization…). Mirrored at `.claude/skills` (symlink); loaded only when needed |
 | **Product inputs** | `workspace/docs/` | Human-approved BRD and design reference. These are entry conditions for kickoff |
 | **Pipeline artifacts** | `harness/templates/` → `workspace/plan/` | Generated phase 0–4 artifacts (PRD/features/forecast, design system + screens, traceability matrix, tech plan, dev plan) — each starts from its template (see `harness/templates/README.md`) |
 | **Work items** | `workspace/epics/` | Epic dirs with `epic.md`, `tracker.md`, `tasks/*.md`, `metrics.csv`. Templates in `harness/templates/epic/` |
@@ -233,16 +233,16 @@ not typo-catching. Human gates are listed in `harness.yaml: human_gates`.
    pip install -r requirements.txt # pyyaml for the scheduler
    git branch development main     # integration branch must exist
    (.claude/skills and .claude/agents are already symlinked into harness/)
-1. Phase 0-3: /kickoff → /brd → /prd → /features → /forecast
-   → /design → /trace → /tech-plan            → HUMAN approves each artifact
-   PM agent: draft workspace/spec/srs.md from BRD/PRD (skills/srs-authoring)
-                                              → HUMAN approves
-2. /dev-plan → master epic map                → HUMAN approves
-3. Genesis epic E00: agent presents stack/architecture options with pros+cons
-   → HUMAN decides ADRs (rule 13) → walking skeleton built → E00 exit gate
-4. Team Lead updates AGENTS.md "Project conventions" placeholders
-5. First feature wave: shard → make next → implement → review → merge
-6. After each epic: /retro → lessons → promotions (HUMAN approves)
+1. /kickoff → /brd → /prd → /features → /forecast → /design
+2. /srs-authoring → approved workspace/spec/srs.md
+                                              → HUMAN approves the build law
+3. /trace → /tech-plan                        → HUMAN decides foundations
+4. /dev-plan → master epic map                → HUMAN approves
+5. Genesis epic E00 consumes the accepted ADRs → walking skeleton built
+   → HUMAN verifies the E00 exit gate
+6. Team Lead updates AGENTS.md "Project conventions" placeholders
+7. First feature wave: shard → make next → implement → review → merge
+8. After each epic: /retro → lessons → promotions (HUMAN approves)
 ```
 
 Paste the Figma URL into `workspace/docs/design/README.md` before any frontend epic.

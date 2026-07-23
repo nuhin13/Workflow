@@ -21,19 +21,20 @@ flowchart TB
     subgraph PIPELINE["📋 Pipeline layer — define the product (phases 0–4)"]
         P0["Phase 0 · Business<br>/kickoff /brd /prd /features /forecast"]
         P1["Phase 1 · Design<br>/design (Figma is law when linked)"]
+        SG["Required SRS gate<br>/srs-authoring (human approval)"]
         P2["Phase 2 · Traceability<br>/trace (living matrix)"]
         P3["Phase 3 · Tech plan<br>/tech-plan (human picks the stack)"]
-        P4["Phase 4 · Dev plan<br>/dev-plan /epic → SRS + epics"]
-        P0 --> P1 --> P2 --> P3 --> P4
+        P4["Phase 4 · Dev plan<br>/dev-plan /epic → epics"]
+        P0 --> P1 --> SG --> P2 --> P3 --> P4
     end
 
     P4 --> P5
 
     subgraph BUILD["🔨 Execution layer — build it (phase 5, loops per epic)"]
-        P5["/build<br>scheduler picks tasks"] --> PR["peer review<br>(different model)"]
+        P5["/build<br>scheduler picks current epic tasks"] --> PR["peer review<br>(different model)"]
         PR --> QA["/qa<br>independent QA gate"]
         QA --> CP["/checkpoint<br>🧍 human approves"]
-        CP -->|next epic| P5
+        CP -->|sets current_epic| P5
     end
 
     CP --> SHIP([🚀 development → main])
@@ -255,7 +256,8 @@ Then follow the loop. Each command tells you the next one:
 
 ```
 /brd → /prd → /features → /forecast     (human approves each)
-→ /design → /trace → /tech-plan         (human picks the stack)
+→ /design → /srs-authoring              (human approves the build law)
+→ /trace → /tech-plan                   (human picks foundational choices)
 → /dev-plan                             (human approves the epic map)
 → /build → /qa E00 → /checkpoint E00    (walking skeleton ships)
 → /epic E01 → /build → /qa → /checkpoint → …repeat per epic

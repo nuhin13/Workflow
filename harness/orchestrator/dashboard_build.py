@@ -324,7 +324,12 @@ def task_usage_html(tasks):
             "<th>usage</th></tr>" + "".join(rows) + "</table>")
 
 
-PIPELINE_PHASES = ["business", "design", "traceability", "tech-plan", "dev-plan", "build"]
+PIPELINE_PHASES = [
+    str(phase).replace("_", "-")
+    for phase in (load_config().get("phase_order") or
+                  ["business", "design", "srs", "traceability",
+                   "tech_plan", "dev_plan", "build"])
+]
 
 
 def phases_html(state):

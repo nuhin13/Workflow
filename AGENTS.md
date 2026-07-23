@@ -17,9 +17,10 @@ through a phased pipeline (skills in `harness/skills/`, `/name` on Claude Code):
 ```
 Phase 0 business   /kickoff /brd /prd /features /forecast → workspace/docs/business/BRD.md · workspace/plan/00-business/
 Phase 1 design     /design                                → workspace/plan/01-design/ (Figma is law when linked)
+Required SRS gate  /srs-authoring                         → workspace/spec/srs.md (HUMAN approval)
 Phase 2 trace      /trace                                 → workspace/plan/02-traceability/matrix.md (kept live forever)
 Phase 3 tech plan  /tech-plan                             → workspace/plan/03-technical/ · ADRs in harness/memory/decisions/
-Phase 4 dev plan   /dev-plan /epic                        → workspace/plan/04-dev/ · workspace/spec/srs.md · workspace/epics/E<NN>/
+Phase 4 dev plan   /dev-plan /epic                        → workspace/plan/04-dev/ · workspace/epics/E<NN>/
 Phase 5 build loop /build → /qa → /checkpoint (per epic)  → QA-gated PRs ──▶ development ──▶ main
 ```
 
@@ -30,11 +31,13 @@ once approved the SRS is canonical for build.
 **Profiles decide how much of this runs (v2 · ADR-0001).** `/kickoff` sets a
 `profile` (`small`/`medium`/`large`/`extra-large`/`enterprise`, human-picked)
 that selects which phases run, which human gates apply, how deep review goes,
-which git tiers exist, and QA depth (`harness.yaml: profiles`). The rules below
-are the FULL (enterprise) set; a lighter profile applies the subset its
-`profiles` entry lists — e.g. the `development` branch tier and SRS/forecast
-phases exist only at `extra-large`+. Escalating a profile mid-project is
-recorded like an ADR; downgrading must state the verification it drops.
+which git tiers exist, and QA depth (`harness.yaml: profiles`). Every profile
+keeps the executable contract-producing spine (approved SRS, traceability,
+technical decisions, dev plan, then build); lighter profiles reduce review,
+git, QA, and artifact depth rather than skipping prerequisites. The
+`development` branch tier exists only at `extra-large`+. Escalating a profile
+mid-project is recorded like an ADR; downgrading must state the verification
+it drops.
 
 **IDs (traceability — never invent other formats):** `BR-###` business req ·
 `FR-###` product req (PRD) · `FR-<AREA>-NN` / `NFR-<AREA>-NN` SRS

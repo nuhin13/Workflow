@@ -24,7 +24,7 @@ except ImportError:
     sys.exit("harness: pip install pyyaml (see requirements.txt)")
 
 sys.path.insert(0, os.path.dirname(__file__))
-from paths import ROOT, abspath
+from paths import ROOT, abspath, load_config
 
 TASK_ID = re.compile(r"^E\d{2}-[TB]\d{2}$")
 EPIC_ID = re.compile(r"^E\d{2}$")
@@ -84,6 +84,57 @@ def check_skills(errs, warns):
         fm = frontmatter(sk)
         if fm is None or not fm.get("name") or not fm.get("description"):
             errs.append(f"{rel}/SKILL.md: frontmatter must define name + description")
+
+
+def check_pipeline_profiles(errs, warns):
+    """Profiles must preserve every prerequisite needed by their later phases."""
+    cfg = load_config()
+    order = list(cfg.get("phase_order") or [])
+    dependencies = cfg.get("phase_dependencies") or {}
+    pipeline = cfg.get("pipeline") or {}
+    profiles = cfg.get("profiles") or {}
+
+    if not order:
+        errs.append("harness.yaml: phase_order must define the executable pipeline")
+        return
+    for phase in order:
+        if phase not in pipeline:
+            errs.append(f"harness.yaml: phase_order phase '{phase}' has no pipeline drivers")
+    if "srs-authoring" not in (pipeline.get("srs") or []):
+        errs.append("harness.yaml: pipeline.srs must invoke srs-authoring")
+
+    order_index = {phase: index for index, phase in enumerate(order)}
+    for phase, required in dependencies.items():
+        if phase not in order_index:
+            errs.append(f"harness.yaml: phase_dependencies defines unknown phase '{phase}'")
+            continue
+        for prerequisite in required or []:
+            if prerequisite not in order_index:
+                errs.append(f"harness.yaml: phase '{phase}' depends on unknown phase '{prerequisite}'")
+            elif order_index[prerequisite] >= order_index[phase]:
+                errs.append(f"harness.yaml: phase '{phase}' dependency '{prerequisite}' "
+                            "must appear earlier in phase_order")
+
+    for profile, policy in profiles.items():
+        phases = policy.get("phases") if isinstance(policy, dict) else None
+        if not isinstance(phases, list):
+            errs.append(f"harness.yaml: profile '{profile}' phases must be an explicit list")
+            continue
+        positions = [order_index.get(phase, -1) for phase in phases]
+        unknown = [phase for phase, pos in zip(phases, positions) if pos < 0]
+        if unknown:
+            errs.append(f"harness.yaml: profile '{profile}' has unknown phases: {unknown}")
+            continue
+        if positions != sorted(positions):
+            errs.append(f"harness.yaml: profile '{profile}' phases are out of phase_order")
+        selected = set(phases)
+        for phase in phases:
+            missing = [req for req in dependencies.get(phase, []) if req not in selected]
+            if missing:
+                errs.append(f"harness.yaml: profile '{profile}' phase '{phase}' "
+                            f"is missing prerequisites {missing}")
+        if "build" in selected and "srs_approval" not in (policy.get("human_gates") or []):
+            errs.append(f"harness.yaml: profile '{profile}' can build without srs_approval")
 
 
 def check_epics_tasks(errs, warns):
@@ -232,7 +283,9 @@ def main():
     ap.add_argument("--strict", action="store_true", help="treat warnings as errors")
     args = ap.parse_args()
     errs, warns = [], []
-    for check in (check_agents, check_skills, check_epics_tasks, check_write_scopes, check_lessons, check_readmes, check_path_refs):
+    for check in (check_agents, check_skills, check_pipeline_profiles,
+                  check_epics_tasks, check_write_scopes, check_lessons,
+                  check_readmes, check_path_refs):
         check(errs, warns)
     for w in warns:
         print(f"harness: ⚠ {w}")

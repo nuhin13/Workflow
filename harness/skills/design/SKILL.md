@@ -20,8 +20,9 @@ Parse `$ARGUMENTS`: (none)=full pass · `sync` · `import` · `SCR-###`.
    - `prototype/` — one HTML per screen + `index.html` hub with working navigation
 4. Present: screen index vs feature list coverage, prototype entry point
    (`open workspace/plan/01-design/prototype/index.html`), batched questions.
-5. On approval: Handoff, state → traceability phase, commit `design: system + screens`,
-   then run `/trace` to index SCR rows.
+5. On approval: Handoff, mark design done, set `phase: srs`, commit
+   `design: system + screens`, then run `/srs-authoring`. The SRS references
+   approved screens; `/trace` runs only after the SRS human gate.
 
 **sync:** tokens.json or design-system.md changed → regenerate/update affected components,
 screen specs, prototype pages in ONE commit (`design: sync <what changed>`). List every

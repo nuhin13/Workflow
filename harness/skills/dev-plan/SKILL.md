@@ -5,7 +5,11 @@ description: Run Phase 4 via the team-lead agent — epic map with E00 skeleton 
 
 # /dev-plan — development plan + Epic 00
 
-1. Preconditions: decided tech plan. Read Handoffs + ALL lessons (`harness/memory/lessons/`).
+1. Preconditions: `workspace/state.yaml: artifacts.srs.approved` is set,
+   traceability is complete, and the tech plan is decided. Verify
+   `workspace/spec/srs.md` exists and its approval/version matches state. If
+   any check fails, STOP; do not generate epics or tasks from draft inputs.
+   Read Handoffs + ALL lessons (`harness/memory/lessons/`).
 2. Delegate to the **team-lead** agent:
    - `workspace/plan/04-dev/dev-plan.md` from `harness/templates/plan/dev-plan.md`: epic map (every epic's
      "runnable flow" names what a human can DO), Mermaid dependency graph, risk-first

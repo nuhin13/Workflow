@@ -14,13 +14,15 @@ project:
 artifacts:
   brd: null             # { version: N, approved: <date>, supersedes: N-1 }
   ui:  null             # { version: N, approved: <date>, source: figma|html_prototype|... }
+  srs: null             # { version: N, approved: <date>, derived_from: { brd: N, prd: N } }
   # prd: { version: 1, derived_from: { brd: 2 } }   # /prd fills; /trace checks
 
-phase: idle             # idle | business | design | traceability | tech-plan | dev-plan | build | done
+phase: idle             # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
 phases:
   business:      { status: pending, artifacts: [] }   # pending | in-progress | done
   design:        { status: pending, artifacts: [] }
+  srs:           { status: pending, artifacts: [] }
   traceability:  { status: pending, artifacts: [] }
   tech-plan:     { status: pending, artifacts: [] }
   dev-plan:      { status: pending, artifacts: [] }

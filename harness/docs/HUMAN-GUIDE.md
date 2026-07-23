@@ -6,7 +6,8 @@ fit. Here is everything you actually do.
 ## Your gates (where the system stops for you)
 | Gate | When | You check |
 |---|---|---|
-| Phase artifacts (BRD/PRD/design/tech-plan/dev-plan) | end of each pipeline phase | approve the artifact + its handoff block before the next phase runs |
+| Phase artifacts (BRD/PRD/design/SRS/tech-plan/dev-plan) | end of each pipeline phase | approve the artifact + its handoff block before the next phase runs |
+| **SRS approval** | after `/srs-authoring`, before `/trace` or planning | requirements are atomic, testable, in scope, and correctly versioned |
 | **Epic 00 exit review** | after E00 tasks | domain model + ADRs accepted, skeleton seen responding — the big one |
 | First-wave + map approval | after /epic-breakdown | right epics? right wave? right priorities? |
 | Genesis ADRs | during Epic 00 | stack/architecture/security decisions |

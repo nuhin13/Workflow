@@ -1,6 +1,7 @@
 # workspace/spec/ — the canonical build specification
 
-Empty on purpose. The first act of the project is generating it.
+Empty on purpose. `/srs-authoring` generates it after the business and design
+artifacts are approved and before traceability or planning.
 
 | File (to be created) | Source | Who |
 |---|---|---|
@@ -16,5 +17,6 @@ Rules:
 - The Figma design (`workspace/docs/design/README.md`) is the visual canon; the SRS
   references screens, it does not restate them.
 
-First command of the project (PM agent):
-`/epic-breakdown` after the SRS is approved — see `harness/workflows/epic-breakdown.md`.
+After the SRS is approved, run `/trace`, then `/tech-plan`, then `/dev-plan`.
+`/epic-breakdown` may only consume the approved SRS; see
+`harness/workflows/epic-breakdown.md`.

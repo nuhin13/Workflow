@@ -8,6 +8,8 @@ Usage:
   python3 harness/orchestrator/scheduler.py --review-queue
 
 Reads the configured epics path + tasks/*.md (YAML frontmatter).
+Dispatch is scoped to `current_epic` from the configured state file; advancing
+that value is owned by the human-approved checkpoint flow.
 Statuses: todo → in-progress → review-requested → (changes-requested →)
 done → verified · side: blocked, frozen.
 Pick order: P1 bugs → MoSCoW → parent-epic WSJF → critical path → (--tight)
@@ -67,6 +69,22 @@ def load():
     return epics, tasks
 
 
+def load_active_epic():
+    """Read the checkpoint-controlled dispatch scope from project state."""
+    state_path = abspath("state")
+    try:
+        with open(state_path, encoding="utf-8") as f:
+            state = yaml.safe_load(f) or {}
+    except OSError as e:
+        raise RuntimeError(f"cannot read {root_rel(state_path)}: {e}") from e
+    except yaml.YAMLError as e:
+        raise RuntimeError(f"cannot parse {root_rel(state_path)}: {e}") from e
+    if not isinstance(state, dict):
+        raise RuntimeError(f"{root_rel(state_path)} must contain a YAML mapping")
+    current = state.get("current_epic")
+    return str(current).strip() if current is not None and str(current).strip() else None
+
+
 def validate(epics, tasks):
     errs = []
     for tid, t in tasks.items():
@@ -103,7 +121,7 @@ def chain_len(tid, children, memo):
     return memo[tid]
 
 
-def ready(epics, tasks, children, layer=None, tight=False):
+def ready(epics, tasks, children, active_epic, layer=None, tight=False):
     in_flight = [t for t in tasks.values() if t.get("status") in IN_FLIGHT]
     busy = set()
     for t in in_flight:
@@ -111,6 +129,8 @@ def ready(epics, tasks, children, layer=None, tight=False):
         busy.update((f.get("create") or []) + (f.get("update") or []))
     memo, out = {}, []
     for tid, t in tasks.items():
+        if t.get("_epic") != active_epic:
+            continue
         if t.get("status") != "todo":
             continue
         if layer and str(t.get("layer", "")) != layer:
@@ -177,7 +197,24 @@ def main():
     if errs:
         print("harness: fix --validate errors first", file=sys.stderr); sys.exit(1)
 
-    picks, in_flight = ready(epics, tasks, children, layer=a.layer, tight=a.tight)
+    try:
+        active_epic = load_active_epic()
+    except RuntimeError as e:
+        print(f"harness: {e}", file=sys.stderr)
+        sys.exit(1)
+    if tasks and not active_epic:
+        print("harness: workspace state has no current_epic; /dev-plan or "
+              "/checkpoint must select one before dispatch", file=sys.stderr)
+        sys.exit(1)
+    if active_epic and active_epic not in epics:
+        print(f"harness: current_epic '{active_epic}' has no epic spec; "
+              "repair workspace state before dispatch", file=sys.stderr)
+        sys.exit(1)
+
+    picks, in_flight = ready(
+        epics, tasks, children, active_epic=active_epic,
+        layer=a.layer, tight=a.tight,
+    )
     wip = 3
     cfg = load_config()
     wip = int(((cfg.get("scheduler") or {}).get("wip_limit_parallel_agents")) or 3)
@@ -188,7 +225,8 @@ def main():
                "owner": tasks[tid].get("owner_agent", "developer-backend"),
                "preferred_agent": tasks[tid].get("preferred_agent", "any"),
                "path": tasks[tid]["_path"]} for tid in picks[:n]]
-    print(json.dumps({"in_flight": in_flight, "wip_limit": wip, "next": result}, indent=2))
+    print(json.dumps({"active_epic": active_epic, "in_flight": in_flight,
+                      "wip_limit": wip, "next": result}, indent=2))
 
 
 if __name__ == "__main__":

@@ -7,8 +7,11 @@ description: Spec one epic via the team-lead agent — epic spec plus complete t
 
 Argument: epic ID from the dev plan (default: first `todo` epic).
 
-1. Preconditions: E00 checkpoint approved (for E≥01); prior epic's checkpoint decision
-   applied (remaps may have changed this epic — check dev-plan remap log). Read lessons.
+1. Preconditions: the SRS approval/version in `workspace/state.yaml` matches
+   `workspace/spec/srs.md`; E00 checkpoint approved (for E≥01); prior epic's
+   checkpoint decision applied (remaps may have changed this epic — check
+   dev-plan remap log). If the SRS is absent, draft, or stale, STOP and return
+   to `/srs-authoring` plus `/trace`. Read lessons.
 2. Delegate to the **team-lead** agent, producing under `workspace/epics/E<NN>-<slug>/`:
    - `epic.md` from `harness/templates/epic/epic.template.md` — runnable flow, scope, Mermaid flow diagram,
      task table with dependencies + parallel lanes, integration task last.

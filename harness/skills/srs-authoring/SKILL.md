@@ -1,11 +1,29 @@
 ---
 name: srs-authoring
-description: Draft workspace/spec/srs.md from the BRD - atomic testable requirements with stable ids, module structure, NFRs, use cases, amendment protocol. Use for the first act of the project (BRD to SRS), for any SRS amendment, and whenever a requirement is untestable or two requirements conflict.
+description: Run the SRS phase by drafting workspace/spec/srs.md from the approved business and design artifacts, then stop for human approval before traceability or planning. Also use for approved amendments and requirement conflicts.
 ---
-# SRS Authoring (BRD → the law)
+# /srs-authoring — SRS gate (BRD → the law)
 
 The SRS is the single build truth (constitution rule 1). It restates the BRD
 in atomic, testable, id-stable form — it never invents scope.
+
+## Pipeline gate
+
+1. Preconditions: business and design phases are approved. Read their Handoff
+   blocks and the current artifact versions in `workspace/state.yaml`.
+2. Set `phase: srs` and `phases.srs.status: in-progress`.
+3. The PM drafts `workspace/spec/srs.md` and
+   `workspace/spec/feature-list.md` using the rules below.
+4. Run the coverage and atomicity checks, update the traceability declarations,
+   then present the SRS version, coverage summary, and open questions.
+5. **STOP for the `srs_approval` human gate.** Neither `/trace`,
+   `/tech-plan`, `/dev-plan`, `/epic`, nor `/build` may run while
+   `artifacts.srs.approved` is unset.
+6. On approval, record
+   `artifacts.srs: {version: N, approved: <date>, derived_from: {...}}`, set
+   `phases.srs.status: done`, set `phase: traceability`, append a history
+   event, and commit `spec: approve SRS vN`.
+7. Next: `/trace`.
 
 ## Structure of workspace/spec/srs.md
 1. **Header**: version, date, BRD version it derives from, approval line.
@@ -38,4 +56,4 @@ meaning breaks the whole chain — hence amendments-only.
 - Ids atomic, unique, stable; priorities carried over.
 - NFRs quantified. Glossary terms defined (workspace/spec/glossary.md).
 - feature-list.md derived (one line per FR, grouped by module).
-- 🧍 HUMAN approves → SRS becomes law; /epic-breakdown may run.
+- HUMAN approves and state records the approval before any planning command.

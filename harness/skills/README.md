@@ -6,8 +6,8 @@ and money. Skills load one at a time, only when needed.
 **How it works.** One folder per skill, `SKILL.md` inside, frontmatter
 `name` + `description`. Two kinds:
 - **Pipeline drivers** — `/kickoff /brd /prd /features /forecast /design
-  /trace /tech-plan /dev-plan /epic /build /qa /checkpoint /status
-  /question /lesson` — each drives one pipeline step.
+  /srs-authoring /trace /tech-plan /dev-plan /epic /build /qa /checkpoint
+  /status /question /lesson` — each drives one pipeline step.
 - **Capability manuals** — git-flow, tdd-workflow, ears-authoring,
   rate-limit-handoff, token-optimization, plain-language… — how-to
   knowledge any role can pull in.
