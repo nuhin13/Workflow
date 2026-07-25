@@ -83,8 +83,9 @@ The v1 source files are locked. Any addition, removal, or content change to the
 BRD or HTML prototype creates v2 and must trigger the normal version and
 traceability ripple.
 
-## PRD precondition
+## V1 planning rule
 
-`Q-002` records the human decision required before `/prd`: whether to create a
-BRD v2 that adds only the harness-required IDs, metadata, and Handoff while
-preserving the locked v1 business content and meaning.
+Per the project owner's answer to `Q-002`, no v2 work is in scope now. Planning
+continues from the locked BRD v1 and HTML prototype v1 without modifying either
+source. Derived v1 documents may assign stable trace aliases to exact BRD v1
+sections solely to maintain harness traceability.
