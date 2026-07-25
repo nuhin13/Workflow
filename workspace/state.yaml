@@ -44,8 +44,10 @@ epics: []
 #   checkpoint: null
 
 current_epic: null
-blockers: [Q-001]       # IDs only; details live in workspace/open-questions.md
+blockers: []            # IDs only; details live in workspace/open-questions.md
 
 history:
   - at: "2026-07-26T02:28:19+06:00"
     event: "kickoff: Garazo (medium); registered approved BRD v1 and HTML prototype v1"
+  - at: "2026-07-26T02:35:11+06:00"
+    event: "Q-001 answered: BRD v1 and HTML prototype v1 are the complete locked source set; any source change creates v2"

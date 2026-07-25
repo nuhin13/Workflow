@@ -73,10 +73,12 @@ are deferred until demand validates them.
 - Validate recovered dues, reminder ROI, yearly pricing, and wholesaler-led
   distribution through the pilot.
 
-## Input gap
+## Locked v1 input baseline
 
-BRD v1 names three companion documents that are not present in the repository:
-`Garazo_Feature_Specs.md`, `Garazo_Design_Brief.md`, and
-`Garage_Market_Problem_Analysis.md`. `Q-001` records whether they will be
-supplied or whether BRD v1 plus the HTML prototype are the complete planning
-inputs.
+Per the project owner's answer to `Q-001`, BRD v1 and HTML prototype v1 are the
+complete planning inputs for v1. The companion documents named inside the BRD
+are not part of this version. No missing companion document blocks planning.
+
+The v1 source files are locked. Any addition, removal, or content change to the
+BRD or HTML prototype creates v2 and must trigger the normal version and
+traceability ripple.
