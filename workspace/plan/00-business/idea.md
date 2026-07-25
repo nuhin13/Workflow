@@ -82,3 +82,9 @@ are not part of this version. No missing companion document blocks planning.
 The v1 source files are locked. Any addition, removal, or content change to the
 BRD or HTML prototype creates v2 and must trigger the normal version and
 traceability ripple.
+
+## PRD precondition
+
+`Q-002` records the human decision required before `/prd`: whether to create a
+BRD v2 that adds only the harness-required IDs, metadata, and Handoff while
+preserving the locked v1 business content and meaning.
