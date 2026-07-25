@@ -2,25 +2,29 @@
 # A fresh session must be able to resume from this file alone.
 
 project:
-  name: null            # set by /kickoff
-  one_liner: null
-  started: null
-  profile: null         # small|medium|large|extra-large|enterprise (set by /kickoff · ADR-0001)
+  name: Garazo
+  one_liner: "A mobile-first management app for Bangladesh's informal vehicle workshops to manage jobs, customers, billing, dues, daily cash, and service reminders."
+  started: "2026-07-26"
+  profile: medium       # small|medium|large|extra-large|enterprise (set by /kickoff · ADR-0001)
 
 # Artifact versions are first-class (v2 · HADR-0001 D-4). `-vN` files on disk
 # (e.g. workspace/docs/business/BRD-v2.md, current pointer = BRD.md). `derived_from`
 # lets /trace compute staleness: bump the BRD to v3 and every artifact derived
 # from v2 is marked stale automatically instead of a human remembering.
 artifacts:
-  brd: null             # { version: N, approved: <date>, supersedes: N-1 }
-  ui:  null             # { version: N, approved: <date>, source: figma|html_prototype|... }
+  brd: { version: 1, approved: "2026-07-26" }
+  ui:  { version: 1, approved: "2026-07-26", source: html_prototype }
   srs: null             # { version: N, approved: <date>, derived_from: { brd: N, prd: N } }
   # prd: { version: 1, derived_from: { brd: 2 } }   # /prd fills; /trace checks
 
-phase: idle             # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
+phase: business         # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
 phases:
-  business:      { status: pending, artifacts: [] }   # pending | in-progress | done
+  business:
+    status: in-progress
+    artifacts:
+      - workspace/docs/business/BRD.md
+      - workspace/plan/00-business/idea.md
   design:        { status: pending, artifacts: [] }
   srs:           { status: pending, artifacts: [] }
   traceability:  { status: pending, artifacts: [] }
@@ -40,6 +44,8 @@ epics: []
 #   checkpoint: null
 
 current_epic: null
-blockers: []            # [Q-001] — IDs only; details live in workspace/open-questions.md
+blockers: [Q-001]       # IDs only; details live in workspace/open-questions.md
 
-history: []             # append-only: [{ at: ISO8601, event: "…" }]
+history:
+  - at: "2026-07-26T02:28:19+06:00"
+    event: "kickoff: Garazo (medium); registered approved BRD v1 and HTML prototype v1"

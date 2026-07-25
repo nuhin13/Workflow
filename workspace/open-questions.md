@@ -1,0 +1,16 @@
+# Open Questions — Garazo
+
+Central register (`workspace/open-questions.md`). Every `Q-###` in any artifact
+is indexed here. Blocking questions are mirrored as IDs only in
+`workspace/state.yaml`.
+
+| ID | Question | Raised in | Blocks | Options + recommendation | Status | Answer |
+|---|---|---|---|---|---|---|
+| Q-001 | BRD v1 references `Garazo_Feature_Specs.md`, `Garazo_Design_Brief.md`, and `Garage_Market_Problem_Analysis.md`, but they are not in the repository. Will these be supplied, or are BRD v1 and HTML prototype v1 the complete planning inputs? | Kickoff input review | `/prd` | Supply them if they contain requirements not captured in the BRD or prototype; otherwise explicitly approve BRD v1 + HTML v1 as the complete source set. Recommend supplying them when available to avoid losing product detail. | open | |
+
+Rules:
+- Every question carries a recommendation; agents propose, humans decide.
+- When answered, apply the answer to every artifact that raised it in the same
+  commit, mark it `answered`, and note where it was applied.
+- Batch non-blocking questions for the next checkpoint; never interrupt for
+  them.

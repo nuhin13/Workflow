@@ -1,27 +1,24 @@
-# UI design canon
+# UI design canon — Garazo
 
-The Figma design is **law** for all UI work (the frontend equivalent of
-"spec is law").
+The registered UI reference is **law** for all UI work (the frontend equivalent
+of "spec is law").
 
-- **Accepted form:** `<figma | html_prototype | agent_generated_design | stitch_export | screenshots>`
-- **Source:** `<paste URL or repo-relative artifact path>`
-- **Human approval:** `<name/date>`
-- **Figma file:** `<paste URL when the accepted form is figma>`
-- **Access:** agents pull frames/tokens via the Figma MCP server registered in
-  `harness/mcp/servers.json` (local Dev-Mode server from the Figma desktop app, or the remote
-  `https://mcp.figma.com/mcp`). Setup: `harness/mcp/figma.md`.
-- **Fallback:** export key screens as PNGs into this folder if MCP is
-  unavailable; name them `<screen>-<state>.png`.
+- **Version:** 1
+- **Accepted form:** `html_prototype`
+- **Source:** `workspace/assets/design-imports/GarazoPrototypeStandalone.html`
+- **Human approval:** Project owner on 2026-07-26, confirmed at kickoff
+- **Figma file:** N/A — the approved source is an HTML prototype
+- **Import status:** Registered. `/design import` will extract tokens,
+  components, screens, states, and navigation into `workspace/plan/01-design/`.
 
-This file must identify a real, human-approved reference before `/kickoff`.
-Do not leave the fields above as placeholders. If the design will be generated
-by an agent, generate and approve that reference first; `/design` later turns
-the accepted source into tokens, screen specs, and the prototype.
+The prototype defines visual treatment, screen structure, states, and navigation.
+The approved SRS will remain authoritative for product behavior.
 
 Rules for frontend tasks:
 
-1. Every frontend task file references the exact Figma frame(s) it implements.
+1. Every frontend task file references the exact imported `SCR-###` screen spec
+   and its source state in the HTML prototype.
 2. Design tokens (colors, spacing, type) are extracted ONCE during the genesis
-   epic into a tokens package — components consume tokens, never hex values.
-3. Visual deviation from Figma = deviation from spec → Open Questions, not
-   improvisation.
+   epic into a tokens package; components consume tokens, never raw hex values.
+3. Visual or navigation deviation from the approved prototype is a spec
+   deviation and must be raised as an Open Question.

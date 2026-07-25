@@ -1,10 +1,10 @@
 # harness.yaml — project topology & policy ("org code")
 # Read by the thin orchestrator scripts in harness/orchestrator/.
 version: 1
-project: "YourProject"           # set by /kickoff — keep in sync with workspace/state.yaml
+project: "Garazo"                # set by /kickoff — keep in sync with workspace/state.yaml
 template_repo: null              # set by /harness-sync setup — where harness updates
                                  # are pulled from and universal lessons promoted to
-profile: null                    # small|medium|large|extra-large|enterprise — set by /kickoff
+profile: medium                  # small|medium|large|extra-large|enterprise — set by /kickoff
                                  # (agent recommends, human picks; see profiles + ADR-0001)
 
 # ── profiles: how much process this project runs (v2 · ADR-0001) ─────────────
