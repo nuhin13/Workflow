@@ -15,7 +15,7 @@ artifacts:
   brd: { version: 1, approved: "2026-07-26" }
   ui:  { version: 1, approved: "2026-07-26", source: html_prototype }
   srs: null             # { version: N, approved: <date>, derived_from: { brd: N, prd: N } }
-  # prd: { version: 1, derived_from: { brd: 2 } }   # /prd fills; /trace checks
+  prd: { version: 1, status: draft, derived_from: { brd: 1, ui: 1 } }
 
 phase: business         # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
@@ -25,6 +25,7 @@ phases:
     artifacts:
       - workspace/docs/business/BRD.md
       - workspace/plan/00-business/idea.md
+      - workspace/plan/00-business/prd.md
   design:        { status: pending, artifacts: [] }
   srs:           { status: pending, artifacts: [] }
   traceability:  { status: pending, artifacts: [] }
@@ -55,3 +56,5 @@ history:
     event: "Q-002 raised: PRD requires a human decision on structurally normalizing BRD v1 as BRD v2"
   - at: "2026-07-26T02:41:22+06:00"
     event: "Q-002 answered: no v2 work; continue v1 planning with source files unchanged and trace aliases in derived documents"
+  - at: "2026-07-26T02:52:16+06:00"
+    event: "drafted PRD v1 from locked BRD v1 and HTML prototype v1; awaiting human scope approval"
