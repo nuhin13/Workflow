@@ -2,7 +2,7 @@
 
 - ID prefix: `FR-###`
 - Version: 1
-- Status: draft
+- Status: approved
 - Traces from: locked BRD v1 (`BR-###` trace anchors below)
 - Traces to: Features (`FT-###`), Screens (`SCR-###`)
 - UI reference: locked HTML prototype v1
@@ -219,19 +219,20 @@ No blocking product-scope questions are open. `Q-001` and `Q-002` are answered
 in `workspace/open-questions.md`; both confirm continued planning from the
 locked v1 source set without modifying it.
 
-## Handoff → Human scope review
+## Handoff → Feature derivation
 
-- Produced by: Codex analyst on 2026-07-26 · Status: draft
+- Produced by: Codex analyst on 2026-07-26 · Status: approved
 - **Decided (do not reopen without escalating):** BRD v1 and HTML prototype v1
   are the complete locked sources; trace anchors are aliases to exact BRD
   sections, not source changes; the MVP is online-first; offline/sync follows
-  with the first paying cohort; P1 and L2 remain outside the MVP cut.
+  with the first paying cohort; P1 and L2 remain outside the MVP cut; the
+  project owner approved the PRD v1 scope and MVP cut on 2026-07-26.
 - **Open (`Q-###`):** N/A — no blocking scope question remains.
 - **Watch out:** BRD references to Flutter, auth, datastore behavior, and reused
   Polygon capabilities remain inputs to the foundational human decisions in
   `/tech-plan`; this PRD does not select their implementation.
-- **Next stage must:** obtain human approval of the journeys, `FR-###` table,
-  and MVP cut; then derive `FT-###` items through `/features`.
+- **Next stage must:** derive `FT-###` items through `/features`, prove complete
+  MVP `FR-###` coverage, and decompose any `XL` feature before handoff.
 - **Must NOT change without a D-### + human ping:** locked BRD v1 or HTML
   prototype v1, the confirm-don't-type minimum job, owner-private money, the
   standalone-product rule, MVP/P1/L2 boundaries, or explicit non-goals.
