@@ -17,18 +17,20 @@ artifacts:
   srs: null             # { version: N, approved: <date>, derived_from: { brd: N, prd: N } }
   prd: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, ui: 1 } }
   feature_list: { version: 1, approved: "2026-07-26", derived_from: { prd: 1, brd: 1, ui: 1 } }
+  forecast: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, prd: 1, feature_list: 1 } }
 
-phase: business         # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
+phase: design           # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
 phases:
   business:
-    status: in-progress
+    status: done
     artifacts:
       - workspace/docs/business/BRD.md
       - workspace/plan/00-business/idea.md
       - workspace/plan/00-business/prd.md
       - workspace/plan/00-business/feature-list.md
-  design:        { status: pending, artifacts: [] }
+      - workspace/plan/00-business/business-forecast.md
+  design:        { status: in-progress, artifacts: [] }
   srs:           { status: pending, artifacts: [] }
   traceability:  { status: pending, artifacts: [] }
   tech-plan:     { status: pending, artifacts: [] }
@@ -64,3 +66,7 @@ history:
     event: "approved PRD v1 scope and MVP cut; feature derivation authorized"
   - at: "2026-07-26T11:18:59+06:00"
     event: "approved feature list v1: 31 features cover all 43 PRD requirements with no XL rows"
+  - at: "2026-07-26T16:43:26+06:00"
+    event: "drafted business forecast v1 with FC-001 through FC-021; awaiting human approval of the growth, pricing, and cost envelope"
+  - at: "2026-07-26T18:45:47+06:00"
+    event: "approved business forecast v1; pricing remains tracked but is not a key planning factor or phase gate; advanced to design"
