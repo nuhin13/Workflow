@@ -16,6 +16,7 @@ artifacts:
   ui:  { version: 1, approved: "2026-07-26", source: html_prototype }
   srs: null             # { version: N, approved: <date>, derived_from: { brd: N, prd: N } }
   prd: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, ui: 1 } }
+  feature_list: { version: 1, approved: "2026-07-26", derived_from: { prd: 1, brd: 1, ui: 1 } }
 
 phase: business         # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
@@ -26,6 +27,7 @@ phases:
       - workspace/docs/business/BRD.md
       - workspace/plan/00-business/idea.md
       - workspace/plan/00-business/prd.md
+      - workspace/plan/00-business/feature-list.md
   design:        { status: pending, artifacts: [] }
   srs:           { status: pending, artifacts: [] }
   traceability:  { status: pending, artifacts: [] }
@@ -60,3 +62,5 @@ history:
     event: "drafted PRD v1 from locked BRD v1 and HTML prototype v1; awaiting human scope approval"
   - at: "2026-07-26T11:11:46+06:00"
     event: "approved PRD v1 scope and MVP cut; feature derivation authorized"
+  - at: "2026-07-26T11:18:59+06:00"
+    event: "approved feature list v1: 31 features cover all 43 PRD requirements with no XL rows"
