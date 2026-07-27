@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>SCR-014 Authorized admin controls</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-page">
+<main class="admin-shell" data-additive-source="Q-003 approved admin controls">
+  <nav class="admin-sidebar" aria-label="Admin areas">
+    <div class="row"><span class="brand">G</span><strong>Garazo Admin</strong></div>
+    <a class="active" href="#configuration">Configuration</a>
+    <a href="#flags">Flags and kill switches</a>
+    <a href="#referrals">Referral audit</a>
+    <a href="#support">Support lookup</a>
+    <a href="#metrics">Product metrics</a>
+  </nav>
+  <section class="admin-main stack">
+    <header class="row">
+      <div class="grow"><h1>Authorized controls</h1><p class="muted">Every change keeps its intended scope and audit record.</p></div>
+      <span class="badge success">Authorized support</span>
+    </header>
+    <div class="card row">
+      <label class="grow">Active scope
+        <select class="input" aria-label="Active scope"><option>Product</option><option>Selected workshop</option></select>
+      </label>
+      <span class="badge primary">Product scope</span>
+    </div>
+
+    <div class="admin-grid">
+      <section id="configuration" class="card">
+        <h2>Pricing and configuration</h2>
+        <p>Manage only approved remote values for the active scope.</p>
+        <label>Approved value<input class="input" value="Current configured value"></label>
+        <button class="button block">Confirm scoped change</button>
+      </section>
+      <section id="flags" class="card">
+        <h2>Feature flags and kill switches</h2>
+        <div class="list-row"><span class="grow">Approved feature control</span><button class="chip selected" role="switch" aria-checked="true">On</button></div>
+        <div class="list-row"><span class="grow">Approved kill switch</span><button class="chip" role="switch" aria-checked="false">Off</button></div>
+        <button class="button block">Confirm scoped controls</button>
+      </section>
+      <section id="referrals" class="card">
+        <h2>Referral audit</h2>
+        <table class="admin-table"><caption class="label">Scoped audit records</caption><thead><tr><th>Record</th><th>Scope</th><th>Result</th></tr></thead><tbody><tr><td>Referral record</td><td>Selected scope</td><td>Recorded</td></tr></tbody></table>
+      </section>
+      <section id="support" class="card">
+        <h2>Support lookup</h2>
+        <label>Authorized workshop lookup<input class="input" type="search" placeholder="Workshop identifier"></label>
+        <button class="button block">Search permitted records</button>
+      </section>
+    </div>
+    <section id="metrics" class="card">
+      <h2>Product metrics</h2>
+      <div class="grid-3">
+        <div><span class="label">Approved metric</span><div class="metric">—</div></div>
+        <div><span class="label">Approved metric</span><div class="metric">—</div></div>
+        <div><span class="label">Approved metric</span><div class="metric">—</div></div>
+      </div>
+      <p>No value is fabricated when the active scope has no metric record.</p>
+    </section>
+  </section>
+</main>
+</body>
+</html>

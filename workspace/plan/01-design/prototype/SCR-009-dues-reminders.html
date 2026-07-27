@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>SCR-009 Dues and reminders</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="prototype-page">
+  <h1 class="prototype-title"><span>SCR-009</span> Dues and reminders</h1>
+  <section class="device" data-screen-label="S7 Dues and reminders">
+    <header class="topbar">
+      <span class="brand">G</span>
+      <span class="topbar-copy"><strong>বাকি ও রিমাইন্ডার</strong><small>মালিকের জন্য সুরক্ষিত</small></span>
+      <a class="badge primary" href="SCR-011-settings.html">SMS ২৫</a>
+    </header>
+
+    <section id="duesPin" class="privacy-gate">
+      <div class="metric">🔒</div>
+      <h2>মালিকের PIN দিন</h2>
+      <p class="muted">বাকি, ROI ও আয় PIN ছাড়া দেখা যাবে না।</p>
+      <div class="card block">
+        <div class="summary-row"><span>মোট বাকি</span><b class="protected-value">••••</b></div>
+        <div class="summary-row"><span>রিমাইন্ডার ROI</span><b class="protected-value">••••</b></div>
+      </div>
+      <button class="button block" onclick="unlockDues()">ডেমো PIN ১২৩৪</button>
+    </section>
+
+    <section id="duesOpen" class="content stack" hidden>
+      <div class="row"><span class="badge success">PIN খোলা</span><button class="chip grow" onclick="lockDues()">লক করুন</button></div>
+      <div class="row">
+        <button id="dueTab" class="button grow" onclick="showTab('dues')">বাকি</button>
+        <button id="remTab" class="button ghost grow" onclick="showTab('reminders')">রিমাইন্ডার</button>
+      </div>
+      <section id="dues" class="stack">
+        <div class="row"><span class="label grow">মোট বাকি</span><b class="danger">৳৮,৪০০</b></div>
+        <div class="card row"><span class="grow"><strong>রহিম মিয়া</strong><small class="muted">১২ দিন · শেষ SMS ৩ দিন আগে</small></span><b class="danger">৳৪০০</b><button class="button secondary">SMS</button></div>
+        <div class="card row"><span class="grow"><strong>করিম উদ্দিন</strong><small class="muted">৩২ দিন · কখনও নয়</small></span><b class="danger">৳৩,০০০</b><button class="button secondary">SMS</button></div>
+        <button class="button outline block" onclick="toggle('bulk')">সবাইকে SMS দিন</button>
+      </section>
+      <section id="reminders" class="stack" hidden data-screen-label="S9 Reminder ROI">
+        <div class="card dark center">
+          <h2>সার্ভিস রিমাইন্ডার ROI</h2>
+          <div class="grid-3"><span><b class="primary-text">১২</b><small> পাঠানো</small></span><span><b class="success">৩</b><small> ফিরেছে</small></span><span><b class="success">৳৬,২০০</b><small> আয়</small></span></div>
+        </div>
+      </section>
+    </section>
+
+    <nav class="bottom-nav"><a href="SCR-002-dashboard.html">⌂<span>হোম</span></a><a href="SCR-003-jobs-board.html">▤<span>কাজ</span></a><a class="plus" href="SCR-004-new-job.html">+</a><a class="active" href="SCR-009-dues-reminders.html">◎<span>বাকি</span></a><a href="SCR-010-private-money.html">৳<span>টাকা</span></a></nav>
+    <div id="scrim" class="scrim" hidden onclick="closeSheet()"></div>
+    <aside id="bulk" class="sheet" hidden data-screen-label="S7 Bulk SMS confirm">
+      <div class="sheet-handle"></div><h2 class="center">সবাইকে SMS দিন</h2><p class="center">৫ জন গ্রাহক · ৫ SMS ক্রেডিট</p>
+      <div class="row"><button class="button ghost grow" onclick="closeSheet()">বাতিল</button><button class="button grow" onclick="closeSheet()">পাঠান</button></div>
+    </aside>
+  </section>
+</main>
+<script>
+function unlockDues(){duesPin.hidden=true;duesOpen.hidden=false}
+function lockDues(){duesOpen.hidden=true;duesPin.hidden=false;closeSheet()}
+function showTab(id){dues.hidden=id!=='dues';reminders.hidden=id!=='reminders';dueTab.className=id==='dues'?'button grow':'button ghost grow';remTab.className=id==='reminders'?'button grow':'button ghost grow'}
+function toggle(id){document.getElementById(id).hidden=false;scrim.hidden=false}
+function closeSheet(){bulk.hidden=true;scrim.hidden=true}
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>SCR-006 Bill share</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="prototype-page">
+  <h1 class="prototype-title"><span>SCR-006</span> Bill share</h1>
+  <section class="device dark" data-screen-label="S5 Bill share preview">
+    <header class="topbar">
+      <a class="back" href="SCR-005-job-detail.html">←</a>
+      <span class="topbar-copy"><strong>বিল প্রিভিউ</strong><small>বাকি থাকলে মালিকের PIN লাগবে</small></span>
+    </header>
+    <section id="sharePin" class="privacy-gate">
+      <div class="metric">🔒</div>
+      <h2>মালিকের PIN দিন</h2>
+      <p class="faint">বিলের বাকি ও শেয়ার অ্যাকশন PIN ছাড়া দেখা যাবে না।</p>
+      <button class="button block" onclick="unlockShare()">ডেমো PIN ১২৩৪</button>
+    </section>
+    <section id="shareBill" class="content stack" hidden>
+      <span class="badge success">PIN খোলা</span>
+      <article class="bill">
+        <header class="bill-head"><h2>আলিফ মোটরস</h2><div class="label">রহিম · ঢাকা মেট্রো-ল-১২-৩৪৫৬</div></header>
+        <div class="list-row"><span class="grow">ইঞ্জিন অয়েল ×১</span><b>৳৮০০</b></div>
+        <div class="list-row"><span class="grow">ব্রেক সার্ভিস ×১</span><b>৳৪০০</b></div>
+        <div class="summary-row"><b>মোট</b><b>৳১,২০০</b></div>
+        <div class="summary-row"><span>পরিশোধ</span><b class="success">৳৮০০</b></div>
+        <div class="summary-row"><b class="danger">বাকি</b><b class="danger">৳৪০০</b></div>
+      </article>
+      <div class="row">
+        <button class="button success-button grow" onclick="alert('WhatsApp share handoff')">WhatsApp</button>
+        <button class="button secondary" onclick="alert('SMS sent')">SMS</button>
+        <button class="button secondary" onclick="alert('Bill saved')">সেভ</button>
+      </div>
+    </section>
+  </section>
+</main>
+<script>function unlockShare(){sharePin.hidden=true;shareBill.hidden=false}</script>
+</body>
+</html>

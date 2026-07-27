@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>SCR-013 End-of-day batch entry</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="prototype-page">
+  <h1 class="prototype-title"><span>SCR-013</span> End-of-day batch entry</h1>
+  <section class="device" data-additive-source="Q-003 approved batch entry">
+    <header class="topbar">
+      <a class="back" href="SCR-003-jobs-board.html">←</a>
+      <span class="topbar-copy"><strong>দিনশেষের এন্ট্রি</strong><small>মালিকের জন্য</small></span>
+      <span class="badge primary">আজ</span>
+    </header>
+
+    <section id="batchPin" class="privacy-gate">
+      <div class="metric">🔒</div>
+      <h2>মালিকের PIN দিন</h2>
+      <p class="muted">কাজের টাকার তথ্য PIN ছাড়া দেখা যাবে না।</p>
+      <div class="pin-dots"><i class="pin-dot"></i><i class="pin-dot"></i><i class="pin-dot"></i><i class="pin-dot"></i></div>
+      <button class="button block" onclick="unlockBatch()">ডেমো PIN ১২৩৪</button>
+    </section>
+
+    <section id="batchFlow" class="content stack" hidden>
+      <div class="chips" aria-label="ধাপ">
+        <button id="batchStep1" class="chip primary-selected" onclick="showBatchStep(1)">১ কাজ</button>
+        <button id="batchStep2" class="chip" onclick="showBatchStep(2)">২ টাকা</button>
+        <button id="batchStep3" class="chip" onclick="showBatchStep(3)">৩ যাচাই</button>
+      </div>
+      <label>ব্যবসার তারিখ<input class="input" type="date" value="2026-07-27"></label>
+
+      <section id="batchJobs" class="stack">
+        <article class="batch-row">
+          <span><strong>ঢাকা মেট্রো-ল-১২-৩৪৫৬</strong><small class="muted">ইঞ্জিন · ডেলিভারি</small></span>
+          <span class="badge success">সঠিক</span>
+        </article>
+        <article class="batch-row">
+          <span><strong>চট্টগ্রাম-হ-১১-২২৩৩</strong><small class="muted">ব্রেক · ডেলিভারি</small></span>
+          <span class="badge success">সঠিক</span>
+        </article>
+        <button class="button ghost block">+ আরেকটি কাজ যোগ করুন</button>
+        <button class="button block" onclick="showBatchStep(2)">টাকার তথ্য দিন</button>
+      </section>
+
+      <section id="batchMoney" class="stack" hidden>
+        <article class="card">
+          <h2>ঢাকা মেট্রো-ল-১২-৩৪৫৬</h2>
+          <label>বিলের মোট<input class="input" inputmode="numeric" value="1200"></label>
+          <label>পরিশোধ<input class="input" inputmode="numeric" value="800"></label>
+          <p>বাকি <strong class="danger">৳৪০০</strong></p>
+        </article>
+        <article class="card">
+          <h2>চট্টগ্রাম-হ-১১-২২৩৩</h2>
+          <label>বিলের মোট<input class="input" inputmode="numeric" value="900"></label>
+          <label>পরিশোধ<input class="input" inputmode="numeric" value="900"></label>
+          <p>বাকি <strong>৳০</strong></p>
+        </article>
+        <button class="button block" onclick="showBatchStep(3)">যাচাই করুন</button>
+      </section>
+
+      <section id="batchReview" class="stack" hidden>
+        <div class="success-box">২টি কাজ ও তাদের টাকার রেকর্ড সঠিক।</div>
+        <article class="card">
+          <div class="summary-row"><span>কাজ</span><b>২</b></div>
+          <div class="summary-row"><span>বিলের মোট</span><b>৳২,১০০</b></div>
+          <div class="summary-row"><span>পরিশোধ</span><b class="success">৳১,৭০০</b></div>
+          <div class="summary-row"><span>বাকি</span><b class="danger">৳৪০০</b></div>
+        </article>
+        <button class="button block" onclick="location.href='SCR-003-jobs-board.html'">একই রেকর্ডে সংরক্ষণ করুন</button>
+      </section>
+    </section>
+  </section>
+</main>
+<script>
+function unlockBatch(){batchPin.hidden=true;batchFlow.hidden=false}
+function showBatchStep(n){
+  batchJobs.hidden=n!==1;batchMoney.hidden=n!==2;batchReview.hidden=n!==3;
+  [batchStep1,batchStep2,batchStep3].forEach((item,index)=>item.className=index===n-1?'chip primary-selected':'chip')
+}
+</script>
+</body>
+</html>

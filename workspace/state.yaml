@@ -14,12 +14,13 @@ project:
 artifacts:
   brd: { version: 1, approved: "2026-07-26" }
   ui:  { version: 1, approved: "2026-07-26", source: html_prototype }
+  design: { version: 1, approved: "2026-07-27", derived_from: { ui: 1, prd: 1, feature_list: 1, forecast: 1 } }
   srs: null             # { version: N, approved: <date>, derived_from: { brd: N, prd: N } }
   prd: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, ui: 1 } }
   feature_list: { version: 1, approved: "2026-07-26", derived_from: { prd: 1, brd: 1, ui: 1 } }
   forecast: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, prd: 1, feature_list: 1 } }
 
-phase: design           # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
+phase: srs              # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
 phases:
   business:
@@ -30,8 +31,15 @@ phases:
       - workspace/plan/00-business/prd.md
       - workspace/plan/00-business/feature-list.md
       - workspace/plan/00-business/business-forecast.md
-  design:        { status: in-progress, artifacts: [] }
-  srs:           { status: pending, artifacts: [] }
+  design:
+    status: done
+    artifacts:
+      - workspace/plan/01-design/tokens.json
+      - workspace/plan/01-design/design-system.md
+      - workspace/plan/01-design/components/
+      - workspace/plan/01-design/screens/
+      - workspace/plan/01-design/prototype/
+  srs:           { status: in-progress, artifacts: [] }
   traceability:  { status: pending, artifacts: [] }
   tech-plan:     { status: pending, artifacts: [] }
   dev-plan:      { status: pending, artifacts: [] }
@@ -49,7 +57,7 @@ epics: []
 #   checkpoint: null
 
 current_epic: null
-blockers: []            # IDs only; details live in workspace/open-questions.md
+blockers: []             # IDs only; details live in workspace/open-questions.md
 
 history:
   - at: "2026-07-26T02:28:19+06:00"
@@ -70,3 +78,11 @@ history:
     event: "drafted business forecast v1 with FC-001 through FC-021; awaiting human approval of the growth, pricing, and cost envelope"
   - at: "2026-07-26T18:45:47+06:00"
     event: "approved business forecast v1; pricing remains tracked but is not a key planning factor or phase gate; advanced to design"
+  - at: "2026-07-26T20:15:00+06:00"
+    event: "draft-imported HTML prototype v1 into design v1; Q-003 blocks approval because batch entry and admin controls have no source design"
+  - at: "2026-07-26T20:25:00+06:00"
+    event: "Q-004 raised: prototype money visibility conflicts with the locked owner-PIN privacy rule; design approval remains blocked"
+  - at: "2026-07-27T15:50:00+06:00"
+    event: "Q-003 and Q-004 answered: approved batch-entry/admin additions and owner-PIN masking for due and ROI values"
+  - at: "2026-07-27T15:51:00+06:00"
+    event: "approved design v1 with 14 canonical screens; advanced to SRS authoring"
