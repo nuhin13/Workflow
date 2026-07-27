@@ -39,7 +39,12 @@ phases:
       - workspace/plan/01-design/components/
       - workspace/plan/01-design/screens/
       - workspace/plan/01-design/prototype/
-  srs:           { status: in-progress, artifacts: [] }
+  srs:
+    status: in-progress
+    artifacts:
+      - workspace/spec/srs.md
+      - workspace/spec/feature-list.md
+      - workspace/spec/glossary.md
   traceability:  { status: pending, artifacts: [] }
   tech-plan:     { status: pending, artifacts: [] }
   dev-plan:      { status: pending, artifacts: [] }
@@ -57,7 +62,7 @@ epics: []
 #   checkpoint: null
 
 current_epic: null
-blockers: []             # IDs only; details live in workspace/open-questions.md
+blockers: [Q-005, Q-006] # IDs only; details live in workspace/open-questions.md
 
 history:
   - at: "2026-07-26T02:28:19+06:00"
@@ -86,3 +91,5 @@ history:
     event: "Q-003 and Q-004 answered: approved batch-entry/admin additions and owner-PIN masking for due and ROI values"
   - at: "2026-07-27T15:51:00+06:00"
     event: "approved design v1 with 14 canonical screens; advanced to SRS authoring"
+  - at: "2026-07-27T15:58:00+06:00"
+    event: "drafted SRS v1 and derived feature list; Q-005 and Q-006 block the human SRS approval gate"
