@@ -20,7 +20,7 @@ artifacts:
   feature_list: { version: 1, approved: "2026-07-26", derived_from: { prd: 1, brd: 1, ui: 1 } }
   forecast: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, prd: 1, feature_list: 1 } }
 
-phase: traceability     # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
+phase: tech-plan        # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
 phases:
   business:
@@ -45,7 +45,11 @@ phases:
       - workspace/spec/srs.md
       - workspace/spec/feature-list.md
       - workspace/spec/glossary.md
-  traceability:  { status: in-progress, artifacts: [] }
+  traceability:
+    status: done
+    artifacts:
+      - workspace/plan/02-traceability/matrix.md
+      - workspace/plan/02-traceability/discrepancies/D-001.md
   tech-plan:     { status: pending, artifacts: [] }
   dev-plan:      { status: pending, artifacts: [] }
   build:         { status: pending }
@@ -97,3 +101,5 @@ history:
     event: "Q-005 answered with 60/120/240-second progressive PIN cooldown and registered-phone OTP recovery; Q-006 and SRS approval remain deferred"
   - at: "2026-07-29T19:27:00+06:00"
     event: "approved SRS v1; Q-006 accepted as a frozen deferred decision for NFR-ADOPTION-02; advanced to traceability"
+  - at: "2026-07-29T19:29:00+06:00"
+    event: "verified initial traceability: 43 PRD rows, 117 functional SRS requirements, 18 NFRs, 31 features, and 14 screens; D-001 accepted; advanced to tech-plan"
