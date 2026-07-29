@@ -91,6 +91,7 @@ Full notes live in `workspace/plan/02-traceability/discrepancies/`.
 | 2026-07-27 | Q-003, Q-004 | Design v1, screen coverage, SRS privacy boundary | `078a6b1`, `4c246a1` |
 | 2026-07-29 | Q-005 | SRS access requirements, EARS criteria, feature list, glossary | `4c246a1` |
 | 2026-07-29 | SRS v1 approval with Q-006 deferred | D-001 and initial matrix | this trace commit |
+| 2026-07-29 | Technical-planning draft | Domain model, lifecycle analysis, and proposed ADR-0001–ADR-0009; no requirement meaning or coverage changed | pending human decisions |
 
 ## Handoff → Technical planning
 

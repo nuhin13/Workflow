@@ -50,7 +50,21 @@ phases:
     artifacts:
       - workspace/plan/02-traceability/matrix.md
       - workspace/plan/02-traceability/discrepancies/D-001.md
-  tech-plan:     { status: pending, artifacts: [] }
+  tech-plan:
+    status: in-progress
+    artifacts:
+      - workspace/plan/03-technical/tech-plan.md
+      - workspace/plan/03-technical/domain/domain-model.md
+      - workspace/plan/03-technical/domain/lifecycle-analysis.md
+      - workspace/plan/03-technical/decisions/ADR-0001-application-stack.md
+      - workspace/plan/03-technical/decisions/ADR-0002-architecture-style.md
+      - workspace/plan/03-technical/decisions/ADR-0003-delivery-methodology.md
+      - workspace/plan/03-technical/decisions/ADR-0004-third-party-service-boundary.md
+      - workspace/plan/03-technical/decisions/ADR-0005-datastore.md
+      - workspace/plan/03-technical/decisions/ADR-0006-hosting-runtime.md
+      - workspace/plan/03-technical/decisions/ADR-0007-auth-session.md
+      - workspace/plan/03-technical/decisions/ADR-0008-api-style.md
+      - workspace/plan/03-technical/decisions/ADR-0009-background-jobs-queue.md
   dev-plan:      { status: pending, artifacts: [] }
   build:         { status: pending }
 
@@ -103,3 +117,5 @@ history:
     event: "approved SRS v1; Q-006 accepted as a frozen deferred decision for NFR-ADOPTION-02; advanced to traceability"
   - at: "2026-07-29T19:29:00+06:00"
     event: "verified initial traceability: 43 PRD rows, 117 functional SRS requirements, 18 NFRs, 31 features, and 14 screens; D-001 accepted; advanced to tech-plan"
+  - at: "2026-07-29T19:42:40+06:00"
+    event: "drafted the domain model, lifecycle analysis, technical plan, and ADR-0001 through ADR-0009 as proposed options; all foundational decisions remain awaiting human review"
