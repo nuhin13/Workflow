@@ -1,8 +1,8 @@
 # SRS Feature List — Garazo
 
 - Version: 1
-- Status: draft — derived from SRS v1
-- Date: 2026-07-27
+- Status: approved with SRS v1 on 2026-07-29
+- Date: 2026-07-29
 - Source: `workspace/spec/srs.md`
 - Traces to: epics after SRS approval and `/trace`
 
@@ -21,6 +21,15 @@ release stages are inherited unchanged.
 | FR-ACCESS-04 | Hide all workshop data after failed authentication | Must |
 | FR-ACCESS-05 | Restrict session to authorized workshop | Must |
 | FR-ACCESS-06 | Select Bangla or English interface | Must |
+| FR-ACCESS-07 | Relock after explicit lock | Must |
+| FR-ACCESS-08 | Relock after leaving protected route | Must |
+| FR-ACCESS-09 | Relock after app background | Must |
+| FR-ACCESS-10 | Relock after 5 minutes protected-area inactivity | Must |
+| FR-ACCESS-11 | Apply 60/120/240-second progressive PIN cooldown | Must |
+| FR-ACCESS-12 | Reject PIN verification during cooldown | Must |
+| FR-ACCESS-13 | Recover PIN through registered-phone OTP | Must |
+| FR-ACCESS-14 | Preserve PIN after invalid recovery OTP | Must |
+| FR-ACCESS-15 | Reset failure escalation after successful verification or recovery | Must |
 
 ### Job cards and workflow
 
@@ -191,7 +200,6 @@ release stages are inherited unchanged.
 
 ## Handoff
 
-- Status: draft; awaits SRS approval.
-- Open: `Q-005`, `Q-006`.
-- Next: keep this list synchronized with `srs.md`; after approval, `/trace`
-  assigns epic coverage without renumbering these IDs.
+- Status: approved with SRS v1.
+- Deferred: `Q-006` freezes NFR-ADOPTION-02 until an approved amendment.
+- Next: `/trace` assigns delivery coverage without renumbering these IDs.

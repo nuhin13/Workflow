@@ -15,12 +15,12 @@ artifacts:
   brd: { version: 1, approved: "2026-07-26" }
   ui:  { version: 1, approved: "2026-07-26", source: html_prototype }
   design: { version: 1, approved: "2026-07-27", derived_from: { ui: 1, prd: 1, feature_list: 1, forecast: 1 } }
-  srs: null             # { version: N, approved: <date>, derived_from: { brd: N, prd: N } }
+  srs: { version: 1, approved: "2026-07-29", derived_from: { brd: 1, prd: 1, design: 1, feature_list: 1 } }
   prd: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, ui: 1 } }
   feature_list: { version: 1, approved: "2026-07-26", derived_from: { prd: 1, brd: 1, ui: 1 } }
   forecast: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, prd: 1, feature_list: 1 } }
 
-phase: srs              # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
+phase: traceability     # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
 phases:
   business:
@@ -40,12 +40,12 @@ phases:
       - workspace/plan/01-design/screens/
       - workspace/plan/01-design/prototype/
   srs:
-    status: in-progress
+    status: done
     artifacts:
       - workspace/spec/srs.md
       - workspace/spec/feature-list.md
       - workspace/spec/glossary.md
-  traceability:  { status: pending, artifacts: [] }
+  traceability:  { status: in-progress, artifacts: [] }
   tech-plan:     { status: pending, artifacts: [] }
   dev-plan:      { status: pending, artifacts: [] }
   build:         { status: pending }
@@ -62,7 +62,7 @@ epics: []
 #   checkpoint: null
 
 current_epic: null
-blockers: [Q-005, Q-006] # IDs only; details live in workspace/open-questions.md
+blockers: []             # IDs only; details live in workspace/open-questions.md
 
 history:
   - at: "2026-07-26T02:28:19+06:00"
@@ -93,3 +93,7 @@ history:
     event: "approved design v1 with 14 canonical screens; advanced to SRS authoring"
   - at: "2026-07-27T15:58:00+06:00"
     event: "drafted SRS v1 and derived feature list; Q-005 and Q-006 block the human SRS approval gate"
+  - at: "2026-07-29T17:26:00+06:00"
+    event: "Q-005 answered with 60/120/240-second progressive PIN cooldown and registered-phone OTP recovery; Q-006 and SRS approval remain deferred"
+  - at: "2026-07-29T19:27:00+06:00"
+    event: "approved SRS v1; Q-006 accepted as a frozen deferred decision for NFR-ADOPTION-02; advanced to traceability"

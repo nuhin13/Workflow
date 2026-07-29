@@ -1,8 +1,8 @@
 # Garazo Glossary
 
 - Version: 1
-- Status: draft with SRS v1
-- Date: 2026-07-27
+- Status: approved with SRS v1 on 2026-07-29
+- Date: 2026-07-29
 
 | Term | Meaning in the specification |
 |---|---|
@@ -16,6 +16,7 @@
 | Customer due | Positive unpaid balance remaining on a customer bill |
 | Customer touchpoint | WhatsApp, SMS, or a future approved public link used without a customer Garazo app |
 | Customer/vehicle relationship | The customer and vehicle records, when supplied, plus their linkage to the originating job |
+| Failure cycle | Five consecutive invalid owner-PIN entries |
 | Due recovery | A retained payment applied to an existing customer due |
 | Entry mode | `live` or `batch` creation path used for a job |
 | Free | Entitlement with the BRD-defined job/device limits and approved light ads |
@@ -25,9 +26,11 @@
 | Minimum job | A job with one non-empty plate and at least one problem icon |
 | Money summary | Aggregated income, expense, due, recovery, profit, or net value protected by owner PIN |
 | Owner PIN | Separate owner authorization used to reveal protected money on a shared device |
+| PIN cooldown | Period during which owner-PIN verification is rejected after a failure cycle |
 | Permitted workshop user | Authenticated non-owner or owner allowed to perform the current operational action |
 | Pro | Paid entitlement exposing only the BRD-approved capabilities available in the current release |
 | Protected value | Due, bill-due, money summary, profit, reminder ROI, or attributed income hidden until owner authorization |
+| Protected route | Screen or flow capable of revealing a protected value after owner-PIN authorization |
 | Region profile | Configuration controlling approved language, number, and Bangladesh-specific presentation |
 | Reminder due occurrence | One scheduled instance at which one reminder becomes eligible to send |
 | `reminder_returned` | KPI count increased once for an eligible return job attributed to a sent reminder |

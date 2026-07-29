@@ -1,8 +1,8 @@
 # Software Requirements Specification — Garazo
 
 - Version: 1
-- Date: 2026-07-27
-- Status: draft — ⏳ AWAITING HUMAN `srs_approval`
+- Date: 2026-07-29
+- Status: approved by project owner on 2026-07-29
 - Derived from: locked BRD v1, approved PRD v1, feature list v1, design v1
 - Visual canon: `workspace/docs/design/README.md`
 - Approved screens: `SCR-001` through `SCR-014`
@@ -53,11 +53,21 @@ approved.
 | FR-ACCESS-04 | Must | The system SHALL show no workshop data after failed authentication. | FR-002, FT-002 | SCR-001 | EARS-ACCESS-4 — IF phone authentication fails, THEN the system SHALL show no workshop record. |
 | FR-ACCESS-05 | Must | The system SHALL restrict an authenticated session to its authorized workshop context. | FR-002, FR-091, FT-002 | Cross-cutting | EARS-ACCESS-5 — WHILE a user is authenticated for one workshop, the system SHALL return only records authorized for that workshop. |
 | FR-ACCESS-06 | Must | The system SHALL let the owner select Bangla or English interface content. | FR-022, FT-017 | SCR-011 | EARS-ACCESS-6 — WHEN the owner selects Bangla or English, the system SHALL apply that language to supported interface content. |
+| FR-ACCESS-07 | Must | The system SHALL end protected owner-money authorization after explicit lock. | FR-014, FR-091, FT-010, Q-005 | SCR-010 | EARS-ACCESS-7 — WHEN the owner selects explicit lock, the system SHALL end protected owner-money authorization immediately. |
+| FR-ACCESS-08 | Must | The system SHALL end protected owner-money authorization after leaving a protected route. | FR-014, FR-091, FT-010, Q-005 | SCR-005, SCR-006, SCR-009, SCR-010, SCR-013 | EARS-ACCESS-8 — WHEN the user leaves a protected route, the system SHALL end protected owner-money authorization immediately. |
+| FR-ACCESS-09 | Must | The system SHALL end protected owner-money authorization after the app enters the background. | FR-014, FR-091, FT-010, Q-005 | Cross-cutting | EARS-ACCESS-9 — WHEN the app enters the background, the system SHALL end protected owner-money authorization immediately. |
+| FR-ACCESS-10 | Must | The system SHALL end protected owner-money authorization after 5 minutes without protected-area activity. | FR-014, FR-091, FT-010, Q-005 | Cross-cutting | EARS-ACCESS-10 — WHEN protected-area inactivity reaches 5 continuous minutes, the system SHALL end protected owner-money authorization. |
+| FR-ACCESS-11 | Must | The system SHALL apply the approved progressive cooldown after each owner-PIN failure cycle. | FR-014, FR-091, FT-010, Q-005 | SCR-010 | EARS-ACCESS-11 — WHEN five consecutive invalid PIN entries complete a failure cycle, the system SHALL block PIN verification for 60 seconds after the first cycle, 120 seconds after the second cycle, and 240 seconds after the third or any later cycle. |
+| FR-ACCESS-12 | Must | The system SHALL reject owner-PIN verification during an active cooldown. | FR-014, FR-091, FT-010, Q-005 | SCR-010 | EARS-ACCESS-12 — WHILE an owner-PIN cooldown is active, the system SHALL reject every new PIN-verification attempt. |
+| FR-ACCESS-13 | Must | The system SHALL let the owner recover PIN access through a valid OTP sent to the registered owner phone. | FR-002, FR-014, FR-091, FT-002, FT-010, Q-005 | SCR-001, SCR-010 | EARS-ACCESS-13 — WHEN the owner completes valid OTP verification on the registered owner phone, the system SHALL allow the owner to set a new PIN. |
+| FR-ACCESS-14 | Must | The system SHALL preserve the existing PIN after invalid or expired recovery OTP. | FR-002, FR-014, FR-091, FT-002, FT-010, Q-005 | SCR-010 | EARS-ACCESS-14 — IF a recovery OTP is invalid or expired, THEN the system SHALL keep the existing owner PIN unchanged. |
+| FR-ACCESS-15 | Must | The system SHALL reset the PIN-failure escalation after successful PIN verification or completed OTP recovery. | FR-014, FR-091, FT-010, Q-005 | SCR-010 | EARS-ACCESS-15 — WHEN PIN verification succeeds or OTP recovery completes, the system SHALL reset the next failure-cycle cooldown to 60 seconds. |
 
 **UC-ACCESS.1:** Actor: Owner. Trigger: first launch or signed-out access.
 Main flow: authenticate, confirm shop setup, enter the correct workshop.
-Error flows: invalid OTP shows no workshop data; unavailable service keeps the
-user outside the operational app.
+Protected-money access relocks on the approved events. Error flows: invalid
+OTP shows no workshop data; invalid PIN cycles use the progressive cooldown;
+verified owner-phone OTP provides the simple recovery path.
 
 ### 3.2 Job cards and workflow
 
@@ -386,14 +396,27 @@ data blocks issue.
 | NFR-USABILITY-02 | Must | The minimum job path SHALL require zero optional text field. | FR-095 | Minimum-path acceptance test |
 | NFR-INDEPENDENCE-01 | Must | 100% of MVP acceptance tests SHALL pass with TireBook absent or unavailable. | FR-096 | MVP suite with integration disabled |
 | NFR-ADOPTION-01 | Must | By month 4, approved pilot reporting SHALL be able to identify 100 workshops with at least 10 job cards. | FR-097 | KPI query over retained pilot events |
-| NFR-ADOPTION-02 | Must | By month 4, qualifying support incidence SHALL be no more than 5% of the 100-workshop target cohort under the human-approved support definition. | FR-097 | KPI query after `Q-006` is answered |
+| NFR-ADOPTION-02 | Must | By month 4, qualifying support incidence SHALL be no more than 5% of the 100-workshop target cohort under the human-approved support definition. | FR-097, Q-006, D-001 | Frozen until an approved SRS amendment defines qualifying support; the owner accepted this deferral with SRS v1 |
 
-## 9. Owner-PIN security detail awaiting approval
+## 9. Approved owner-PIN security behavior
 
-The approved privacy boundary is fixed: protected values stay hidden until the
-owner PIN succeeds. Exact relock, retry, and recovery parameters remain open in
-`Q-005`; they must be quantified before SRS approval. No technical auth
-architecture is selected here.
+`Q-005` was answered by the project owner on 2026-07-29.
+
+| Behavior | Approved rule |
+|---|---|
+| Immediate relock | Explicit lock, leaving a protected route, or app background |
+| Inactivity relock | 5 continuous minutes without protected-area activity |
+| Failure cycle | 5 consecutive invalid owner-PIN entries |
+| First failure cycle | 60-second cooldown |
+| Second consecutive failure cycle | 120-second cooldown |
+| Third and later consecutive failure cycles | 240-second cooldown, capped |
+| During cooldown | Reject PIN verification and reveal no protected value |
+| Recovery | Valid OTP sent to the registered owner phone permits setting a new PIN |
+| Invalid recovery | Invalid or expired OTP changes no PIN |
+| Escalation reset | Successful PIN verification or completed OTP recovery resets the next cooldown to 60 seconds |
+
+These are observable product rules. The later human auth ADR still selects the
+implementation architecture.
 
 ## 10. Traceability declaration
 
@@ -403,7 +426,7 @@ architecture is selected here.
 | PRD non-functional requirements | `FR-090`–`FR-097` map to `NFR-*` and supporting functional requirements |
 | Feature list | `FT-001`–`FT-031` remain represented without changing release boundaries |
 | Design | `SCR-001`–`SCR-014` are referenced where a UI contract exists |
-| Human decisions | `Q-003` and `Q-004` are incorporated; `Q-005` and `Q-006` remain open |
+| Human decisions | `Q-003`, `Q-004`, and `Q-005` are incorporated; `Q-006` is an owner-accepted deferral tracked by `D-001` |
 
 ## 11. Explicitly out of scope
 
@@ -416,23 +439,22 @@ architecture is selected here.
 - P1 or L2 implementation before its separate detailed approval
 - Any unapproved field, API, stack, architecture, datastore, queue, or auth strategy
 
-## 12. Open questions
+## 12. Deferred decisions
 
 | ID | Blocks | Decision needed |
 |---|---|---|
-| Q-005 | SRS approval | Quantified owner-PIN inactivity relock, failed-attempt cooldown, and recovery behavior |
-| Q-006 | SRS approval | The operational definition of a workshop that “requires support” for the ≤5% pilot KPI |
+| Q-006 | NFR-ADOPTION-02 implementation and verification | Deferred by the owner with SRS v1 approval; resolve through an approved amendment before pilot instrumentation |
 
 ## Handoff → Human SRS approval
 
-- Produced by: Codex PM role on 2026-07-27 · Status: draft
+- Produced by: Codex PM role on 2026-07-27 · Status: approved 2026-07-29
 - **Decided (do not reopen without escalating):** locked source v1, approved
   MVP/P1/L2 boundaries, 14 approved screens, first-class batch entry, separate
   authorized admin, and owner-PIN masking from Q-004.
-- **Open (`Q-###`):** Q-005 and Q-006 block approval.
+- **Open (`Q-###`):** N/A — Q-006 is an accepted deferral tracked by D-001.
 - **Watch out:** P1 and L2 requirements are boundary contracts, not permission
   to invent detailed fields or begin implementation.
-- **Next stage must:** answer Q-005 and Q-006, update this draft, pass the human
-  `srs_approval` gate, then run `/trace`.
+- **Next stage must:** run `/trace`; keep NFR-ADOPTION-02 frozen until Q-006
+  is resolved through an approved SRS amendment.
 - **Must NOT change without a D-### + human ping:** requirement meaning,
   priorities, release boundaries, privacy law, standalone rule, or non-goals.
