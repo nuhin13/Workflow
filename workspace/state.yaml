@@ -19,8 +19,9 @@ artifacts:
   prd: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, ui: 1 } }
   feature_list: { version: 1, approved: "2026-07-26", derived_from: { prd: 1, brd: 1, ui: 1 } }
   forecast: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, prd: 1, feature_list: 1 } }
+  tech_plan: { version: 1, approved: "2026-07-30", derived_from: { srs: 1, design: 1, forecast: 1 } }
 
-phase: tech-plan        # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
+phase: dev-plan         # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
 phases:
   business:
@@ -51,7 +52,7 @@ phases:
       - workspace/plan/02-traceability/matrix.md
       - workspace/plan/02-traceability/discrepancies/D-001.md
   tech-plan:
-    status: in-progress
+    status: done
     artifacts:
       - workspace/plan/03-technical/tech-plan.md
       - workspace/plan/03-technical/domain/domain-model.md
@@ -119,3 +120,21 @@ history:
     event: "verified initial traceability: 43 PRD rows, 117 functional SRS requirements, 18 NFRs, 31 features, and 14 screens; D-001 accepted; advanced to tech-plan"
   - at: "2026-07-29T19:42:40+06:00"
     event: "drafted the domain model, lifecycle analysis, technical plan, and ADR-0001 through ADR-0009 as proposed options; all foundational decisions remain awaiting human review"
+  - at: "2026-07-30T12:22:48+06:00"
+    event: "ADR-0002 accepted by the project owner: modular monolith with a separately runnable worker; eight foundational decisions remain"
+  - at: "2026-07-30T12:25:35+06:00"
+    event: "ADR-0003 accepted by the project owner: flow-based Kanban with thin vertical slices and WIP limits; seven foundational decisions remain"
+  - at: "2026-07-30T12:37:01+06:00"
+    event: "ADR-0001 accepted by the project owner: Flutter/Dart owner app, Next.js admin, and NestJS/TypeScript API and worker; six foundational decisions remain"
+  - at: "2026-07-30T12:38:15+06:00"
+    event: "ADR-0005 accepted by the project owner: managed PostgreSQL for structured records plus private object storage for media; five foundational decisions remain"
+  - at: "2026-07-30T12:39:16+06:00"
+    event: "ADR-0008 accepted by the project owner: versioned REST/JSON described by OpenAPI; four foundational decisions remain"
+  - at: "2026-07-30T12:52:22+06:00"
+    event: "ADR-0007 accepted conditionally by the project owner: Firebase phone OTP with Garazo-owned authorization, application session, and separate owner-PIN grant; production requires the Bangladesh delivery, privacy/consent, abuse, and cost pilot; three foundational decisions remain"
+  - at: "2026-07-30T13:25:29+06:00"
+    event: "ADR-0009 accepted by the project owner: PostgreSQL-backed durable queue with idempotent handlers; concrete queue-library dependency remains separately human-gated; two foundational decisions remain"
+  - at: "2026-07-30T13:40:16+06:00"
+    event: "ADR-0004 accepted by the project owner: provider ports/adapters in the owning modules with durable intent and normalized result records; ADR-0006 remains the final foundational decision"
+  - at: "2026-07-30T13:52:22+06:00"
+    event: "ADR-0006 accepted by the project owner as Option 3: one hardened VM with Docker Compose plus managed PostgreSQL and private object storage; technical plan v1 decided with all nine ADRs accepted; advanced to dev-plan"

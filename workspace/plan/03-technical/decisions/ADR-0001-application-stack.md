@@ -1,7 +1,7 @@
 # ADR-0001 — Application stack
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [FR-ACCESS-01, FR-JOB-01, FR-OFFLINE-01, NFR-PERF-01,
   NFR-I18N-01, NFR-A11Y-01, SCR-001–SCR-014, FC-008, FC-011, FC-020]
 
@@ -65,11 +65,27 @@ one-language delivery over Flutter fidelity. Final call is yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 1 — Flutter/Dart owner app, Next.js admin, and NestJS/TypeScript API
+and worker.
+
+Confirmed by the project owner on 2026-07-30.
 
 ## Consequences
 
-N/A — pending human choice. After selection, record exact language/framework
-major-version policy, repository layout, generated-client boundary, and mobile
-architecture convention without changing the chosen option silently.
-
+- The Android-first owner application uses Flutter and Dart. Mobile
+  architecture, state management, and local-persistence libraries remain
+  implementation choices to be specified in approved tasks.
+- The separate admin surface uses Next.js and TypeScript.
+- The modular API and separately runnable worker use NestJS and TypeScript
+  over the shared domain-module boundaries accepted in ADR-0002.
+- Mobile and server/admin have separate language toolchains. CI, formatting,
+  static analysis, testing, and dependency policy must cover both Dart and
+  TypeScript.
+- The cross-client reuse boundary is the versioned API contract and generated
+  clients, not shared mobile/admin UI code.
+- Camera, media, sharing, notifications, and future offline support must be
+  wrapped behind app-owned interfaces so plugin choices do not leak through
+  the domain.
+- Exact framework versions, repository package layout, datastore, API style,
+  authentication provider, queue, and hosting remain subject to later
+  decisions or approved task contracts.

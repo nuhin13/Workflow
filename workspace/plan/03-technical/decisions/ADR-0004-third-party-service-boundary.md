@@ -1,7 +1,7 @@
 # ADR-0004 — Third-party service boundary
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [FR-ACCESS-03, FR-REMINDER-02–FR-REMINDER-05,
   FR-PLAN-09–FR-PLAN-12, FR-SHARE-01–FR-SHARE-02, FR-ONLINE-03,
   FR-TIREBOOK-01–FR-TIREBOOK-03, FC-012, FC-015, FC-020]
@@ -58,11 +58,28 @@ operation, and future consented integration. Final call is yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 1 — Provider ports/adapters in the owning modules with durable intent
+and normalized result records.
+
+Confirmed by the project owner on 2026-07-30.
 
 ## Consequences
 
-N/A — pending human choice. Provider vendors, credentials, payload fields,
-retention, and contracts remain separate later decisions/tasks and may not be
-invented from this boundary decision.
-
+- Each external capability has a provider-neutral port owned by its Garazo
+  domain module and one or more replaceable adapters.
+- Firebase identity, business SMS, private object storage, Android sharing,
+  and future TireBook provider types and payloads must not leak into domain
+  records or API contracts.
+- Consequential external work is represented by a durable intent before
+  execution. Attempts and results are normalized and retained where required
+  for retry, audit, credit, and support evidence.
+- Provider callbacks and failures are treated as untrusted input, mapped to
+  stable domain outcomes, and processed idempotently.
+- Credentials and provider configuration stay outside domain code and follow
+  the later approved secrets and production-configuration contracts.
+- Direct SDK calls inside application use cases and a separate integration
+  service are rejected for the initial architecture.
+- Replacing a provider should require a new adapter and compatibility tests,
+  not changes to billing, reminders, identity mapping, or workshop records.
+- Vendors, credentials, payload fields, retention, SDK dependencies, and
+  provider contracts remain separate later decisions or human-approved tasks.

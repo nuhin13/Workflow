@@ -4,14 +4,15 @@
   (`FT-001`–`FT-031`); approved design v1 (`SCR-001`–`SCR-014`);
   approved SRS v1; verified traceability matrix; approved forecast
   (`FC-001`–`FC-021`)
-- Traces to: proposed product decisions (`ADR-0001`–`ADR-0009`) and the
-  future development plan
-- Status: draft — all foundational decisions await the project owner
-- Last updated: 2026-07-29
+- Traces to: product decisions (`ADR-0001`–`ADR-0009`) and the future
+  development plan
+- Status: decided — all nine foundational decisions accepted by the project
+  owner
+- Last updated: 2026-07-30
 
-This document compares foundations. It does not choose them. Each proposed ADR
-has two or three real options, a weighted comparison, an advisory
-recommendation, and a `Decision` that remains `⏳ AWAITING HUMAN`.
+This document compares foundations and records the project owner's choices.
+Each ADR retains its real options, weighted comparison, advisory
+recommendation, accepted decision, and consequences.
 
 `Q-006` and `D-001` freeze only `NFR-ADOPTION-02`. This plan does not define,
 instrument, or claim verification of the support-incidence KPI.
@@ -134,7 +135,7 @@ strong for the named criterion. Weights total 100; weighted totals are out of
 | Team/agent friendliness | Conventional but split Dart/TypeScript | Strong single-language tooling | Strong platform conventions but more toolchains |
 | Exit cost if wrong | High after mobile features and local persistence land | High after native modules and local persistence land | Very high if cross-platform becomes necessary |
 
-**Leading-option sketch for evaluation only**
+**Accepted architecture sketch**
 
 ```mermaid
 flowchart LR
@@ -152,7 +153,8 @@ repository layer. The real downside is permanent Dart/TypeScript split and
 less reuse with the admin surface. The demand forecast does not decide this
 choice (`FC-008`, `FC-011`, `FC-020`).
 
-**Decision:** proposed `ADR-0001-application-stack.md`.
+**Decision:** accepted Option A on 2026-07-30; see
+`ADR-0001-application-stack.md`.
 
 ### 3.2 Architecture style
 
@@ -168,7 +170,7 @@ choice (`FC-008`, `FC-011`, `FC-020`).
 | Team/agent friendliness | Strong conventional boundaries | More coordination and contract work | More provider-specific behavior |
 | Exit cost if wrong | Medium if module APIs and ownership stay explicit | High consolidation cost | High provider and orchestration migration cost |
 
-**Leading-option sketch for evaluation only**
+**Accepted-option sketch**
 
 ```mermaid
 flowchart TB
@@ -191,7 +193,8 @@ transactions, while money and SMS-credit writes need strong atomicity
 (`FC-008`, `FC-011`, `FC-020`, `FC-021`). Extraction remains possible if
 observability later shows a real bottleneck.
 
-**Decision:** proposed `ADR-0002-architecture-style.md`.
+**Decision:** accepted Option A on 2026-07-30; see
+`ADR-0002-architecture-style.md`.
 
 ### 3.3 Delivery methodology
 
@@ -207,7 +210,7 @@ observability later shows a real bottleneck.
 | Team/agent friendliness | Strong with one-task/branch/worktree rules | Good but task gates can cross sprint boundaries | Strong locally, weak end-to-end |
 | Exit cost if wrong | Low | Low to medium | Medium because unfinished layers accumulate |
 
-**Leading-option sketch for evaluation only**
+**Accepted-option sketch**
 
 ```mermaid
 flowchart LR
@@ -224,7 +227,8 @@ low-confidence until pilot use, while the harness already enforces small tasks,
 review, QA, and checkpoint flow. Vertical slices expose the minimum-job speed,
 privacy, and money invariants earlier (`FC-002`, `FC-004`–`FC-012`).
 
-**Decision:** proposed `ADR-0003-delivery-methodology.md`.
+**Decision:** accepted Option A on 2026-07-30; see
+`ADR-0003-delivery-methodology.md`.
 
 ### 3.4 Third-party service boundary
 
@@ -240,7 +244,7 @@ privacy, and money invariants earlier (`FC-002`, `FC-004`–`FC-012`).
 | Team/agent friendliness | Strong explicit contracts | Easy initially, hard to test comprehensively | More repositories/deployments and contract work |
 | Exit cost if wrong | Low to medium | High after SDK types and callbacks spread | Medium to high to consolidate |
 
-**Leading-option sketch for evaluation only**
+**Accepted-option sketch**
 
 ```mermaid
 flowchart LR
@@ -260,7 +264,8 @@ must consume credit exactly once and show delivery evidence; that favors clear
 ports and durable state over distributed deployment (`FC-012`, `FC-015`,
 `FC-020`). The extra adapter code is a real up-front cost.
 
-**Decision:** proposed `ADR-0004-third-party-service-boundary.md`.
+**Decision:** accepted Option A on 2026-07-30; see
+`ADR-0004-third-party-service-boundary.md`.
 
 ### 3.5 Datastore
 
@@ -276,7 +281,7 @@ ports and durable state over distributed deployment (`FC-012`, `FC-015`,
 | Team/agent friendliness | Strong SQL/tooling and explicit constraints | Strong SQL/tooling | Fast document start, more invariant logic in application |
 | Exit cost if wrong | Medium | Medium | High data-model and offline migration cost |
 
-**Leading-option sketch for evaluation only**
+**Accepted-option sketch**
 
 ```mermaid
 flowchart LR
@@ -293,7 +298,8 @@ exact-once money effects, tenant joins, audit requirements, and KPI queries.
 PostgreSQL also offers database-level row security as defense in depth. Media
 must remain in object storage because it dominates the `FC-010` estimate.
 
-**Decision:** proposed `ADR-0005-datastore.md`.
+**Decision:** accepted Option A on 2026-07-30; see
+`ADR-0005-datastore.md`.
 
 ### 3.6 Hosting and runtime
 
@@ -309,18 +315,22 @@ must remain in object storage because it dominates the `FC-010` estimate.
 | Team/agent friendliness | Strong container contract and repeatable deployment | More manifests and operational knowledge | Simple locally, manual production controls |
 | Exit cost if wrong | Medium if containers and standard SQL are retained | Medium | Medium to managed containers |
 
-**Leading-option sketch for evaluation only**
+**Accepted-option sketch**
 
 ```mermaid
 flowchart TB
-  Users[Clients] --> API[Managed container: API]
-  Schedule[Managed schedule trigger] --> Worker[Managed container: worker]
+  Users[Clients] --> Admin
+  Users --> API
+  subgraph Host[Hardened VM - Docker Compose]
+    Admin[Next.js admin]
+    API[NestJS API]
+    Worker[NestJS worker]
+  end
   API --> SQL[(Managed SQL)]
   Worker --> SQL
-  API --> Storage[(Object storage)]
+  API --> Storage[(Private object storage)]
   Worker --> Provider[External provider adapters]
-  API --> Obs[Logs, metrics and traces]
-  Worker --> Obs
+  Host --> Obs[Off-host logs, metrics and alerts]
 ```
 
 **Recommendation:** Option A, with a current provider quote and region review
@@ -329,7 +339,8 @@ operations while preserving a container exit path. Configure instance and
 database-connection limits; autoscaling is not a substitute for capacity
 planning.
 
-**Decision:** proposed `ADR-0006-hosting-runtime.md`.
+**Decision:** accepted Option C on 2026-07-30; see
+`ADR-0006-hosting-runtime.md`.
 
 ### 3.7 Authentication and session
 
@@ -345,7 +356,7 @@ planning.
 | Team/agent friendliness | Strong SDK/docs, but requires backend token verification | Strong docs, more tenant configuration | Most custom code and security tests |
 | Exit cost if wrong | High identity migration; mitigated by internal account mapping | High identity migration | Medium provider migration, high maintenance burden |
 
-**Leading-option sketch for evaluation only**
+**Accepted-option sketch**
 
 ```mermaid
 sequenceDiagram
@@ -376,7 +387,8 @@ privacy review. Managed phone verification reduces custom authentication risk,
 but Garazo must still own account-to-workshop authorization and must not treat
 the phone provider's token as owner-money authorization.
 
-**Decision:** proposed `ADR-0007-auth-session.md`.
+**Decision:** accepted Option A on 2026-07-30 with a production-rollout
+condition; see `ADR-0007-auth-session.md`.
 
 ### 3.8 API style
 
@@ -392,7 +404,7 @@ the phone provider's token as owner-money authorization.
 | Team/agent friendliness | Strong contract generation and black-box tests | Strong schema tooling, more resolver complexity | Strong generated types, less familiar HTTP debugging |
 | Exit cost if wrong | Medium | High client/query migration | High transport and client migration |
 
-**Leading-option sketch for evaluation only**
+**Accepted-option sketch**
 
 ```mermaid
 flowchart LR
@@ -407,7 +419,8 @@ flowchart LR
 stacks under the leading stack option and a future versioned TireBook contract.
 At `FC-011`, GraphQL or gRPC performance advantages are not a planning driver.
 
-**Decision:** proposed `ADR-0008-api-style.md`.
+**Decision:** accepted Option A on 2026-07-30; see
+`ADR-0008-api-style.md`.
 
 ### 3.9 Background jobs and queue
 
@@ -423,7 +436,7 @@ At `FC-011`, GraphQL or gRPC performance advantages are not a planning driver.
 | Team/agent friendliness | Simple topology, careful SQL/worker tests | Strong Node tooling if ADR-0001 chooses Node | Strong operational interface, more emulator/integration work |
 | Exit cost if wrong | Medium behind a queue port | Medium | Medium to high provider migration |
 
-**Leading-option sketch for evaluation only**
+**Accepted-option sketch**
 
 ```mermaid
 sequenceDiagram
@@ -445,37 +458,59 @@ supports exact-once credit and reminder requirements. Establish extraction
 triggers: sustained queue lag, database contention, or provider workload that
 cannot be isolated within the accepted performance budget.
 
-**Decision:** proposed `ADR-0009-background-jobs-queue.md`.
+**Decision:** accepted Option A on 2026-07-30; see
+`ADR-0009-background-jobs-queue.md`.
 
 ## 4. Target architecture (chosen)
 
-N/A — foundational decisions are not yet chosen. Completing a target
-architecture now would violate the human decision gate.
-
-The dependency order below shows how a later accepted architecture will be
-assembled; it does not select an option.
+Garazo uses a Flutter/Dart owner app and a separate Next.js admin surface.
+They call a versioned REST/JSON API described by OpenAPI. The NestJS API and
+separately runnable NestJS worker share an explicitly modular monolith. The
+initial runtime is one hardened VM using Docker Compose; managed PostgreSQL
+and private object storage remain outside that host. Firebase phone OTP is
+conditional on the approved Bangladesh pilot. All external providers stay
+behind owning-module ports/adapters.
 
 ```mermaid
-flowchart TD
-  A2[ADR-0002 architecture style] --> A1[ADR-0001 application stack]
-  A3[ADR-0003 delivery methodology] --> Plan[Development plan]
-  A1 --> A5[ADR-0005 datastore]
-  A1 --> A8[ADR-0008 API style]
-  A5 --> A9[ADR-0009 jobs and queue]
-  A1 --> A7[ADR-0007 auth and session]
-  A8 --> A4[ADR-0004 third-party boundary]
-  A9 --> A4
-  A4 --> A6[ADR-0006 hosting and runtime]
-  A5 --> A6
-  A7 --> A6
-  A6 --> Target[Chosen target architecture]
+flowchart TB
+  Owner[Workshop owner] --> Mobile[Flutter owner app]
+  Support[Authorized support operator] --> Admin
+  Contract[Versioned OpenAPI contract] -. generates .-> Mobile
+  Contract -. generates .-> Admin
+
+  subgraph Host[Hardened VM - Docker Compose]
+    Admin[Next.js admin]
+    API[NestJS API]
+    Worker[NestJS worker]
+    Modules[Shared domain modules]
+    Adapters[Provider adapters]
+    Admin --> API
+    API --> Modules
+    Worker --> Modules
+    Modules --> Adapters
+  end
+
+  Mobile --> API
+  API --> PG[(Managed PostgreSQL)]
+  Worker --> PG
+  Adapters --> Firebase[Firebase phone identity]
+  Adapters --> SMS[Business SMS provider]
+  Adapters --> Media[(Private object storage)]
+  Adapters -. future consented contract .-> TireBook[Future TireBook]
+  Host --> Observe[Off-host logs, metrics and alerts]
 ```
+
+The VM hosts application containers only. Its loss must not remove the
+authoritative database, private media, source artifacts, configuration
+recovery material, or backups. Exact suppliers, region, networking,
+availability target, secrets, backup/RPO/RTO, and sizing remain approved-task
+or later human-gated contracts.
 
 ### Most complex flow: reference sequence, technology-neutral
 
-This sequence expresses required state and transaction boundaries. Queue,
-provider, API, and datastore technologies remain unresolved by
-`ADR-0005`/`ADR-0008`/`ADR-0009`.
+This sequence expresses the accepted state and transaction boundaries.
+Request/response fields, physical schema, retry values, and provider payloads
+remain subject to approved task contracts.
 
 ```mermaid
 sequenceDiagram
@@ -506,9 +541,8 @@ sequenceDiagram
 
 ## 5. Cross-cutting concerns
 
-These are decision-independent draft conventions derived from the approved
-SRS and inherited lessons. Epic 00 may encode them only after the related
-foundational ADRs are accepted.
+These conventions are derived from the approved SRS, accepted ADRs, and
+inherited lessons. Epic 00 must encode them without weakening their contracts.
 
 ### Security
 
@@ -525,7 +559,7 @@ foundational ADRs are accepted.
   masked in UI; cache and accessibility output must contain no locked value
   (`NFR-SEC-02`, `NFR-SEC-03`).
 
-**Draft Epic 00 convention:** every request context carries authenticated actor
+**Epic 00 convention:** every request context carries authenticated actor
 identity and server-resolved workshop/scope; protected-money responses require
 an unexpired server-validated owner grant.
 
@@ -542,7 +576,7 @@ an unexpired server-validated owner grant.
 - Product events remain separate from operational telemetry. No
   `NFR-ADOPTION-02` event is implemented while `D-001` is frozen.
 
-**Draft Epic 00 convention:** all entry points and background jobs emit the
+**Epic 00 convention:** all entry points and background jobs emit the
 same correlation ID through logs, metrics, audit, and provider attempt state.
 
 ### Error handling
@@ -558,7 +592,7 @@ same correlation ID through logs, metrics, audit, and provider attempt state.
 - A retry must carry an idempotency identity and must not turn an unknown
   outcome into a second financial effect.
 
-**Draft Epic 00 convention:** one error envelope contains stable code,
+**Epic 00 convention:** one error envelope contains stable code,
 localized-message key, correlation ID, and field errors; it never carries a
 protected value.
 
@@ -577,7 +611,7 @@ protected value.
 - The minimum job path is timed separately for live and batch entry. Load tests
   validate 45 requests/second until the forecast changes (`FC-011`).
 
-**Draft Epic 00 convention:** no financial or authorization path is complete
+**Epic 00 convention:** no financial or authorization path is complete
 without happy, rejection, retry, and concurrent-attempt tests.
 
 ### CI/CD
@@ -593,7 +627,7 @@ without happy, rejection, retry, and concurrent-attempt tests.
 - Production deploys require health checks, migration status, rollback steps,
   and post-deploy smoke/tenant-isolation checks.
 
-**Draft Epic 00 convention:** every deployable exposes readiness and liveness;
+**Epic 00 convention:** every deployable exposes readiness and liveness;
 schema migration is a separately logged, human-approved step, never application
 startup magic.
 
@@ -603,11 +637,11 @@ The expected baseline is `FC-020`; the aggressive scenario is `FC-021`.
 
 | Concern | Expected posture | First likely pressure | Detection | Upgrade path |
 |---|---|---|---|---|
-| Request handling | Small horizontally repeatable API footprint for 45 requests/second (`FC-011`) | Database connections or slow aggregate reads, not CPU count | p95/p99 latency, connection pool wait, query time | Query/index review, bounded read models, then scale containers |
+| Request handling | One containerized API on the hardened VM for 45 requests/second (`FC-011`) | VM resources, database connections, or slow aggregate reads | p95/p99 latency, host saturation, connection pool wait, query time | Query/index review, bounded read models, vertical sizing, then a hosting review |
 | Structured records | One transactional relational store for 16,000 jobs/month (`FC-009`, `FC-020`) | Aggregate/report queries and indexes | table/index growth, slow queries, lock waits | Read models/replica after measured need |
 | Media | Private object storage; 180 GB total-data estimate at M+12 (`FC-010`) | Attachment size/rate and derived bill artifacts | bytes/workshop, upload failures, object count | Compression/limits, lifecycle policy, CDN only for approved public artifacts |
 | Messaging | Durable scheduled work for 5,600 sends/month (`FC-012`) | Provider throttling/failure and queue lag | oldest job age, retry count, provider response | Rate-aware workers; separate queue/Redis/managed tasks if DB contention appears |
-| Operations | Keep monthly infrastructure inside the approved envelope after quotes (`FC-016`) | Unbounded logs/media or minimum-instance spend | cost by service/workshop, storage growth | Budgets, retention, right-sizing, provider review |
+| Operations | Keep monthly infrastructure inside the approved envelope after quotes (`FC-016`) | Unbounded logs/media or an oversized host | cost by service/workshop, host utilization, storage growth | Budgets, retention, right-sizing, provider review |
 
 No capacity figure above exceeds an approved `FC-###` input. New limits require
 a forecast amendment before they become commitments.
@@ -623,7 +657,7 @@ a forecast amendment before they become commitments.
 | Duplicate financial or SMS-credit effect | Timeout, retry, parallel submit, worker replay | Idempotency identity, unique constraint, atomic transaction, concurrency tests | Backend |
 | SMS/OTP provider failure blocks core work | Supplier outage or poor Bangladesh delivery | Provider ports, normalized failures, manual WhatsApp handoff where approved; Garazo remains standalone | Backend + operations |
 | Media cost exceeds forecast | Attachment rate or average size materially exceeds `FC-010` | Measure bytes/job; explicit limits/compression/retention require later approved contract | Product + operations |
-| Serverless/container autoscaling exhausts SQL | Burst or configuration error | Connection pooling, max instances, load tests at `FC-011` | Infrastructure |
+| Single VM interrupts API, admin, and worker | Host, runtime, disk, network, or unsafe-deploy failure | Hardened rebuildable host, managed external data, health checks, rollback, off-host monitoring, tested recovery | Infrastructure |
 | Premature microservices consume delivery capacity | Architecture selected for hypothetical scale | Require measured extraction trigger tied to `FC-011`/`FC-021` | Architect |
 | First-paying-cohort offline scope is treated as MVP | Teaser screens are mistaken for approved detailed design | Keep `FR-OFFLINE-*` and FT-020/FT-021 out of MVP epics until detailed approval | Team lead |
 
@@ -631,35 +665,28 @@ a forecast amendment before they become commitments.
 
 | ADR | Decision | Status |
 |---|---|---|
-| ADR-0001 | Application stack | proposed — awaiting human |
-| ADR-0002 | Architecture style | proposed — awaiting human |
-| ADR-0003 | Delivery methodology | proposed — awaiting human |
-| ADR-0004 | Third-party service boundary | proposed — awaiting human |
-| ADR-0005 | Datastore | proposed — awaiting human |
-| ADR-0006 | Hosting and runtime | proposed — awaiting human |
-| ADR-0007 | Authentication and session | proposed — awaiting human |
-| ADR-0008 | API style | proposed — awaiting human |
-| ADR-0009 | Background jobs and queue | proposed — awaiting human |
+| ADR-0001 | Application stack | accepted — Option 1: Flutter + Next.js + NestJS |
+| ADR-0002 | Architecture style | accepted — Option 1: modular monolith plus separately runnable worker |
+| ADR-0003 | Delivery methodology | accepted — Option 1: vertical-flow Kanban with WIP limits |
+| ADR-0004 | Third-party service boundary | accepted — Option 1: owning-module ports/adapters |
+| ADR-0005 | Datastore | accepted — Option 1: managed PostgreSQL + private object storage |
+| ADR-0006 | Hosting and runtime | accepted — Option 3: hardened VM + Docker Compose, managed data services |
+| ADR-0007 | Authentication and session | accepted — Option 1: Firebase phone OTP + Garazo authorization/session/PIN |
+| ADR-0008 | API style | accepted — Option 1: versioned REST/JSON + OpenAPI |
+| ADR-0009 | Background jobs and queue | accepted — Option 1: PostgreSQL-backed durable queue |
 
-### Recommended human decision order
+### Human decision sequence complete
 
-1. `ADR-0002` architecture style
-2. `ADR-0003` delivery methodology
-3. `ADR-0001` application stack
-4. `ADR-0005` datastore
-5. `ADR-0008` API style
-6. `ADR-0007` authentication and session
-7. `ADR-0009` background jobs and queue
-8. `ADR-0004` third-party service boundary
-9. `ADR-0006` hosting and runtime
-
-This order resolves structure before implementation technology, then data and
-contracts before identity/async integration, and hosting last.
+All nine foundational areas were presented separately and accepted by the
+project owner. ADR-0006 records the owner's Option 3 override of the advisory
+managed-container recommendation. Any foundational change now requires a new
+ADR that supersedes the accepted record.
 
 ## 9. Official source snapshot
 
-These primary sources were checked on 2026-07-29. They support technology
-facts only; they do not make Garazo's human decisions.
+These primary sources were checked on 2026-07-29; authentication, queue, and
+hosting sources were rechecked on 2026-07-30. They support technology facts
+only; they do not make Garazo's human decisions.
 
 | Area | Official source |
 |---|---|
@@ -670,22 +697,34 @@ facts only; they do not make Garazo's human decisions.
 | Architecture styles | [Azure Architecture Center: architecture styles](https://learn.microsoft.com/en-gb/azure/architecture/guide/architecture-styles/) · [microservices trade-offs](https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/microservices) |
 | Delivery methods | [Kanban Guide](https://kanbanguides.org/the-kanban-guide/) · [Scrum Guide](https://scrumguides.org/download.html) · [Shape Up](https://basecamp.com/shapeup) |
 | PostgreSQL/MySQL | [PostgreSQL row-security policy](https://www.postgresql.org/docs/current/sql-createpolicy.html) · [MySQL InnoDB transaction model](https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-model.html) |
-| Managed containers | [Cloud Run overview](https://cloud.google.com/run/docs/overview/what-is-cloud-run) · [GKE Autopilot overview](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview) · [Docker Compose production](https://docs.docker.com/compose/how-tos/production/) |
+| Hosting/runtime | [Cloud Run overview](https://cloud.google.com/run/docs/overview/what-is-cloud-run) · [GKE Autopilot overview](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview) · [Docker Compose production](https://docs.docker.com/compose/how-tos/production/) |
 | Phone identity/session | [Firebase Android phone authentication](https://firebase.google.com/docs/auth/android/phone-auth) · [Auth0 SMS passwordless](https://auth0.com/docs/authenticate/passwordless/authentication-methods/sms-otp) · [OWASP session management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html) |
 | API contracts | [OpenAPI specification](https://spec.openapis.org/oas/latest.html) · [gRPC overview](https://grpc.io/docs/what-is-grpc/) |
 | Queues | [pg-boss project documentation](https://github.com/timgit/pg-boss) · [BullMQ queues](https://docs.bullmq.io/guide/queues) · [Cloud Tasks retries](https://cloud.google.com/tasks/docs/configure-retry-task) |
 
 ## Handoff
 
-- Produced by: architect agent on 2026-07-29
-- Status: draft; no foundational decision has been accepted
-- Decided: approved SRS, domain invariants, release boundaries, and
-  forecast-backed planning baseline only
-- Awaiting human: `ADR-0001` through `ADR-0009`, one area at a time
+- Produced by: architect agent and finalized by Codex with project-owner
+  decisions on 2026-07-30
+- Status: decided; all nine foundational decisions have been accepted
+- Decided: `ADR-0001` selects Flutter + Next.js + NestJS; `ADR-0002` selects a
+  modular monolith with a separately runnable worker; `ADR-0003` selects
+  vertical-flow Kanban with WIP limits; `ADR-0005` selects managed PostgreSQL
+  plus private object storage; `ADR-0008` selects versioned REST/JSON with
+  OpenAPI; `ADR-0007` selects Firebase phone OTP with Garazo-owned
+  authorization/session/PIN, conditional on the Bangladesh pilot; `ADR-0009`
+  selects a PostgreSQL-backed durable queue; `ADR-0004` selects owning-module
+  provider ports/adapters with durable intent and normalized results;
+  `ADR-0006` selects a hardened VM with Docker Compose plus managed PostgreSQL
+  and private object storage; the approved SRS, domain invariants, release
+  boundaries, and forecast-backed planning baseline also remain fixed
+- Awaiting human: N/A — no foundational technical decision remains
 - Frozen: `Q-006` / `D-001` / `NFR-ADOPTION-02`; no instrumentation or
   verification work may claim it
-- Next step: present `ADR-0002` first, capture the human's accept/override and
-  reasoning, then update its status and consequences before presenting the
-  next area
-- Must not do yet: complete the chosen target architecture, finalize Epic 00
-  conventions, advance to `/dev-plan`, or commit a decision as accepted
+- Conditional before production: complete the Firebase Bangladesh delivery,
+  privacy/consent, abuse, and cost pilot; define and approve VM recovery,
+  networking, secrets, backup/RPO/RTO, and production configuration
+- Next step: run `/dev-plan` from this decided plan, beginning with the genesis
+  epic and populating the live traceability matrix with epic/task links
+- Must not do yet: implement unapproved schema/API fields, add dependencies,
+  perform migrations, create secrets, or change production configuration

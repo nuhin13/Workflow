@@ -1,7 +1,7 @@
 # ADR-0002 — Architecture style
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [FR-JOB-14, FR-BILLING-10, FR-PLAN-11, NFR-SEC-01,
   NFR-REL-01, FT-002, FT-003, FT-007, FT-011, FT-012, FC-011, FC-020,
   FC-021]
@@ -60,11 +60,22 @@ yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 1 — Modular monolith plus separately runnable worker.
+
+Confirmed by the project owner on 2026-07-30.
 
 ## Consequences
 
-N/A — pending human choice. If Option 1 is selected, define enforceable module
-imports and ownership tests; do not call an unstructured layered monolith
-"modular."
-
+- Garazo begins as one modular application codebase organized by the approved
+  domain contexts, with API and worker as separately runnable entry points.
+- Cross-record money, credit, audit, and idempotency work can use one logical
+  transaction boundary. The physical datastore remains subject to ADR-0005.
+- Module ownership, public interfaces, and allowed imports must be enforced by
+  architecture tests. An unstructured layered monolith does not satisfy this
+  decision.
+- API deployment has a broader blast radius than independently deployed
+  services. This is accepted in exchange for simpler delivery and operations.
+- A module may be extracted only after measured database, queue, fault, team,
+  or deployment pressure justifies it. Extraction requires a new ADR.
+- Domain microservices and function-per-capability serverless are rejected for
+  the initial architecture.

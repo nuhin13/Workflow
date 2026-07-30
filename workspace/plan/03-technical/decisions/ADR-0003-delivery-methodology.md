@@ -1,7 +1,7 @@
 # ADR-0003 — Delivery methodology
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [NFR-PERF-01, NFR-SEC-01–NFR-SEC-04, FT-001–FT-019,
   FC-002, FC-004–FC-012]
 
@@ -54,11 +54,21 @@ Final call is yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 1 — Flow-based Kanban with thin vertical slices and WIP limits.
+
+Confirmed by the project owner on 2026-07-30.
 
 ## Consequences
 
-N/A — pending human choice. The accepted method must be expressed through the
-existing profile, branch, review, QA, and human-gate rules rather than replacing
-them.
-
+- Work is pulled as small end-to-end journeys rather than scheduled as
+  layer-first batches or fixed two-week commitments.
+- Explicit WIP limits and task-aging review are required. Their working values
+  will be defined in the development plan and adjusted from observed flow.
+- Every slice still follows the selected profile's task, branch/worktree, peer
+  review, QA, checkpoint, traceability, and human-gate rules.
+- Pilot evidence and runnable checkpoints drive reprioritization. Forecast
+  dates are review points, not invented sprint-capacity promises.
+- Scrum is not the base delivery method, though timeboxed planning or review
+  sessions may be used without changing the pull system.
+- Layer-first delivery is rejected because it postpones integration,
+  usability, privacy, and money-flow feedback.

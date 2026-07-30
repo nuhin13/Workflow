@@ -1,7 +1,7 @@
 # ADR-0006 — Hosting and runtime
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [FR-ONLINE-01–FR-ONLINE-03, NFR-REL-01, NFR-SEC-01,
   FC-008, FC-010, FC-011, FC-016, FC-020, FC-021]
 
@@ -15,7 +15,7 @@ an approved but low-confidence envelope of ৳30,000–৳90,000 at M+12
 (`FC-016`). Current region availability, data handling, and quotes require
 human review.
 
-Official references checked 2026-07-29:
+Official references checked 2026-07-29 and rechecked 2026-07-30:
 [Cloud Run overview](https://cloud.google.com/run/docs/overview/what-is-cloud-run),
 [GKE Autopilot](https://cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview),
 [Docker Compose production](https://docs.docker.com/compose/how-tos/production/),
@@ -62,11 +62,35 @@ is yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 3 — Single hardened VM with Docker Compose plus managed PostgreSQL and
+private object storage.
+
+Confirmed by the project owner on 2026-07-30. The owner selected direct
+control, predictable always-on operation, and provider portability over the
+advisory recommendation for managed containers.
 
 ## Consequences
 
-N/A — pending human choice. Region, supplier, environments, networking,
-availability target, backup/RPO/RTO, secret manager, and exact sizing remain
-unapproved and require later contracts.
-
+- The Next.js admin, NestJS API, and separately runnable NestJS worker are
+  deployed as containers on one hardened VM using a production Compose
+  definition.
+- PostgreSQL and private object storage remain managed services and are not
+  hosted on the application VM.
+- The team owns operating-system and container-runtime patching, firewall and
+  access hardening, deploy safety, process supervision, monitoring, capacity,
+  incident response, and host recovery.
+- One host failure can interrupt the admin, API, and worker together. Recovery
+  automation, tested rebuild instructions, health checks, rollback, and
+  off-host configuration/backups are required before production.
+- Standard container images and external managed data services preserve a
+  later migration path to managed containers. Such a migration requires a new
+  ADR.
+- Initial scaling is bounded by the VM. Sustained resource pressure,
+  unacceptable recovery time, or availability needs beyond one host trigger a
+  hosting review rather than unplanned service splitting.
+- Managed containers and managed Kubernetes are rejected for the initial
+  runtime.
+- Region, VM supplier, environments, networking, TLS/ingress mechanism,
+  availability target, backup/RPO/RTO, secret manager, image registry,
+  observability supplier, and exact sizing remain later human-approved
+  contracts.

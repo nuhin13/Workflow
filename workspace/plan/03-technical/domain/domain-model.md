@@ -1,11 +1,11 @@
 # Garazo Domain Model
 
-- Status: draft — conceptual model, not a database schema
-- Last updated: 2026-07-29
+- Status: technical plan v1 — conceptual model, not a database schema
+- Last updated: 2026-07-30
 - Traces from: approved SRS v1 (`FR-ACCESS-*`–`FR-ONLINE-*`,
   `NFR-SEC-*`, `NFR-REL-*`); approved screens `SCR-001`–`SCR-014`;
   forecast `FC-001`–`FC-021`
-- Traces to: proposed `ADR-0002`, `ADR-0004`, `ADR-0005`, `ADR-0007`,
+- Traces to: accepted `ADR-0002`, `ADR-0004`, `ADR-0005`, `ADR-0007`,
   `ADR-0008`, and `ADR-0009`
 
 This model names concepts and ownership boundaries already implied by the
@@ -186,9 +186,9 @@ is the largest uncertainty (`FC-010`). Therefore:
 
 ## Handoff
 
-- This model is input to the nine proposed ADRs, not an accepted schema.
-- The human must choose foundational ADRs before any physical model or API
-  contract is finalized.
+- This conceptual model is input to the nine accepted ADRs, not a physical
+  schema.
+- Any physical model or API contract must be introduced through an approved
+  task and remain within the accepted decisions.
 - Keep `NFR-ADOPTION-02` absent from implementation planning until an approved
   amendment resolves `Q-006`/`D-001`.
-

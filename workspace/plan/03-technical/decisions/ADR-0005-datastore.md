@@ -1,7 +1,7 @@
 # ADR-0005 — Datastore
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [FR-ACCESS-05, FR-JOB-14, FR-BILLING-01–FR-BILLING-10,
   FR-CASH-01–FR-CASH-05, FR-PLAN-11, NFR-SEC-01, NFR-REL-01,
   FC-009, FC-010, FC-020]
@@ -62,10 +62,29 @@ yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 1 — Managed PostgreSQL for structured records plus private object
+storage for media.
+
+Confirmed by the project owner on 2026-07-30.
 
 ## Consequences
 
-N/A — pending human choice. Physical tables, keys, columns, indexes, retention,
-migrations, ORM/query layer, and object-store vendor remain unapproved.
-
+- PostgreSQL is the authoritative structured store for workshop, job, billing,
+  payment, due, ledger, reminder, entitlement, credit, audit, idempotency, and
+  durable-intent records.
+- Database constraints and transactions must protect financial and retry
+  invariants. PostgreSQL row-level security is defense in depth; server-side
+  workshop authorization remains mandatory.
+- Photos, voice recordings, and generated bill binaries live in private object
+  storage. PostgreSQL retains their workshop-scoped ownership and metadata
+  references.
+- Schema migrations become an explicit, reviewed, backward-compatible, and
+  human-approved deployment step under the repository constitution.
+- Connection pooling, maximum concurrency, query/index monitoring, backup,
+  recovery, and row-security tests are required operational concerns.
+- Future offline support must reconcile with the PostgreSQL-backed server
+  model; this decision does not authorize Firestore or define local sync
+  fields and conflict rules.
+- Physical tables, keys, columns, indexes, retention, ORM/query layer,
+  PostgreSQL provider, and object-storage vendor remain later decisions or
+  approved task contracts.

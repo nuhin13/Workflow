@@ -1,16 +1,17 @@
 # Garazo Lifecycle Analysis
 
-- Status: draft — behavior analysis, not implementation selection
-- Last updated: 2026-07-29
+- Status: technical plan v1 — behavior analysis, not implementation detail
+- Last updated: 2026-07-30
 - Traces from: approved SRS v1; `Q-005`; approved design
   `SCR-003`, `SCR-005`, `SCR-009`, `SCR-010`, `SCR-012`–`SCR-014`;
   `FC-009`, `FC-012`, `FC-020`, `FC-021`
-- Traces to: proposed `ADR-0002`, `ADR-0004`, `ADR-0005`, `ADR-0007`,
+- Traces to: accepted `ADR-0002`, `ADR-0004`, `ADR-0005`, `ADR-0007`,
   `ADR-0008`, `ADR-0009`
 
 Only states and effects supported by the approved sources are treated as
 product behavior. Technology-specific queue/session/provider states are
-illustrative boundaries and remain subject to ADR decisions.
+illustrative boundaries constrained by the accepted ADRs; exact task
+contracts remain unapproved.
 
 ## 1. Job lifecycle
 
@@ -261,4 +262,3 @@ authorization, transition, and audit invariants.
 - Do not add states such as job cancellation, refund, write-off, reminder
   opt-out, or offline conflict resolution without an approved SRS/task change.
 - Keep `NFR-ADOPTION-02` frozen under `D-001`.
-

@@ -1,7 +1,7 @@
 # ADR-0009 — Background jobs and queue
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [FR-REMINDER-02–FR-REMINDER-05, FR-BILLING-09,
   FR-PLAN-11–FR-PLAN-12, FR-ANALYTICS-02, NFR-REL-01,
   FC-010, FC-012, FC-015, FC-016, FC-020]
@@ -13,7 +13,7 @@ and exactly-once SMS-credit effects. Expected M+12 SMS volume is 5,600
 sends/month (`FC-012`, `FC-020`). A domain write and its asynchronous intent
 must not split silently; jobs must be replay-safe.
 
-Official references checked 2026-07-29:
+Official references checked 2026-07-29 and rechecked 2026-07-30:
 [pg-boss](https://github.com/timgit/pg-boss),
 [PostgreSQL locking](https://www.postgresql.org/docs/current/explicit-locking.html),
 [BullMQ queues](https://docs.bullmq.io/guide/queues),
@@ -62,11 +62,31 @@ measured, not merely forecast. Final call is yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 1 — Database-backed durable queue in PostgreSQL, using a maintained
+stack-compatible worker library.
+
+Confirmed by the project owner on 2026-07-30. This accepts the queue pattern,
+not a specific new dependency.
 
 ## Consequences
 
-N/A — pending human choice. Library, job payload, retry/backoff, retention,
-dead-letter/replay operation, scheduling time zone, concurrency, and extraction
-thresholds need later accepted contracts.
-
+- A consequential domain change and its asynchronous intent are inserted in
+  the same PostgreSQL transaction, preventing an acknowledged write from
+  silently losing its required background work.
+- The separately runnable NestJS worker claims due jobs with bounded
+  concurrency and records normalized attempts, outcomes, and rescheduling
+  state.
+- Every handler remains idempotent. Unique constraints and transaction rules
+  protect billing, SMS-credit, reminder, and analytics effects; the queue
+  itself is not treated as an end-to-end exactly-once guarantee.
+- Queue depth, oldest-job age, retries, database locks, connection use, and
+  handler failures must be observable.
+- Queue load shares PostgreSQL. Sustained lag or measured database contention
+  triggers a review and a new ADR before extraction to Redis or managed tasks.
+- Redis/BullMQ and managed HTTP task queues are rejected for the initial
+  architecture.
+- Selecting a concrete queue library is a later implementation choice and a
+  new dependency that still requires explicit human approval.
+- Job payloads, retry/backoff, retention, dead-letter/replay operations,
+  scheduling time zone, concurrency, and extraction thresholds remain
+  approved-task contracts.

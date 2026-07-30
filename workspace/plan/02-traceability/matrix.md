@@ -1,8 +1,9 @@
 # Traceability Matrix — Garazo
 
 - Maintained by `/trace`; update in the same commit as any traced artifact change.
-- Last verified: 2026-07-29
-- Source versions: BRD v1 · PRD v1 · feature list v1 · design v1 · SRS v1
+- Last verified: 2026-07-30
+- Source versions: BRD v1 · PRD v1 · feature list v1 · design v1 · SRS v1 ·
+  technical plan v1
 - Current delivery depth: pre-epic; task and test columns are intentionally `—`
 
 ## 1. Requirement → delivery chain
@@ -91,18 +92,33 @@ Full notes live in `workspace/plan/02-traceability/discrepancies/`.
 | 2026-07-27 | Q-003, Q-004 | Design v1, screen coverage, SRS privacy boundary | `078a6b1`, `4c246a1` |
 | 2026-07-29 | Q-005 | SRS access requirements, EARS criteria, feature list, glossary | `4c246a1` |
 | 2026-07-29 | SRS v1 approval with Q-006 deferred | D-001 and initial matrix | this trace commit |
-| 2026-07-29 | Technical-planning draft | Domain model, lifecycle analysis, and proposed ADR-0001–ADR-0009; no requirement meaning or coverage changed | pending human decisions |
+| 2026-07-29 | Technical-planning draft | Domain model, lifecycle analysis, and proposed ADR-0001–ADR-0009; no requirement meaning or coverage changed | `75bf452` |
+| 2026-07-30 | ADR-0002 architecture style accepted | Technical plan, decision index, consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
+| 2026-07-30 | ADR-0003 delivery methodology accepted | Technical plan, decision index, consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
+| 2026-07-30 | ADR-0001 application stack accepted | Technical plan, decision index, consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
+| 2026-07-30 | ADR-0005 datastore accepted | Technical plan, decision index, consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
+| 2026-07-30 | ADR-0008 API style accepted | Technical plan, decision index, consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
+| 2026-07-30 | ADR-0007 authentication and session accepted conditionally | Technical plan, decision index, security consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
+| 2026-07-30 | ADR-0009 background jobs and queue accepted | Technical plan, decision index, retry/idempotency consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
+| 2026-07-30 | ADR-0004 third-party service boundary accepted | Technical plan, decision index, integration-boundary consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
+| 2026-07-30 | ADR-0006 hosting/runtime accepted; technical plan v1 decided | Chosen target architecture, VM operations consequences, trace handoff, and pipeline state; no requirement meaning or coverage changed | this technical-plan commit |
 
-## Handoff → Technical planning
+## Handoff → Development planning
 
-- Produced by: Codex `/trace` on 2026-07-29 · Status: verified
+- Produced by: Codex `/trace`, verified through decided technical plan v1 on
+  2026-07-30
 - **Decided:** 43 PRD rows join all approved BRD anchors, 117 functional SRS
-  requirements, 18 NFRs, 31 features, and 14 screens.
+  requirements, 18 NFRs, 31 features, and 14 screens. ADR-0001–ADR-0009 are
+  accepted; ADR-0006 records the owner's hardened-VM Option 3 override.
 - **Open (`Q-###`):** N/A for the next phase. Q-006 is an accepted deferral
   tracked by D-001 and freezes only NFR-ADOPTION-02.
-- **Watch out:** P1/L2 rows and the first-paying-cohort offline UI are boundary
-  contracts, not implementation-ready detail.
-- **Next stage must:** run `/tech-plan`; present foundational options as
-  proposed ADRs and stop for human decisions.
+- **Watch out:** P1/L2 rows and the first-paying-cohort offline UI remain
+  boundary contracts. Firebase production use is conditional on its approved
+  Bangladesh pilot. The selected single VM requires explicit recovery and
+  operational tasks.
+- **Next stage must:** run `/dev-plan`; create the genesis and product epics
+  from technical plan v1 and populate EP/task links without inventing
+  schema/API details.
 - **Must NOT change without a D-### + human ping:** approved SRS IDs or
-  meaning, release boundaries, privacy rules, or source versions.
+  meaning, accepted ADR choices, release boundaries, privacy rules, or source
+  versions.

@@ -1,7 +1,7 @@
 # ADR-0008 — API style
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [FR-ACCESS-05, FR-ONLINE-01–FR-ONLINE-03, FR-ADMIN-01–FR-ADMIN-08,
   FR-TIREBOOK-01–FR-TIREBOOK-03, NFR-SEC-01, NFR-REL-01, FC-011]
 
@@ -57,11 +57,25 @@ contract rather than access to internal endpoints. Final call is yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 1 — Versioned REST/JSON described by OpenAPI.
+
+Confirmed by the project owner on 2026-07-30.
 
 ## Consequences
 
-N/A — pending human choice. Routes, request/response fields, pagination,
-versioning details, idempotency header/name, error schema, and external API
-fields remain unapproved task-level contracts.
-
+- One versioned OpenAPI document is the canonical application contract. The
+  NestJS API implementation and contract tests must remain consistent with it.
+- Dart clients for Flutter and TypeScript clients for Next.js are generated
+  from the approved contract; hand-maintained duplicate client models are
+  avoided.
+- CI must detect generated-client drift and incompatible contract changes.
+  Breaking changes require an explicitly approved versioning path.
+- Consequential writes expose approved idempotency metadata and stable domain
+  error codes. Workshop authorization and protected-value filtering remain
+  server-side responsibilities.
+- Future TireBook exchange receives a separate, versioned, consented contract
+  rather than access to internal Garazo endpoints.
+- GraphQL and gRPC are rejected as the initial client API styles.
+- Routes, request/response fields, pagination, exact versioning mechanics,
+  idempotency header/name, error schema, and external API fields remain
+  approved-task contracts.

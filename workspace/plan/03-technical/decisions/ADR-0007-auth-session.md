@@ -1,7 +1,7 @@
 # ADR-0007 — Authentication and session
 
-- status: proposed
-- date: 2026-07-29 | proposed_by: architect | decided_by: ⏳ human pending
+- status: accepted
+- date: 2026-07-29 | proposed_by: architect | decided_by: project owner on 2026-07-30
 - traces_to: [FR-ACCESS-03–FR-ACCESS-15, FR-ADMIN-01, NFR-SEC-01–NFR-SEC-04,
   Q-005, FT-002, FT-010, FT-018, FC-006]
 
@@ -15,7 +15,7 @@ permission are separate again. Expected M+12 is 700 total accounts
 (`FC-006`); abuse resistance, recovery, and provider delivery matter more than
 scale.
 
-Official references checked 2026-07-29:
+Official references checked 2026-07-29 and rechecked 2026-07-30:
 [Firebase Android phone auth](https://firebase.google.com/docs/auth/android/phone-auth),
 [Auth0 SMS passwordless](https://auth0.com/docs/authenticate/passwordless/authentication-methods/sms-otp),
 [OWASP authentication](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html),
@@ -66,11 +66,37 @@ server-validated step-up authorization. Final call is yours.
 
 ## Decision
 
-⏳ AWAITING HUMAN
+Option 1 — Firebase Authentication/Identity Platform phone OTP, verified by
+the Garazo backend; Garazo owns workshop authorization, its application
+session, and the separate owner-PIN grant.
+
+Confirmed by the project owner on 2026-07-30, conditional on a successful
+Bangladesh-number delivery, privacy/consent, abuse, and cost pilot before
+production rollout.
 
 ## Consequences
 
-N/A — pending human choice. Exact token/cookie storage, session lifetime,
-admin factors, PIN hashing parameters, OTP expiry/rate limits, device
-registration, and provider tenant configuration need later security contracts.
-
+- Firebase proves phone possession and returns a signed identity assertion.
+  The NestJS backend verifies it, maps it to a stable Garazo account, resolves
+  workshop membership server-side, and issues a rotated Garazo session.
+- Firebase identity is not workshop authorization and is not authorization to
+  reveal owner-protected money.
+- The Flutter flow must disclose that Google processes and stores
+  authentication phone numbers for spam and abuse prevention, and must obtain
+  appropriate end-user consent.
+- Production enablement is conditional on testing real Bangladesh numbers for
+  delivery, latency, abuse controls, consent, and current cost. Failure of the
+  pilot requires a new ADR before switching providers or building first-party
+  OTP.
+- Fictional-number and disabled-app-verification facilities are testing-only
+  and must never be enabled or embedded in production.
+- The owner PIN remains a separate server-validated step-up grant. It keeps
+  the approved relock behavior, five-attempt cycle, 60/120/240-second cooldown,
+  and registered-phone OTP recovery.
+- Support-operator authentication and scoped admin authorization remain
+  separate from workshop-user identity.
+- Auth0 and first-party OTP are rejected as the initial owner authentication
+  strategy.
+- Exact token/cookie storage, session lifetime, admin factors, PIN hashing
+  parameters, OTP expiry/rate limits, device registration, and provider tenant
+  configuration remain later human-approved security contracts.
