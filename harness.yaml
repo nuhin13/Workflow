@@ -148,9 +148,26 @@ write_scopes:
     - workspace/open-questions.md
     - harness/memory/lessons/
     - workspace/runs/
-  product_code:      # developers' code surface — E00 genesis REPLACES this
+  product_code:      # developers' code surface — established by E00 genesis
     - src/
     - tests/
+    - apps/
+    - packages/
+    - contracts/
+    - scripts/
+    - docs/
+    - package.json
+    - pnpm-lock.yaml
+    - pnpm-workspace.yaml
+    - .node-version
+    - .flutter-version
+    - tsconfig.base.json
+    - eslint.config.mjs
+    - prettier.config.mjs
+    - .gitignore
+    - .dockerignore
+    - .env.example
+    - README.md
   test_code:         # independent verification may add tests, never implementation
     - tests/
   analyst:     [workspace/docs/business/, workspace/plan/00-business/, workspace/assets/]
@@ -158,7 +175,7 @@ write_scopes:
   architect:   [workspace/plan/03-technical/]
   pm:          [workspace/spec/, workspace/epics/, workspace/plan/00-business/]
   team-lead:   [workspace/plan/04-dev/, workspace/epics/, workspace/spec/]
-  developer-backend:  [product_code, workspace/epics/]   # epics = own task file status/checklist only
+  developer-backend:  [product_code, infra/db/, infra/compose/, Makefile, workspace/epics/]   # epics = own task file status/checklist only
   developer-frontend: [product_code, workspace/epics/]
   qa:          [workspace/epics/, test_code]
   devops:      [.github/, infra/, docker/, Makefile, product_code]
