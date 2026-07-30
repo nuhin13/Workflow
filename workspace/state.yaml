@@ -20,8 +20,9 @@ artifacts:
   feature_list: { version: 1, approved: "2026-07-26", derived_from: { prd: 1, brd: 1, ui: 1 } }
   forecast: { version: 1, approved: "2026-07-26", derived_from: { brd: 1, prd: 1, feature_list: 1 } }
   tech_plan: { version: 1, approved: "2026-07-30", derived_from: { srs: 1, design: 1, forecast: 1 } }
+  dev_plan: { version: 1, approved: "2026-07-30", derived_from: { srs: 1, design: 1, feature_list: 1, tech_plan: 1 } }
 
-phase: dev-plan         # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
+phase: build            # idle | business | design | srs | traceability | tech-plan | dev-plan | build | done
 
 phases:
   business:
@@ -66,11 +67,90 @@ phases:
       - workspace/plan/03-technical/decisions/ADR-0007-auth-session.md
       - workspace/plan/03-technical/decisions/ADR-0008-api-style.md
       - workspace/plan/03-technical/decisions/ADR-0009-background-jobs-queue.md
-  dev-plan:      { status: pending, artifacts: [] }
-  build:         { status: pending }
+  dev-plan:
+    status: done
+    artifacts:
+      - workspace/plan/04-dev/dev-plan.md
+      - workspace/epics/E00-genesis/epic.md
+      - workspace/epics/E00-genesis/conventions.md
+      - workspace/epics/E00-genesis/tracker.md
+      - workspace/epics/E00-genesis/tasks/
+  build:         { status: in-progress }
 
 # Filled by /dev-plan, maintained by /epic, /build, /qa, /checkpoint
-epics: []
+epics:
+  - id: E00
+    title: Genesis and Walking Skeleton
+    status: specced
+    runnable_flow: "Start the Compose stack and run the diagnostic Flutter UI through the API to PostgreSQL and back with green CI."
+    tasks:
+      - { id: E00-T01, title: "Scaffold repository and module boundaries", status: todo, owner: null }
+      - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: todo, owner: null }
+      - { id: E00-T03, title: "Containerize runtime and CI baseline", status: todo, owner: null }
+      - { id: E00-T04, title: "Implement the persistence walking skeleton", status: todo, owner: null }
+      - { id: E00-T05, title: "Prove integration and recovery gate", status: todo, owner: null }
+    qa_report: null
+    checkpoint: null
+  - id: E01
+    title: Secure Workshop Access
+    status: pending
+    runnable_flow: "Verify the owner phone, set up the workshop, enter only the authorized workshop, and switch Bangla/English presentation."
+  - id: E02
+    title: Fast Jobs and Customer Book
+    status: pending
+    runnable_flow: "Create and progress or batch-enter a job, then find retained customer and vehicle history in a later online session."
+  - id: E03
+    title: Private Billing and Daily Cash
+    status: pending
+    runnable_flow: "Unlock protected money, bill and collect or retain a due, share a safe bill, reconcile the day, and relock."
+  - id: E04
+    title: Plans, Credits, and Service Reminders
+    status: pending
+    runnable_flow: "Exercise Free/Pro limits, SMS credits, one service reminder, one return, and protected ROI."
+  - id: E05
+    title: Admin Controls and Pilot Evidence
+    status: pending
+    runnable_flow: "Use an authorized audited admin control and view only approved pilot evidence."
+  - id: E06
+    title: Offline Work and Reconciliation
+    status: pending
+    runnable_flow: "Use approved Pro records offline, reconnect, and reconcile without loss, duplicate money effects, or tenant leaks."
+  - id: E07
+    title: Mechanics and Salary
+    status: pending
+    runnable_flow: "Manage approved mechanic and salary records while preserving owner-money privacy."
+  - id: E08
+    title: Inventory
+    status: pending
+    runnable_flow: "Record a stock movement and reconcile retained quantity without duplicate effects."
+  - id: E09
+    title: Appointments and Booking
+    status: pending
+    runnable_flow: "Submit a valid public booking and open its retained workshop details."
+  - id: E10
+    title: Reports
+    status: pending
+    runnable_flow: "Run an approved period report and reconcile its totals or truthful empty state."
+  - id: E11
+    title: Public Vehicle History
+    status: pending
+    runnable_flow: "Share a vehicle-history link containing only approved fields and no private workshop money."
+  - id: E12
+    title: Multi-branch Operation
+    status: pending
+    runnable_flow: "Select a branch and see only permitted branch records and approved aggregates."
+  - id: E13
+    title: Fleet Accounts
+    status: pending
+    runnable_flow: "Distinguish one fleet's vehicles, jobs, bills, and balances from retail and other fleets."
+  - id: E14
+    title: TireBook Exchange
+    status: pending
+    runnable_flow: "Exchange a consented booking and approved service history while Garazo remains independently operable."
+  - id: E15
+    title: VAT Invoices
+    status: pending
+    runnable_flow: "Issue an approved VAT invoice linked to its originating workshop bill."
 # - id: E00
 #   title: Skeleton
 #   status: todo           # todo | specced | in-progress | qa | checkpoint | done | remapped
@@ -80,7 +160,7 @@ epics: []
 #   qa_report: null
 #   checkpoint: null
 
-current_epic: null
+current_epic: E00
 blockers: []             # IDs only; details live in workspace/open-questions.md
 
 history:
@@ -138,3 +218,5 @@ history:
     event: "ADR-0004 accepted by the project owner: provider ports/adapters in the owning modules with durable intent and normalized result records; ADR-0006 remains the final foundational decision"
   - at: "2026-07-30T13:52:22+06:00"
     event: "ADR-0006 accepted by the project owner as Option 3: one hardened VM with Docker Compose plus managed PostgreSQL and private object storage; technical plan v1 decided with all nine ADRs accepted; advanced to dev-plan"
+  - at: "2026-07-30T17:34:39+06:00"
+    event: "approved development plan v1, E00 specification, lean task routing, and the protected E00 product write-scope bootstrap; seeded E00–E15 and advanced to build with E00 awaiting formal analysis"
