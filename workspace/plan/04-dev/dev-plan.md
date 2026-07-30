@@ -92,9 +92,10 @@ graph TD
 - Critical MVP chain: E00 → E01 → E02 → E03 → E04 → E05. These epics do not
   run in parallel because each consumes a validated user-flow contract from
   the prior checkpoint.
-- Inside E00, T02 (contract/module boundaries) and T03
-  (runtime/CI/operations) may run after T01 in separate worktrees; their file
-  plans do not overlap. T04 merges both. T05 is the final integration task.
+- E00 runs T01 → T02 → T03 → T04 → T05 serially. T02, T03, and T04 each own
+  an ordered change to the shared dependency lock; serializing them prevents
+  merge conflicts and lost dependency provenance. T05 is the final
+  integration task.
 - Lean routing: T01–T04 use the `build` tier against their complete contracts;
   T05 and independent high-risk/final review use `deep`. Each task starts with
   fresh context and selectively reads only its declared files and references.
@@ -109,9 +110,8 @@ graph TD
 flowchart LR
   subgraph E00Tasks[E00 task lanes]
     T01[E00-T01 scaffold] --> T02[E00-T02 contracts]
-    T01 --> T03[E00-T03 runtime]
-    T02 --> T04[E00-T04 round trip]
-    T03 --> T04
+    T02 --> T03[E00-T03 runtime]
+    T03 --> T04[E00-T04 round trip]
     T04 --> T05[E00-T05 integration gate]
   end
   T05 --> MVP[E01–E05 serial risk chain]

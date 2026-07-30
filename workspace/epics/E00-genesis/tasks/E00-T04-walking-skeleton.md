@@ -11,7 +11,7 @@ preferred_agent: any
 tier: build
 token_estimate: { tier: M, range: "70k-140k" }
 priority: { moscow: must, p: P2 }
-depends_on: [E00-T02, E00-T03]
+depends_on: [E00-T03]
 blocks: [E00-T05]
 traces_to: [FR-ONLINE-01, FR-ONLINE-02, NFR-REL-01, ADR-0002, ADR-0005, ADR-0008]
 external_services: [postgresql]
@@ -42,6 +42,8 @@ files:
     - packages/server-core/src/index.ts
     - infra/compose/compose.development.yaml
     - Makefile
+    - packages/server-core/package.json
+    - pnpm-lock.yaml
 feature_flags: [system.walkingSkeleton]
 ui_reference: "N/A — development-only diagnostic; not a product SCR screen"
 started_at:
@@ -89,8 +91,8 @@ by default.
   returns to T02/spec revision.
 - Do not run the migration without explicit human migration approval.
 - Do not put PostgreSQL in production Compose or configure a managed provider.
-- Do not add an ORM/query builder/migration framework or other dependency; use
-  the approved PostgreSQL driver/connection boundary from the dependency gate.
+- Do not add an ORM/query builder, migration framework, or dependency beyond
+  the separately approved minimal PostgreSQL driver.
 - Do not implement NFR-ADOPTION-02 or emit product analytics.
 - Do not edit state, traceability, AGENTS.md, harness, or upstream artifacts.
 
@@ -116,6 +118,8 @@ by default.
 - `apps/mobile/lib/app/app.dart` — expose diagnostic route only under the
   non-production build flag.
 - `packages/server-core/src/index.ts` — export system public interface.
+- `packages/server-core/package.json` and `pnpm-lock.yaml` — add only the
+  separately approved PostgreSQL driver and its locked dependency graph.
 - `infra/compose/compose.development.yaml` — make the local compatibility
   database available to explicit migration/test commands; no startup
   migration.
@@ -126,7 +130,7 @@ by default.
 
 - None.
 
-> The diff may not exceed this list (lockfiles excepted). QA enforces.
+> The diff may not exceed this list. QA enforces.
 
 ## 6. Database changes
 
@@ -226,7 +230,8 @@ functions:
 ## 10. External services & feature flags
 
 - PostgreSQL: local compatibility service for tests; production remains
-  external managed boundary. No provider is selected.
+  external managed boundary. The exact minimal driver/version/license
+  requires human dependency approval; no managed provider is selected.
 - `system.walkingSkeleton`: default false, non-production only, locally
   configured, not remotely/admin controllable.
 

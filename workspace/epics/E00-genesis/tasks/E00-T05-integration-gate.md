@@ -10,7 +10,7 @@ owner_agent: devops
 preferred_agent: any
 tier: deep
 token_estimate: { tier: M, range: "50k-90k" }
-priority: { moscow: must, p: P2 }
+priority: { moscow: should, p: P2 }
 depends_on: [E00-T04]
 blocks: []
 traces_to: [NFR-REL-01, NFR-SEC-01, NFR-A11Y-01, NFR-INDEPENDENCE-01, ADR-0001, ADR-0002, ADR-0004, ADR-0005, ADR-0006, ADR-0007, ADR-0008, ADR-0009]
@@ -107,7 +107,7 @@ checkpoint. Production remains unconfigured and no provider is contacted.
 
 - None.
 
-> The diff may not exceed this list (lockfiles excepted). QA enforces.
+> The diff may not exceed this list. QA enforces.
 
 ## 6. Database changes
 

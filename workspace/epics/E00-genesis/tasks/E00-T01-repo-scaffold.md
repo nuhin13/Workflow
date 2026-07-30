@@ -12,7 +12,7 @@ tier: build
 token_estimate: { tier: M, range: "50k-100k" }
 priority: { moscow: must, p: P2 }
 depends_on: []
-blocks: [E00-T02, E00-T03]
+blocks: [E00-T02]
 traces_to: [NFR-REL-01, NFR-I18N-01, NFR-A11Y-01, NFR-INDEPENDENCE-01, ADR-0001, ADR-0002]
 external_services: []
 files:
@@ -25,6 +25,7 @@ files:
     - apps/mobile/.metadata
     - apps/mobile/android/
     - apps/mobile/pubspec.yaml
+    - apps/mobile/pubspec.lock
     - apps/mobile/analysis_options.yaml
     - apps/mobile/l10n.yaml
     - apps/mobile/lib/main.dart
@@ -36,6 +37,7 @@ files:
     - apps/admin/package.json
     - apps/admin/tsconfig.json
     - apps/admin/next.config.ts
+    - apps/admin/next-env.d.ts
     - apps/admin/src/app/layout.tsx
     - apps/admin/src/app/page.tsx
     - apps/api/package.json
@@ -132,9 +134,9 @@ or UI-component libraries.
 - All paths in frontmatter `files.create` — minimal compile/test skeleton,
   Android host, shared package boundaries, generated Dart/TypeScript token
   targets, localization boundary, and root TypeScript configuration.
-- Lockfiles are created only after the exact dependency baseline is
-  human-approved; any Flutter-generated Android file must stay within the
-  listed `apps/mobile/android/` directory.
+- The two listed lockfiles are created only after the exact dependency
+  baseline is human-approved; any Flutter-generated Android file must stay
+  within the listed `apps/mobile/android/` directory.
 
 ### Update
 
@@ -146,7 +148,7 @@ or UI-component libraries.
 
 - None.
 
-> The diff may not exceed this list (lockfiles excepted). QA enforces.
+> The diff may not exceed this list. QA enforces.
 
 ## 6. Database changes
 

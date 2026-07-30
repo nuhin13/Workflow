@@ -104,6 +104,7 @@ Full notes live in `workspace/plan/02-traceability/discrepancies/`.
 | 2026-07-30 | ADR-0004 third-party service boundary accepted | Technical plan, decision index, integration-boundary consequences, and state; no requirement meaning or coverage changed | this technical-plan commit |
 | 2026-07-30 | ADR-0006 hosting/runtime accepted; technical plan v1 decided | Chosen target architecture, VM operations consequences, trace handoff, and pipeline state; no requirement meaning or coverage changed | this technical-plan commit |
 | 2026-07-30 | Development plan v1 and E00 approved | FT-001–FT-031 assigned exactly once to E01–E15; E00-T01–T05 foundation traces populated; Q-006/D-001 unchanged | this dev-plan commit |
+| 2026-07-30 | E00 analyze corrections | Aligned the diagnostic request contract, serialized dependency-lock writers, and regraded task scheduling; requirement meaning and E00 EARS coverage unchanged | this analyze commit |
 
 ## Handoff → E00 analysis
 

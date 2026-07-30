@@ -10,8 +10,8 @@ owner_agent: devops
 preferred_agent: any
 tier: build
 token_estimate: { tier: M, range: "60k-130k" }
-priority: { moscow: must, p: P2 }
-depends_on: [E00-T01]
+priority: { moscow: should, p: P2 }
+depends_on: [E00-T02]
 blocks: [E00-T04]
 traces_to: [FR-ONLINE-01, FR-ONLINE-02, NFR-REL-01, NFR-SEC-01, ADR-0004, ADR-0005, ADR-0006]
 external_services: [managed-postgresql-boundary, private-object-storage-boundary, off-host-observability-boundary]
@@ -49,6 +49,7 @@ files:
     - Makefile
     - apps/api/src/main.ts
     - apps/worker/src/main.ts
+    - pnpm-lock.yaml
 feature_flags: []
 ui_reference: "N/A — infrastructure task"
 started_at:
@@ -125,12 +126,14 @@ contracts; record them as open operational items, do not choose them.
 - `apps/api/src/main.ts` — validated configuration, structured logger,
   graceful shutdown.
 - `apps/worker/src/main.ts` — same plus worker-ready marker for health.
+- `pnpm-lock.yaml` — add only the approved runtime-config workspace importer
+  and dependencies.
 
 ### Delete
 
 - None.
 
-> The diff may not exceed this list (lockfiles excepted). QA enforces.
+> The diff may not exceed this list. QA enforces.
 
 ## 6. Database changes
 

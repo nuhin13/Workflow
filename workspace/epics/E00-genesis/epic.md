@@ -169,36 +169,45 @@ presented as product behavior.
 |---|---|---|---|---|---|
 | E00-T01 | Scaffold repository and module boundaries | `tasks/E00-T01-repo-scaffold.md` | — | M | todo |
 | E00-T02 | Establish OpenAPI and generated clients | `tasks/E00-T02-api-contract.md` | E00-T01 | M | todo |
-| E00-T03 | Containerize runtime and CI baseline | `tasks/E00-T03-runtime-baseline.md` | E00-T01 | M | todo |
-| E00-T04 | Implement the persistence walking skeleton | `tasks/E00-T04-walking-skeleton.md` | E00-T02, E00-T03 | M | todo |
+| E00-T03 | Containerize runtime and CI baseline | `tasks/E00-T03-runtime-baseline.md` | E00-T02 | M | todo |
+| E00-T04 | Implement the persistence walking skeleton | `tasks/E00-T04-walking-skeleton.md` | E00-T03 | M | todo |
 | E00-T05 | Prove integration and recovery gate | `tasks/E00-T05-integration-gate.md` | E00-T04 | M | todo |
 
 ```mermaid
 graph LR
   T01[E00-T01] --> T02[E00-T02]
-  T01 --> T03[E00-T03]
-  T02 --> T04[E00-T04]
-  T03 --> T04
+  T02 --> T03[E00-T03]
+  T03 --> T04[E00-T04]
   T04 --> T05[E00-T05]
 ```
 
-## 8. Analyze report (draft)
+## 8. Analyze report
 
-Formal `/analyze E00` runs after human approval. Preflight results:
+Formal `/analyze E00` completed on 2026-07-30 after an independent,
+fresh-context team-lead review. Three initial defects were corrected: the
+diagnostic body is now exactly `{}`, dependency-lock writers are serialized
+with explicit lockfile ownership, and MoSCoW was regraded to 60% Must.
 
-| Check | Draft result |
-|---|---|
-| Task ↔ acceptance trace | pass — every E00 criterion maps to T01–T05 |
-| Contract sanity | pass — T02 owns the contract; T04 implements without redefining it |
-| Parallel file collision | pass — T02 and T03 have disjoint write sets |
-| Scope fences | pass — every task includes explicit do/don't sections |
-| Size | pass — five M tasks; no L task |
+| Check | Result | Evidence |
+|---|---|---|
+| Task ↔ EARS trace | PASS | T01–T05 each own criteria and cover EARS-E00-1–EARS-E00-14 exactly once |
+| Contract sanity | PASS | T02 alone defines the routes; T04 implements them unchanged; `{}` is required; every list check is explicitly N/A; error envelope and camelCase casing are uniform |
+| Collision matrix | PASS | E00 is a serial T01 → T02 → T03 → T04 → T05 DAG; `pnpm-lock.yaml`/`pubspec.lock` ownership is explicit and ordered |
+| Scope fences | PASS | Every task contains filled DOES and does-NOT sections; no task authorizes feature code, live providers, secrets, or production configuration |
+| MoSCoW inflation | PASS | T01, T02, T04 are Must; T03 and T05 are Should; 3/5 = 60% |
+| Estimates and routing | PASS | Five M tasks, no L task; T01–T04 use `build`, T05 uses `deep` |
+| Human gates | PASS, dispatch condition retained | Exact dependencies, diagnostic migration, auth/security work, secrets/environment, and production configuration remain gated |
+| Frozen requirement | PASS | Q-006/D-001/NFR-ADOPTION-02 remains excluded |
+
+**Analyze verdict:** specification consistency PASS. Dispatch remains locked
+until the human approves this report and the exact dependency/version/license
+baseline required by E00-T01.
 
 ## 9. Open questions
 
 | ID | Question | Blocks | Status |
 |---|---|---|---|
-| N/A | No unresolved foundational choice. Exact dependency patches and additions are proposed in T01/T02 and still require the explicit human dependency gate before install. | E00 build start | gate, not a spec gap |
+| N/A | No unresolved foundational choice. Exact dependency patches and additions for T01/T02/T04 still require the explicit human dependency gate before install. | E00 build start | gate, not a spec gap |
 | Q-006 | Definition of qualifying support remains deferred under D-001. | NFR-ADOPTION-02 only | frozen; excluded from E00 |
 
 ## 10. Epic Definition of Done
@@ -228,8 +237,8 @@ Formal `/analyze E00` runs after human approval. Preflight results:
 
 - Team-lead specification approved; do not dispatch before formal
   `/analyze E00` approval and the exact dependency gate.
-- Start E00-T01 on `epic_00_task_01`; T02 and T03 become the only parallel
-  lane after T01 is merged.
+- Start E00-T01 on `epic_00_task_01`; T02 → T03 → T04 → T05 remain serial
+  because the middle tasks update the dependency lock in order.
 - New dependencies, the diagnostic migration, any auth/security code,
   secrets/environment changes, and production configuration retain their
   separate human gates.

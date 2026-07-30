@@ -18,18 +18,17 @@
 ```mermaid
 graph LR
   T01[E00-T01] --> T02[E00-T02]
-  T01 --> T03[E00-T03]
-  T02 --> T04[E00-T04]
-  T03 --> T04
+  T02 --> T03[E00-T03]
+  T03 --> T04[E00-T04]
   T04 --> T05[E00-T05]
 ```
 
 ## Parallel lanes
 
-- After T01: T02 (`cross-cutting`) and T03 (`infra`) may run concurrently in
-  separate worktrees. Their planned file lists do not overlap.
-- T04 waits for both and is the only writer to walking-skeleton
-  implementation files.
+- E00 runs T01 → T02 → T03 → T04 → T05 serially. T02, T03, and T04 each
+  update the shared dependency lock in sequence, so no lockfile merge or
+  dependency provenance can be lost.
+- T04 is the only writer to walking-skeleton implementation files.
 - T05 is the final integration/verification task.
 
 ## Review log
@@ -49,3 +48,6 @@ graph LR
 - 2026-07-30 Project owner approved the dev plan, E00 specification, lean
   routing, and protected repository write-scope bootstrap; formal `/analyze`
   and dependency gates remain.
+- 2026-07-30 Fresh-context `/analyze E00` found and corrected the request-body
+  mismatch, lockfile collision, and MoSCoW inflation; all consistency checks
+  now pass and await the human analyze gate.

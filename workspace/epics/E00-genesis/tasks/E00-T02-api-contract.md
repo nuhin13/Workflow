@@ -12,7 +12,7 @@ tier: build
 token_estimate: { tier: M, range: "60k-120k" }
 priority: { moscow: must, p: P2 }
 depends_on: [E00-T01]
-blocks: [E00-T04]
+blocks: [E00-T03]
 traces_to: [FR-ACCESS-05, FR-ONLINE-01, FR-ONLINE-02, NFR-SEC-01, NFR-REL-01, ADR-0002, ADR-0007, ADR-0008]
 external_services: []
 files:
@@ -42,6 +42,8 @@ files:
   update:
     - apps/api/src/app.module.ts
     - apps/mobile/pubspec.yaml
+    - apps/mobile/pubspec.lock
+    - pnpm-lock.yaml
 feature_flags: [system.walkingSkeleton]
 ui_reference: "N/A — contract and security boundary; no product UI"
 started_at:
@@ -113,13 +115,15 @@ data.
   context/error filter.
 - `apps/mobile/pubspec.yaml` — add only generator-required runtime support
   after human approval.
+- `apps/mobile/pubspec.lock` and `pnpm-lock.yaml` — record only the approved
+  generator/client dependency changes.
 - `packages/api-client-typescript/src/index.ts` — export generated client.
 
 ### Delete
 
 - None.
 
-> The diff may not exceed this list (lockfiles excepted). QA enforces.
+> The diff may not exceed this list. QA enforces.
 
 ## 6. Database changes
 
@@ -144,7 +148,7 @@ Pagination: N/A — no list endpoint.
 
 Validation:
 
-- Request body must be `{}` or absent; any field returns 400
+- Request body must be exactly `{}`; an absent body or any field returns 400
   `VALIDATION.INVALID_FIELD`.
 - `X-Correlation-Id`, when accepted, is 1–128 printable ASCII characters and
   is never treated as identity/authorization.
