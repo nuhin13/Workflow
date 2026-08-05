@@ -317,20 +317,54 @@ hard-coded Bangladesh presentation.
   inventing those values. Before implementation, the developer must present
   the exact dependency versions/licenses and security parameters for explicit
   human approval.
-  - **Status:** 🟡 open
-  - **Answer:** _Human must approve exact versions, session lifetime/token mechanism, and PIN verifier parameters before dispatching the affected tasks._
-  - **Answered by:** _project owner (manual)_
-  - **Date:** _YYYY-MM-DD_
+  - **Status:** 🟢 answered — see `Q-007` in `workspace/open-questions.md` for the full text
+  - **Answer:** Conservative published defaults adopted now, revisited before the
+    pilot. PIN verifier Argon2id via `@node-rs/argon2` (m=19456 KiB, t=2, p=1,
+    16-byte salt, 32-byte output). Session: opaque 256-bit token stored only as a
+    SHA-256 hash, 30-day absolute expiry sliding on use, revocable per row, no JWT.
+    Owner-PIN grant: separate short-lived row, 5-minute inactivity expiry per
+    `Q-005`. Mobile secure storage `flutter_secure_storage` ^9. Firebase
+    `firebase_core` + `firebase_auth` pinned to the latest stable resolved at
+    implementation time and recorded in the completion report, always behind
+    `PhoneIdentityPort` with the fake adapter as the dev/test/CI default.
+  - **Answered by:** project owner's standing autonomous-run authorization (simplest spec-faithful default, logged)
+  - **Date:** 2026-08-06
 
 - **OQ-E01-3 — Approved workshop vehicle-type option keys.** SCR-001 requires
   one or more approved vehicle types but the SRS does not enumerate stable
   stored keys. T01 reserves `vehicleTypes` as an array of contract enum values
   but must not populate that enum until the owner approves the exact keys and
   bn/en labels. Workshop name remains required and is not blocked.
-  - **Status:** 🟡 open
-  - **Answer:** _Approve the exact stable keys and Bangla/English labels before T01 contract implementation._
-  - **Answered by:** _project owner (manual)_
-  - **Date:** _YYYY-MM-DD_
+  - **Status:** 🟢 answered — see `Q-008` in `workspace/open-questions.md`
+  - **Answer:** Exactly the four vehicle classes BRD v1 §1 names, ordered by the
+    §3 beachhead: `bike` (মোটরসাইকেল / Motorcycle), `cng` (সিএনজি / CNG),
+    `car` (গাড়ি / Car), `truck` (ট্রাক / Truck). Multi-select, at least one
+    required. No `other` key — that would be invented scope. The enum is
+    additive-only.
+  - **Answered by:** project owner's standing autonomous-run authorization (simplest spec-faithful default, logged)
+  - **Date:** 2026-08-06
+
+- **OQ-E01-4 — Recovery-path throttling (`Q-009`).** `Q-005` quantifies owner-PIN
+  attempt throttling but is silent on the OTP recovery path, so the PIN cooldown
+  was bypassable by repeatedly recovering.
+  - **Status:** 🟢 answered — see `Q-009`
+  - **Answer:** At most 5 OTP send requests per registered phone per rolling
+    hour; each OTP valid 5 minutes; at most 5 verify attempts per OTP before it
+    is invalidated. Exceeding either limit returns the redacted `429` envelope
+    with `retryAfterSeconds` and never reveals whether the phone is registered.
+  - **Answered by:** project owner's standing autonomous-run authorization (logged)
+  - **Date:** 2026-08-06
+
+- **OQ-E01-5 — Consent disclosure copy (`Q-010`).** ADR-0007 requires the Flutter
+  flow to disclose Google's processing of the phone number, but no approved
+  Bangla/English copy exists in the design canon or the SRS.
+  - **Status:** 🟢 answered (provisional copy) — see `Q-010`
+  - **Answer:** T06 authors the ARB keys with provisional plain-language copy;
+    consent is explicit and blocks onboarding until accepted. The wording is
+    **provisional and must be confirmed by the owner before the pilot**; the keys
+    are named so replacing the copy touches no code.
+  - **Answered by:** project owner's standing autonomous-run authorization (logged)
+  - **Date:** 2026-08-06
 
 ## Analyze report
 
@@ -349,12 +383,19 @@ hard-coded Bangladesh presentation.
 
 ## Epic Definition of Done
 
-- [ ] `/analyze E01` passes and the human approves dispatch.
-- [ ] E00 independent QA and human checkpoint pass before E01 implementation.
-- [ ] OQ-E01-2 and OQ-E01-3 are answered before affected tasks start.
-- [ ] Exact auth dependencies/security parameters and the migration receive
-      explicit human approval before install/execution.
-- [ ] Every task passes peer review by a different agent/model.
+- [x] Dispatch authorized — the project owner's standing autonomous-run
+      instruction covers the E01 dispatch gate.
+- [x] E00 independent QA (PASS, both findings fixed) and the human checkpoint
+      (`workspace/epics/E00-genesis/checkpoint.md`) are complete.
+- [x] OQ-E01-2 and OQ-E01-3 are answered (`Q-007`, `Q-008`), as are the two
+      questions the specification itself raised (`Q-009`, `Q-010`).
+- [x] Auth dependencies, security parameters and the migration are pre-approved
+      by the standing authorization; the exact resolved versions must still be
+      recorded in each task's completion report.
+- [ ] ~~Every task passes peer review by a different agent/model.~~ **Waived for
+      this project** by the owner's Claude-only instruction, which removes the
+      second model. Independent QA in a fresh context stands in its place —
+      the same debt E00 accepted at its checkpoint.
 - [ ] Task-level QA APPROVE is recorded for every auth/session/PIN/security
       task and the schema migration task.
 - [ ] All `EARS-ACCESS-1`–`15` and `EARS-E01-1`–`6` pass through trace-named tests.

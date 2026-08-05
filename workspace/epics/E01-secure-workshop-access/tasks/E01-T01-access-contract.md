@@ -187,11 +187,18 @@ name a workshop, so it cannot name someone else's.
 |---|---|---|---|---|---|
 | PUT | `/api/v1/access/owner-pin` | session | `{pin: string, recoveryAssertion?: string}` | 204 empty | 204 |
 | POST | `/api/v1/access/owner-pin/verifications` | session | `{pin: string}` | `{grant: GrantEnvelope}` | 200 |
-| POST | `/api/v1/access/owner-pin/verifications` | session | wrong pin | `AUTH.PIN_INVALID` + `{remainingAttempts}` | 401 |
+| POST | `/api/v1/access/owner-pin/verifications` | session | wrong pin, attempts 1–4 of the cycle | `AUTH.PIN_INVALID` + `{remainingAttempts}` | 401 |
+| POST | `/api/v1/access/owner-pin/verifications` | session | wrong pin, **5th (last) attempt of the cycle** | `AUTH.PIN_COOLDOWN` + `{retryAfterSeconds}` | 429 |
 | POST | `/api/v1/access/owner-pin/verifications` | session, cooling down | any | `AUTH.PIN_COOLDOWN` + `{retryAfterSeconds}` | 429 |
 | DELETE | `/api/v1/access/owner-pin/grant` | session | none | empty | 204 |
 | POST | `/api/v1/access/owner-pin/recoveries` | session | `{recoveryAssertion: string, newPin: string}` | 204 empty | 204 |
 | POST | `/api/v1/access/owner-pin/recoveries` | session | invalid/expired assertion | `AUTH.RECOVERY_INVALID` | 401 |
+| POST | `/api/v1/access/owner-pin/recoveries` | session | send/verify limit exceeded (`Q-009`) | `AUTH.RECOVERY_COOLDOWN` + `{retryAfterSeconds}` | 429 |
+
+> **The fifth wrong PIN returns 429, not 401** (`Q-007`/T05 alignment). The
+> cooldown begins at that moment, so the response that *starts* the cooldown must
+> already carry `retryAfterSeconds`. Returning 401 with `remainingAttempts: 0`
+> would leave the client with no wait time to display. Attempts 1–4 return 401.
 
 ### Schemas
 
@@ -215,7 +222,8 @@ WorkshopSummary:
   properties:
     workshopId:    { type: string }        # opaque; identifies, never authorizes
     name:          { type: string, maxLength: 120 }
-    vehicleTypes:  { type: array, items: { type: string } }
+    vehicleTypes:  { type: array, minItems: 1, uniqueItems: true,
+                     items: { type: string, enum: [bike, cng, car, truck] } }
     locale:        { type: string, enum: [bn, en] }
     regionProfile: { type: string, enum: [BD] }
   additionalProperties: false
@@ -232,8 +240,11 @@ is required.
 - `pin` / `newPin`: exactly 4–6 digits. The contract states the shape; T05
   owns strength rules and hashing.
 - `name`: 1–120 characters after trimming; must not be only whitespace.
-- `vehicleTypes`: 1–12 entries from the approved enumeration; duplicates
-  rejected.
+- `vehicleTypes`: at least 1 entry, no duplicates, every entry from the approved
+  enumeration `bike | cng | car | truck` (`Q-008`, from BRD v1 §1 in the §3
+  beachhead order). The enum is **additive-only**: later keys append, existing
+  keys never change meaning. Display labels live in the ARB files (T06), never
+  in the contract.
 - `locale`: exactly `bn` or `en`.
 - Unknown properties are rejected on every request body (`additionalProperties:
   false`), consistent with E00.
@@ -244,10 +255,11 @@ is required.
 |---|---|---|
 | `AUTH.INVALID_CREDENTIALS` | 401 | Identity exchange failed. **One code for every pre-session failure.** |
 | `AUTH.SESSION_INVALID` | 401 | Missing, expired, or revoked session |
-| `AUTH.PIN_INVALID` | 401 | Wrong PIN, cooldown not yet reached |
-| `AUTH.PIN_COOLDOWN` | 429 | Cooldown active |
+| `AUTH.PIN_INVALID` | 401 | Wrong PIN, attempts 1–4 of the cycle; cooldown not yet started |
+| `AUTH.PIN_COOLDOWN` | 429 | Cooldown active, including the 5th wrong attempt that starts it |
 | `AUTH.PIN_NOT_SET` | 409 | No PIN established yet |
 | `AUTH.RECOVERY_INVALID` | 401 | Recovery assertion invalid or expired |
+| `AUTH.RECOVERY_COOLDOWN` | 429 | Recovery send/verify limit exceeded (`Q-009`); never reveals whether the phone is registered |
 | `AUTH.GRANT_REQUIRED` | 403 | Protected resource without a valid owner grant |
 | `WORKSHOP.NOT_SET_UP` | 409 | Session has no workshop yet |
 | `WORKSHOP.ALREADY_SET_UP` | 409 | Setup already completed |
