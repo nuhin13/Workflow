@@ -6,7 +6,10 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { mkdirSync, rmdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import test, { after, before } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +18,38 @@ const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const requireFromServerCore = createRequire(
   join(repositoryRoot, 'packages/server-core/package.json'),
 );
+
+// `node --test` runs each *.spec.ts file as its own process, and this file
+// runs CONCURRENTLY with tests/integration/tenant-isolation.spec.ts — both
+// apply migration 0002 in `before()`, and this file's own
+// `test_ADR_0005_down_migration_removes_only_access_tables` drops and
+// re-creates the whole schema mid-suite. Two processes running DDL (ALTER
+// TABLE, CREATE POLICY, GRANT) against the same tables at once genuinely
+// deadlocks PostgreSQL, and even without a deadlock, this file's mid-suite
+// `down` would make the other file's in-flight SELECTs fail on a dropped
+// table. The fix is full mutual exclusion for the file's ENTIRE run, not just
+// around individual migrate calls: the lock is acquired in `before()` and
+// held until `after()`. `mkdirSync` is atomic at the OS level, so it doubles
+// as a cross-process mutex with no extra tooling.
+const MIGRATION_LOCK_DIR = join(tmpdir(), 'garazo-migration-lock');
+
+async function acquireMigrationLock(): Promise<void> {
+  const deadline = Date.now() + 120_000;
+  for (;;) {
+    try {
+      mkdirSync(MIGRATION_LOCK_DIR);
+      return;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+      if (Date.now() > deadline) throw new Error('timed out waiting for the migration lock');
+      await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+    }
+  }
+}
+
+function releaseMigrationLock(): void {
+  rmdirSync(MIGRATION_LOCK_DIR, { recursive: true });
+}
 
 const SUPERUSER_DATABASE_URL = 'postgres://garazo:garazo-local-dev@127.0.0.1:5432/garazo';
 // garazo_app is the application role the migration creates. Its password is a
@@ -44,6 +79,62 @@ function compose(...args: string[]): string {
   });
 }
 
+/** True only when the container is already running AND passing its healthcheck. */
+function isPostgresContainerHealthy(): boolean {
+  try {
+    const status = execFileSync(
+      'docker',
+      ['inspect', '--format', '{{.State.Health.Status}}', 'garazo-dev-postgres-1'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+    ).trim();
+    return status === 'healthy';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * `docker compose up` is not safe under concurrent invocation from separate
+ * processes targeting the same project: even with the container already
+ * running, two near-simultaneous `up` calls can both decide a (re)create is
+ * needed and collide with "Conflict. The container name ... is already in
+ * use". This suite already serializes against
+ * tests/integration/tenant-isolation.spec.ts via the migration lock, but
+ * tests/integration/system-probe-postgres.spec.ts (E00, out of this task's
+ * scope) calls `docker compose up` on its own, unlocked. The health-check
+ * short-circuit above handles the common case; retrying past a transient
+ * conflict — rather than failing the whole suite — handles the rest: by the
+ * retry, the container that "won" the race is already up, and this call
+ * becomes a no-op health check.
+ */
+function composeUpWithRetry(): void {
+  // Short-circuit entirely when another process already brought the
+  // container up and healthy — this is what makes the common case a single
+  // winner instead of three concurrent `docker compose up` calls.
+  if (isPostgresContainerHealthy()) {
+    return;
+  }
+
+  const maxAttempts = 10;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      compose('up', '--detach', '--wait', '--wait-timeout', '120', 'postgres');
+      return;
+    } catch (error) {
+      if (isPostgresContainerHealthy()) {
+        // Another process's concurrent `up` finished the job while this
+        // attempt was mid-flight and reported the conflict; nothing left to do.
+        return;
+      }
+      const message = error instanceof Error ? error.message : String(error);
+      if (attempt === maxAttempts || !message.includes('Conflict')) {
+        throw error;
+      }
+      execFileSync('sleep', [String(1 + Math.floor(Math.random() * 2))]);
+    }
+  }
+}
+
 function migrate(direction: 'up' | 'down', migration = '0002_access_workshop'): void {
   execFileSync('bash', ['scripts/migrate-diagnostic.sh', direction, migration], {
     cwd: repositoryRoot,
@@ -54,7 +145,9 @@ function migrate(direction: 'up' | 'down', migration = '0002_access_workshop'): 
 }
 
 before(async () => {
-  compose('up', '--detach', '--wait', '--wait-timeout', '120', 'postgres');
+  await acquireMigrationLock();
+
+  composeUpWithRetry();
 
   const { Pool } = requireFromServerCore('pg') as { Pool: new (config: object) => PoolLike };
 
@@ -76,6 +169,7 @@ after(async () => {
   await appPool?.end();
   // The container and the applied migration are left running: tearing down
   // here would fight other suites sharing the same database.
+  releaseMigrationLock();
 });
 
 /** Clears every access table between assertions, respecting FK order. */
@@ -113,12 +207,15 @@ test('test_EARS_E01_T02_2_no_secret_is_stored_in_reversible_form', async () => {
   assert.ok(databaseAvailable, 'the test database did not start');
   await resetAccessTables();
 
+  // Real one-way digests (sha256 hex), NOT a string that embeds the raw
+  // value — a digest like `digest-of-${rawPhone}` would trivially "leak" the
+  // raw value as a substring and prove nothing about real hashing.
   const rawPhone = '+8801711000000';
   const rawPin = '1234';
   const rawToken = 'super-secret-session-token-value';
-  const phoneDigest = `digest-of-${rawPhone}`;
-  const tokenDigest = `digest-of-${rawToken}`;
-  const pinDigest = `argon2id$digest-of-${rawPin}`;
+  const phoneDigest = createHash('sha256').update(rawPhone).digest('hex');
+  const tokenDigest = createHash('sha256').update(rawToken).digest('hex');
+  const pinDigest = `argon2id$${createHash('sha256').update(rawPin).digest('hex')}`;
 
   await superuserPool!.query(
     `INSERT INTO accounts (account_id, phone_digest, created_at) VALUES (gen_random_uuid(), $1, now())`,
@@ -183,7 +280,9 @@ test('test_EARS_E01_T02_3_revoking_a_session_revokes_its_money_grants', async ()
     [session.rows[0]!.session_id, workshop.rows[0]!.workshop_id],
   );
 
-  let grants = await superuserPool!.query(`SELECT 1 FROM owner_money_grants WHERE token_digest = 'g1'`);
+  let grants = await superuserPool!.query(
+    `SELECT 1 FROM owner_money_grants WHERE token_digest = 'g1'`,
+  );
   assert.equal(grants.rows.length, 1, 'the grant should exist before revocation');
 
   // "Revoking" here is deleting the session outright to prove the CASCADE;
@@ -212,7 +311,9 @@ test('test_FR_ACCESS_11_pin_failure_accounting_is_atomic', async () => {
     join(repositoryRoot, 'packages/server-core/dist/access/postgres-access.repository.js'),
   ) as {
     PostgresAccessRepository: new (pool: unknown) => {
-      recordPinFailure(scope: unknown): Promise<{ consecutiveFailures: number; completedCycles: number }>;
+      recordPinFailure(
+        scope: unknown,
+      ): Promise<{ consecutiveFailures: number; completedCycles: number }>;
     };
   };
 
@@ -234,15 +335,20 @@ test('test_FR_ACCESS_11_pin_failure_accounting_is_atomic', async () => {
     // the fifth completes a cycle, resetting consecutive_failures to 0 with
     // completedCycles = 1.
     const finalCounts = results.map((r) => r.consecutiveFailures).sort((a, b) => a - b);
-    assert.deepEqual(finalCounts, [0, 1, 2, 3, 4], 'each concurrent failure must see a distinct count');
+    assert.deepEqual(
+      finalCounts,
+      [0, 1, 2, 3, 4],
+      'each concurrent failure must see a distinct count',
+    );
 
     const finalState = await superuserPool!.query<{
       consecutive_failures: number;
       completed_cycles: number;
       cooldown_until: Date | null;
-    }>(`SELECT consecutive_failures, completed_cycles, cooldown_until FROM owner_pin_failure_states WHERE workshop_id = $1`, [
-      workshopId,
-    ]);
+    }>(
+      `SELECT consecutive_failures, completed_cycles, cooldown_until FROM owner_pin_failure_states WHERE workshop_id = $1`,
+      [workshopId],
+    );
     const row = finalState.rows[0]!;
     assert.equal(row.consecutive_failures, 0);
     assert.equal(row.completed_cycles, 1);
@@ -255,6 +361,22 @@ test('test_FR_ACCESS_11_pin_failure_accounting_is_atomic', async () => {
 test('test_ADR_0005_down_migration_removes_only_access_tables', async () => {
   assert.ok(databaseAvailable, 'the test database did not start');
 
+  // A neighbour created and owned entirely by THIS test, not
+  // `system_probes` (E00's table). `node --test` runs
+  // tests/integration/system-probe-postgres.spec.ts as an unrelated,
+  // concurrent process (out of this task's scope) whose own
+  // `test_EARS_E00_9_down_migration_removes_only_the_diagnostic_table` briefly
+  // drops and re-creates system_probes mid-suite at a time this file cannot
+  // observe or coordinate with — asserting against system_probes would make
+  // this assertion depend on that other file's timing, not on migration
+  // 0002's down path, which is the only thing this test is actually
+  // responsible for proving. A self-owned neighbour keeps the assertion
+  // deterministic while still proving the same thing the task's test plan
+  // asks for: "a neighbouring table survives".
+  await superuserPool!.query(
+    `CREATE TABLE IF NOT EXISTS _e01_t02_neighbour_probe (id int PRIMARY KEY)`,
+  );
+
   try {
     migrate('down');
 
@@ -266,12 +388,17 @@ test('test_ADR_0005_down_migration_removes_only_access_tables', async () => {
       assert.equal(result.rows[0]!.present, null, `${table} survived the down migration`);
     }
 
-    const probe = await superuserPool!.query<{ present: string | null }>(
-      `SELECT to_regclass('public.system_probes') AS present`,
+    const neighbour = await superuserPool!.query<{ present: string | null }>(
+      `SELECT to_regclass('public._e01_t02_neighbour_probe') AS present`,
     );
-    assert.notEqual(probe.rows[0]!.present, null, 'the down migration destroyed system_probes (E00, unrelated)');
+    assert.notEqual(
+      neighbour.rows[0]!.present,
+      null,
+      'the down migration destroyed an unrelated neighbouring table',
+    );
   } finally {
     migrate('up');
+    await superuserPool!.query(`DROP TABLE IF EXISTS _e01_t02_neighbour_probe`);
   }
 });
 
