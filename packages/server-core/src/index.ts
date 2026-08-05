@@ -68,11 +68,7 @@ export type {
   WorkshopSummary,
 } from './access/access.repository';
 export { assertScoped, withTenantScope } from './access/tenant-guard';
-export type {
-  TenantScopedClient,
-  TenantScopePool,
-  WorkshopScoped,
-} from './access/tenant-guard';
+export type { TenantScopedClient, TenantScopePool, WorkshopScoped } from './access/tenant-guard';
 export { PostgresAccessRepository } from './access/postgres-access.repository';
 
 // System diagnostic (E00-T04). The PostgreSQL adapter is exported so the API

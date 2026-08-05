@@ -17,7 +17,7 @@
 // Open Questions/Deviations note.
 
 import { randomUUID } from 'node:crypto';
-import { asOpaqueId, type OpaqueId, type WorkshopScope } from './access-context.ts';
+import { asOpaqueId, type OpaqueId, type WorkshopScope } from './access-context';
 import type {
   Account,
   AccessRepository,
@@ -25,8 +25,8 @@ import type {
   NewWorkshopInput,
   SessionRecord,
   WorkshopSummary,
-} from './access.repository.ts';
-import { withTenantScope } from './tenant-guard.ts';
+} from './access.repository';
+import { withTenantScope } from './tenant-guard';
 
 /** Structural shape of a `pg.Pool` query result. Matches `pg`'s real return shape. */
 interface PgQueryResult<Row> {
@@ -154,11 +154,10 @@ export class PostgresAccessRepository implements AccessRepository {
       const membershipId = randomUUID();
       const now = new Date(input.now);
 
-      await client.query(`INSERT INTO accounts (account_id, phone_digest, created_at) VALUES ($1, $2, $3)`, [
-        accountId,
-        input.phoneDigest,
-        now,
-      ]);
+      await client.query(
+        `INSERT INTO accounts (account_id, phone_digest, created_at) VALUES ($1, $2, $3)`,
+        [accountId, input.phoneDigest, now],
+      );
 
       const workshopResult = await client.query<{
         workshop_id: string;

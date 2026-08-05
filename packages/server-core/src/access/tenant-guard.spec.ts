@@ -5,7 +5,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { asOpaqueId } from './access-context.ts';
-import { assertScoped, withTenantScope, type TenantScopedClient, type TenantScopePool } from './tenant-guard.ts';
+import {
+  assertScoped,
+  withTenantScope,
+  type TenantScopedClient,
+  type TenantScopePool,
+} from './tenant-guard.ts';
 
 interface FakePool {
   pool: TenantScopePool;
@@ -48,9 +53,7 @@ test('test_EARS_E01_T02_1_assertScoped_throws_for_none', () => {
 });
 
 test('test_EARS_E01_T02_1_assertScoped_accepts_workshop_scope', () => {
-  assert.doesNotThrow(() =>
-    assertScoped({ kind: 'workshop', workshopId: asOpaqueId('w1') }),
-  );
+  assert.doesNotThrow(() => assertScoped({ kind: 'workshop', workshopId: asOpaqueId('w1') }));
 });
 
 test('test_EARS_E01_T02_1_unscoped_query_is_rejected', async () => {
@@ -90,9 +93,13 @@ test('test_EARS_E01_T02_1_withTenantScope_rolls_back_and_releases_on_error', asy
 
   await assert.rejects(
     () =>
-      withTenantScope(pool, { kind: 'workshop', workshopId: asOpaqueId('workshop-a') }, async () => {
-        throw new Error('boom');
-      }),
+      withTenantScope(
+        pool,
+        { kind: 'workshop', workshopId: asOpaqueId('workshop-a') },
+        async () => {
+          throw new Error('boom');
+        },
+      ),
     /boom/,
   );
 
@@ -125,9 +132,13 @@ test('test_EARS_E01_T02_1_withTenantScope_always_releases_the_client', async () 
   assert.equal(releaseCalls, 1);
 
   await assert.rejects(
-    withTenantScope(trackedPool, { kind: 'workshop', workshopId: asOpaqueId('workshop-a') }, async () => {
-      throw new Error('boom');
-    }),
+    withTenantScope(
+      trackedPool,
+      { kind: 'workshop', workshopId: asOpaqueId('workshop-a') },
+      async () => {
+        throw new Error('boom');
+      },
+    ),
   );
   assert.equal(releaseCalls, 2);
 });
