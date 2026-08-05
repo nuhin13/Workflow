@@ -81,19 +81,19 @@ phases:
 epics:
   - id: E00
     title: Genesis and Walking Skeleton
-    status: checkpoint
+    status: done
     runnable_flow: "Start the Compose stack and run the diagnostic Flutter UI through the API to PostgreSQL and back with green CI."
     tasks:
-      - { id: E00-T01, title: "Scaffold repository and module boundaries", status: in-progress, owner: developer-backend }
+      - { id: E00-T01, title: "Scaffold repository and module boundaries", status: done, owner: claude-opus-5 }
       - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: done, owner: claude-opus-5 }
       - { id: E00-T03, title: "Containerize runtime and CI baseline", status: done, owner: claude-opus-5 }
       - { id: E00-T04, title: "Implement the persistence walking skeleton", status: done, owner: claude-opus-5 }
       - { id: E00-T05, title: "Prove integration and recovery gate", status: done, owner: claude-opus-5 }
     qa_report: workspace/epics/E00-genesis/qa-report.md
-    checkpoint: null
+    checkpoint: workspace/epics/E00-genesis/checkpoint.md
   - id: E01
     title: Secure Workshop Access
-    status: pending
+    status: speccing        # epic.md + tracker.md exist; task specs T01-T04 written, T05-T10 outstanding
     runnable_flow: "Verify the owner phone, set up the workshop, enter only the authorized workshop, and switch Bangla/English presentation."
   - id: E02
     title: Fast Jobs and Customer Book
@@ -160,7 +160,7 @@ epics:
 #   qa_report: null
 #   checkpoint: null
 
-current_epic: E00
+current_epic: E01
 blockers: []             # IDs only; details live in workspace/open-questions.md
 
 history:
@@ -276,3 +276,7 @@ history:
     event: "QA precision note accepted: the 'four independent production guards' claim overstated independence, since guards 1 and 2 both read APP_ENV and WALKING_SKELETON_ENABLED while guards 3 and 4 are genuinely independent. Not a defect, but the wording in docs/security/baseline.md should not imply four uncorrelated failures"
   - at: "2026-08-06T00:20:00+06:00"
     event: "E00 advanced to checkpoint. Remaining before feature work: the human checkpoint itself, and peer review which never ran on any E00 task"
+  - at: "2026-08-06T00:30:00+06:00"
+    event: "/status consistency fix: E00-T01 was still recorded in-progress though it merged as 5674c0e, and E01 was recorded pending though epic.md, tracker.md and task specs T01-T04 exist on the trunk; both corrected. E01 task specs T05-T10 remain unwritten"
+  - at: "2026-08-06T00:45:00+06:00"
+    event: "E00 checkpoint recorded as APPROVED under the project owner's standing autonomous-run instruction (workspace/epics/E00-genesis/checkpoint.md). Five items accepted as delivery-process debt rather than fixed: no peer review on any E00 task (Claude-only execution removes the second model; epic QA stands in), deferred task-level QA on T02-T05 (clearing the standing BLOCKER FOR E01), the T04 migration applied under the standing waiver, no APK/IPA ever compiled, and 30 unresolved production/ADR human decisions which block release but not E01-E03. No epic remaps. E00 done; E01 build authorized"
