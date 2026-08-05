@@ -138,3 +138,58 @@ test('test_EARS_E00_7_log_level_threshold_is_honoured', () => {
 
   assert.equal(lines.length, 2);
 });
+
+// Added after E00 QA raised a MEDIUM finding: redaction was key-based only, so
+// the `message` field — free text with no key to match on — was never scanned.
+// Nothing leaked at the time, but E01–E03 handle PINs, OTPs and due amounts,
+// and the first interpolated value would have gone straight through.
+
+test('test_EARS_E00_7_secret_shaped_values_in_free_text_are_scrubbed', () => {
+  const { sink, lines } = collect();
+  const logger = createStructuredLogger('api', sink);
+
+  // The mistake this guards: no sensitive KEY exists anywhere in this call.
+  logger.info(`otp delivered to ${SECRET_FIXTURES.phone} via ${SECRET_FIXTURES.token}`);
+  logger.warn(`connecting to ${SECRET_FIXTURES.databaseUrl}`);
+  logger.error(`billing key ${SECRET_FIXTURES.apiKey} rejected`);
+
+  const output = lines.join('\n');
+  assert.ok(!output.includes(SECRET_FIXTURES.phone), `leaked a phone number: ${output}`);
+  assert.ok(!output.includes(SECRET_FIXTURES.token), `leaked a token: ${output}`);
+  assert.ok(!output.includes('s3cr3t-password'), `leaked a password: ${output}`);
+  assert.ok(!output.includes(SECRET_FIXTURES.apiKey), `leaked an API key: ${output}`);
+
+  // The operational signal must survive — a scrub that destroys the message
+  // teaches people to stop using the logger.
+  assert.ok(output.includes('otp delivered to'));
+  assert.ok(output.includes('rejected'));
+});
+
+test('test_EARS_E00_7_secret_shaped_values_under_innocent_keys_are_scrubbed', () => {
+  // A non-sensitive key can still carry a sensitive value.
+  const redacted = redactLogFields({
+    level: 'info',
+    message: 'note',
+    context: { note: `session ${SECRET_FIXTURES.token}`, detail: SECRET_FIXTURES.databaseUrl },
+  } as unknown as LogRecord);
+
+  const serialized = JSON.stringify(redacted);
+  assert.ok(!serialized.includes(SECRET_FIXTURES.token));
+  assert.ok(!serialized.includes('s3cr3t-password'));
+});
+
+test('test_EARS_E00_7_ordinary_operational_text_is_not_mangled', () => {
+  // Over-matching would get the whole mechanism switched off, so ordinary
+  // numbers and identifiers must survive untouched.
+  const { sink, lines } = collect();
+  const logger = createStructuredLogger('api', sink);
+
+  logger.info('api started on port 3000 with concurrency 1 in 250ms');
+  logger.info('processed 42 jobs for workshop context');
+
+  const output = lines.join('\n');
+  assert.ok(output.includes('port 3000'));
+  assert.ok(output.includes('concurrency 1'));
+  assert.ok(output.includes('250ms'));
+  assert.ok(output.includes('42 jobs'));
+});

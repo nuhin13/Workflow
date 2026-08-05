@@ -101,3 +101,41 @@
   so a freeze always lands on a committed boundary.
 - recurrence: 1
 - status: open
+
+## L-process-011 — Dismissed an anomaly instead of chasing it
+- date: 2026-08-05 | source: Garazo E00 QA (finding 1)
+- situation: while running the E00 clean-clone gate I grepped its output and saw only FAIL
+  lines, never PASS lines. I noted it as "odd", wrote "let me not worry", and moved on
+  because the exit code was correct. Independent QA later found the cause: the PASS branch
+  used `printf '--- ...'` while the FAIL branch used `printf -- '--- ...'`. On bash 3.2 —
+  still the /bin/bash Apple ships — a format string starting with `--` is parsed as an
+  option, so every PASS line failed with "printf: --: invalid option" and stderr filled with
+  errors on all 14 steps.
+- root cause: the exit code was green, so the anomaly looked cosmetic. It was not: the gate
+  was silently swallowing its own confirmation output on the default shell of the platform
+  it runs on. "Tests pass" masked "the tool is broken".
+- fix applied: `printf --` before every format string that begins with a dash. More
+  generally: an unexplained anomaly in verification output is a defect in the verification
+  until proven otherwise. Green exit codes do not license ignoring visible weirdness — the
+  output IS the evidence, and evidence that behaves strangely cannot be trusted.
+- recurrence: 1
+- status: open
+
+## L-process-012 — Key-based redaction cannot see free text
+- date: 2026-08-05 | source: Garazo E00 QA (finding 2)
+- situation: the structured logger redacted by matching sensitive KEY names, and exempted the
+  top-level `message` field from any scan. No call site leaked anything, so every test
+  passed. But `logger.info(`otp ${code} sent`)` has no sensitive key at all — the value would
+  have gone straight to the log. E01–E03 handle OTPs, PINs and owner-PIN-protected due
+  amounts, so the first interpolated value would have been a permanent leak.
+- root cause: the redaction mechanism and the way people actually write log calls disagreed.
+  Key-based redaction assumes every sensitive value arrives under a name; interpolation
+  produces sensitive values with no name at all.
+- fix applied: added a conservative value-shape scrub (JWT, provider keys, URIs with
+  credentials, Bangladeshi mobile numbers, long hex digests) applied to `message` and to
+  every string value, plus tests proving ordinary operational text survives unmangled. The
+  REAL rule stays structural and belongs in every later task spec: never interpolate a value
+  into a log message — pass it as a keyed field so redaction can see it. The scrub is the
+  safety net, not a licence.
+- recurrence: 1
+- status: open

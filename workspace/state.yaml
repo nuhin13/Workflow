@@ -81,7 +81,7 @@ phases:
 epics:
   - id: E00
     title: Genesis and Walking Skeleton
-    status: qa
+    status: checkpoint
     runnable_flow: "Start the Compose stack and run the diagnostic Flutter UI through the API to PostgreSQL and back with green CI."
     tasks:
       - { id: E00-T01, title: "Scaffold repository and module boundaries", status: in-progress, owner: developer-backend }
@@ -89,7 +89,7 @@ epics:
       - { id: E00-T03, title: "Containerize runtime and CI baseline", status: done, owner: claude-opus-5 }
       - { id: E00-T04, title: "Implement the persistence walking skeleton", status: done, owner: claude-opus-5 }
       - { id: E00-T05, title: "Prove integration and recovery gate", status: done, owner: claude-opus-5 }
-    qa_report: null
+    qa_report: workspace/epics/E00-genesis/qa-report.md
     checkpoint: null
   - id: E01
     title: Secure Workshop Access
@@ -266,3 +266,13 @@ history:
     event: "epic_00 merged into kickoff_garazo at the project owner's request; all five E00 tasks and the full product codebase (apps/, packages/, contracts/, infra/, scripts/, tests/, docs/) now live on the trunk"
   - at: "2026-08-05T23:42:00+06:00"
     event: "E00 status is qa, NOT verified. Outstanding before feature work: peer review never ran on any E00 task (constitution rule 12), task-level QA is deferred on T02/T03/T04/T05, the T04 migration was applied under a standing waiver rather than an in-thread schema approval, and no APK or IPA has ever been compiled"
+  - at: "2026-08-06T00:10:00+06:00"
+    event: "independent QA swept E00 in a fresh context and returned PASS with two findings; the reviewer reproduced the claims rather than reading them — stopping the live PostgreSQL container to confirm the API survived and returned a redacted 503, restarting it to confirm the counter continued, and booting the production image with the diagnostic flag forced on to confirm it refuses to start"
+  - at: "2026-08-06T00:12:00+06:00"
+    event: "QA finding 1 (LOW) fixed: scripts/verify-clean-clone.sh used printf with a format string starting with a dash, which bash 3.2 (the /bin/bash Apple ships) parses as an option, so every PASS line failed and stderr filled with errors across all 14 steps while the exit code stayed green. I had seen this anomaly earlier and dismissed it because the exit code was correct; recorded as L-process-011"
+  - at: "2026-08-06T00:14:00+06:00"
+    event: "QA finding 2 (MEDIUM) fixed: log redaction was key-based and never scanned the message field, so an interpolated secret had no key to match on. Added a conservative value-shape scrub for messages and string values, with tests proving ordinary operational text survives unmangled. The structural rule — never interpolate a value into a log message, pass it as a keyed field — is recorded as L-process-012 and must appear in E01 task specs"
+  - at: "2026-08-06T00:16:00+06:00"
+    event: "QA precision note accepted: the 'four independent production guards' claim overstated independence, since guards 1 and 2 both read APP_ENV and WALKING_SKELETON_ENABLED while guards 3 and 4 are genuinely independent. Not a defect, but the wording in docs/security/baseline.md should not imply four uncorrelated failures"
+  - at: "2026-08-06T00:20:00+06:00"
+    event: "E00 advanced to checkpoint. Remaining before feature work: the human checkpoint itself, and peer review which never ran on any E00 task"

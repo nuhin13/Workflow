@@ -8,7 +8,7 @@
 export { loadRuntimeConfig, ConfigError } from './config';
 export type { RuntimeConfig, ServiceName, AppEnv, LogLevel } from './config';
 
-export { createStructuredLogger, redactLogFields, REDACTED } from './logger';
+export { createStructuredLogger, redactLogFields, scrubMessage, REDACTED } from './logger';
 export type { Logger, LogSink, LogRecord, SafeLogRecord } from './logger';
 
 export {

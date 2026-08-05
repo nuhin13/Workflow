@@ -23,8 +23,13 @@ run_step() {
   STEP=$((STEP + 1))
   printf '\n=== [%02d] %s ===\n' "$STEP" "$label"
 
+  # `printf --` before EVERY format string that begins with a dash. Without it,
+  # bash 3.2 — still the /bin/bash Apple ships — parses the format itself as an
+  # option and fails with "printf: --: invalid option". The exit code is
+  # unaffected, so this hides: the PASS lines simply vanish and stderr fills
+  # with errors on a machine nobody tests on deliberately.
   if "$@"; then
-    printf '--- [%02d] PASS: %s\n' "$STEP" "$label"
+    printf -- '--- [%02d] PASS: %s\n' "$STEP" "$label"
   else
     printf -- '--- [%02d] FAIL: %s\n' "$STEP" "$label" >&2
     FAILED+=("$label")
