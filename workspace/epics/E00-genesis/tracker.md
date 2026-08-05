@@ -9,8 +9,8 @@
 
 - [ ] E00-T01 · Scaffold repository and module boundaries · in-progress · developer-backend
 - [x] E00-T02 · Establish OpenAPI and generated clients · done · claude-opus-5
-- [ ] E00-T03 · Containerize runtime and CI baseline · in-progress · claude-opus-5
-- [ ] E00-T04 · Implement the persistence walking skeleton · todo · —
+- [x] E00-T03 · Containerize runtime and CI baseline · done · claude-opus-5
+- [ ] E00-T04 · Implement the persistence walking skeleton · in-progress · claude-opus-5
 - [ ] E00-T05 · Prove integration and recovery gate · todo · —
 
 ## Dependency graph
@@ -68,7 +68,18 @@ graph LR
 - 2026-08-05 T02 carries a DEFERRED task-level QA gate. Its spec requires
   independent QA because it defines the authorization boundary; that has not
   run and must before E01 builds auth on these types.
-- 2026-08-05 T03 started.
+- 2026-08-05 T03 done and squash-merged to `epic_00` as `17f2da5`. Three
+  non-root images, production/development Compose, validated fail-closed
+  configuration, redacted logging, graceful shutdown, runtime smoke gate,
+  verify-only CI, and supplier-neutral runbooks. 51 node + 9 Flutter tests.
+- 2026-08-05 A real Postgres + API + worker + admin stack was started, reached
+  healthy, served HTTP and shut down preserving its volume.
+- 2026-08-05 T03 carries a DEFERRED task-level QA gate, same as T02. It sets the
+  secret handling, log redaction and production topology later epics inherit.
+- 2026-08-05 Twelve production decisions recorded as gates in
+  `infra/vm/recovery-open-items.md` (supplier, registry, secret manager, RPO/RTO,
+  backups, observability, base-image digest, sizing). None were guessed.
+- 2026-08-05 T04 started.
 - 2026-08-05 T01 dispatched to developer-backend on claude-code in worktree
   `../wt-E00-T01` (branch `epic_00_task_01`).
 - 2026-08-05 T01 frozen mid-task by a claude-code session rate limit. Partial

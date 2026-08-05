@@ -86,8 +86,8 @@ epics:
     tasks:
       - { id: E00-T01, title: "Scaffold repository and module boundaries", status: in-progress, owner: developer-backend }
       - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: done, owner: claude-opus-5 }
-      - { id: E00-T03, title: "Containerize runtime and CI baseline", status: in-progress, owner: claude-opus-5 }
-      - { id: E00-T04, title: "Implement the persistence walking skeleton", status: todo, owner: null }
+      - { id: E00-T03, title: "Containerize runtime and CI baseline", status: done, owner: claude-opus-5 }
+      - { id: E00-T04, title: "Implement the persistence walking skeleton", status: in-progress, owner: claude-opus-5 }
       - { id: E00-T05, title: "Prove integration and recovery gate", status: todo, owner: null }
     qa_report: null
     checkpoint: null
@@ -242,3 +242,11 @@ history:
     event: "BLOCKER FOR E01: E00-T02's required task-level QA gate has not run. It defines the authorization boundary (AuthenticatedActor, WorkshopScope, OwnerMoneyGrant, AdminScope) that E01 authentication will build on, so independent QA must happen before E01 implementation starts"
   - at: "2026-08-05T15:45:00+06:00"
     event: "started E00-T03 (containerize runtime and CI baseline)"
+  - at: "2026-08-05T18:30:00+06:00"
+    event: "E00-T03 done and squash-merged to epic_00 as 17f2da5; three non-root container images, production and development Compose topologies, fail-closed configuration, substring-based log redaction covering owner-PIN-protected money, graceful shutdown, a runtime smoke gate and verify-only CI, all proven by starting a real Postgres plus API, worker and admin stack"
+  - at: "2026-08-05T18:32:00+06:00"
+    event: "recorded twelve unresolved production decisions as gates in infra/vm/recovery-open-items.md (hosting supplier, managed PostgreSQL, object storage, container registry, TLS/ingress, secret manager, RPO/RTO, backup policy, availability target, observability supplier, base-image digest pinning, VM sizing); runbook steps depending on them are marked BLOCKED rather than guessed"
+  - at: "2026-08-05T18:34:00+06:00"
+    event: "BLOCKER FOR E01 (updated): task-level QA is now deferred on BOTH E00-T02 and E00-T03. Together they define the authorization boundary, secret handling, log redaction and production topology that every later epic inherits; independent QA must run before E01 implementation"
+  - at: "2026-08-05T18:36:00+06:00"
+    event: "started E00-T04 (persistence walking skeleton)"
