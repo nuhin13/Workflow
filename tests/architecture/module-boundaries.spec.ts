@@ -99,16 +99,54 @@ test('test_ADR_0004_domain_code_has_no_provider_sdk_import', () => {
     ...sourceFiles('apps/worker/src'),
   ];
 
+  /**
+   * Adapter edges MAY import their own provider driver — that is the entire
+   * point of ADR-0004's ports-and-adapters boundary. What must never happen is
+   * a driver type reaching domain code, because then swapping the provider
+   * stops being a one-file change.
+   *
+   * Recognised by filename, so an adapter is visible as an adapter in a
+   * directory listing and in a diff.
+   */
+  const isAdapterEdge = (path: string): boolean =>
+    /\/postgres-[^/]+\.ts$/.test(path) ||
+    /\.check\.ts$/.test(path) ||
+    // A composition root is BY DEFINITION where concrete implementations are
+    // chosen and wired (ADR-0002). Forbidding a driver import here would only
+    // push the wiring into a differently named file without changing what
+    // depends on what.
+    /\/app\.module\.ts$/.test(path);
+
+  const adapters: string[] = [];
+
   for (const path of guarded) {
-    for (const specifier of importedModules(read(path))) {
-      for (const sdk of providerSdks) {
-        assert.ok(
-          specifier !== sdk && !specifier.startsWith(`${sdk}/`),
-          `${path} imports the provider SDK ${specifier}; go through a port in @garazo/server-core (ADR-0004)`,
-        );
-      }
+    const imports = importedModules(read(path));
+    const providerImports = imports.filter((specifier) =>
+      providerSdks.some((sdk) => specifier === sdk || specifier.startsWith(`${sdk}/`)),
+    );
+
+    if (providerImports.length === 0) {
+      continue;
     }
+
+    assert.ok(
+      isAdapterEdge(path),
+      `${path} imports the provider SDK ${providerImports.join(', ')}; only an adapter edge may (ADR-0004)`,
+    );
+    adapters.push(path);
   }
+
+  // The exemption must stay narrow. If this list grows, provider coupling is
+  // spreading and the boundary is eroding one "just this once" at a time.
+  assert.deepEqual(
+    adapters.sort(),
+    [
+      'apps/api/src/app.module.ts',
+      'apps/api/src/system/postgres-readiness.check.ts',
+      'packages/server-core/src/system/postgres-system-probe.repository.ts',
+    ],
+    'the set of files importing a provider driver changed; confirm each is a genuine adapter edge',
+  );
 });
 
 test('test_ADR_0007_identity_session_owner_grant_admin_scope_are_distinct', () => {

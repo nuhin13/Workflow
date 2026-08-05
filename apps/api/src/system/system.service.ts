@@ -17,10 +17,11 @@ export interface ReadinessCheck {
 export const READINESS_CHECK = Symbol('READINESS_CHECK');
 
 /**
- * The gated persistence probe, injected by T04.
+ * The gated persistence probe.
  *
- * Absent in T02: the route exists at the transport layer but reports
- * unavailable until an implementation is bound.
+ * Bound by E00-T04 to the real PostgreSQL-backed use case. When no
+ * implementation is bound the route reports the database as unavailable rather
+ * than fabricating a success.
  */
 export interface WalkingSkeletonProbe {
   recordVisit(): Promise<number>;

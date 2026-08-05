@@ -14,6 +14,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/design/generated/design_tokens.dart';
+import '../features/system_probe/presentation/system_probe_page.dart';
 import '../l10n/generated/app_localizations.dart';
 
 /// Identifies the accessible shell root so tests can assert NFR-A11Y-01 against
@@ -42,11 +43,24 @@ double designSpace(String token) {
   return double.parse(token);
 }
 
+/// Whether the E00 walking-skeleton diagnostic route exists in this build.
+///
+/// `kReleaseMode` is a COMPILE-TIME constant, so in a release build the route
+/// table below is const-folded and the diagnostic page is tree-shaken out of the
+/// binary entirely. That is stronger than a runtime check: there is no
+/// environment value, remote flag, or debugger trick that can reach a page which
+/// is not in the compiled artifact (EARS-E00-11).
+const bool systemProbeRouteEnabled = !bool.fromEnvironment('dart.vm.product');
+
 /// Builds the localized, token-backed application shell.
 ///
 /// Exposed as a factory so widget tests can pump exactly what `main()` runs.
 Widget buildGarazoApp() {
   return MaterialApp(
+    routes: <String, WidgetBuilder>{
+      if (systemProbeRouteEnabled)
+        systemProbeRouteName: (BuildContext context) => const SystemProbePage(),
+    },
     onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,

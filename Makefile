@@ -8,7 +8,8 @@ PLATFORM ?=
 
 .PHONY: next status review validate dashboard metrics metrics-json hooks help \
         install toolchain tokens api contract lint format test build \
-        up down verify scan dev-api dev-worker dev-admin dev-mobile
+        up down verify scan migrate-diagnostic migrate-diagnostic-down \
+        test-skeleton dev-api dev-worker dev-admin dev-mobile
 
 # ── Harness / tracker ─────────────────────────────────────────────────────────
 next:        ## next executable task(s); make next PLATFORM=codex LAYER=frontend
@@ -63,6 +64,12 @@ down:        ## stop the local stack (named volumes are PRESERVED)
 	bash scripts/compose-down.sh
 verify:      ## full runtime smoke gate: build, start, health, non-root, log scan
 	bash scripts/verify-compose.sh
+migrate-diagnostic:      ## apply the E00 diagnostic migration (human-gated; refuses production)
+	bash scripts/migrate-diagnostic.sh up
+migrate-diagnostic-down: ## revert the E00 diagnostic migration
+	bash scripts/migrate-diagnostic.sh down
+test-skeleton:           ## walking-skeleton integration + end-to-end suites
+	node --test "tests/integration/**/*.spec.ts" "tests/e2e/**/*.spec.ts"
 scan:        ## scan tracked files for committed credentials
 	bash scripts/scan-secrets.sh
 dev-api:     ## run the NestJS API composition root

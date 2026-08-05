@@ -1,6 +1,6 @@
 // E00-T02 · system transport boundary. Thin by design: shape in, shape out.
 
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Req } from '@nestjs/common';
 import type { RequestContext } from '@garazo/server-core';
 import { ApiError, ApiErrorCode } from '../common/errors/api-error';
 import { contextOf, type RequestWithContext } from '../common/request/request-context.middleware';
@@ -24,16 +24,22 @@ export interface WalkingSkeletonResponse {
 }
 
 /**
- * Whether the diagnostic probe route may respond at all (EARS-E00-5).
+ * Whether the diagnostic probe route may respond at all (EARS-E00-5/E00-11).
  *
  * Both conditions must hold, and the production check is separate from the flag
  * so that a mis-set flag in production still cannot expose the route. The flag
  * is read from the process environment only — a remote product or admin flag
  * must never be able to switch this on.
+ *
+ * The key names are `APP_ENV` and `WALKING_SKELETON_ENABLED`, matching the
+ * validated contract in @garazo/runtime-config. They were previously `NODE_ENV`
+ * and `GARAZO_FLAG_SYSTEM_WALKING_SKELETON`, which nothing ever set: the route
+ * returned 404 in every environment, and the walking skeleton could not run at
+ * all. One name per setting, defined in one place.
  */
 export function isWalkingSkeletonEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
-  const isProduction = (env.NODE_ENV ?? '').toLowerCase() === 'production';
-  const flagEnabled = (env.GARAZO_FLAG_SYSTEM_WALKING_SKELETON ?? '').toLowerCase() === 'true';
+  const isProduction = (env.APP_ENV ?? '').toLowerCase() === 'production';
+  const flagEnabled = (env.WALKING_SKELETON_ENABLED ?? '').toLowerCase() === 'true';
   return !isProduction && flagEnabled;
 }
 
@@ -66,6 +72,10 @@ export class SystemController {
   }
 
   @Post('walking-skeleton')
+  // Nest answers 201 for POST by default. The contract specifies 200, and the
+  // generated clients are built from that contract, so the default would put
+  // the server and every client permanently out of step.
+  @HttpCode(200)
   async walkingSkeleton(
     @Req() request: RequestWithContext,
     @Body() body: unknown,

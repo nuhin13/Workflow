@@ -11,5 +11,30 @@
   "shellNotConfigured": "Skeleton not configured.",
   "@shellNotConfigured": {
     "description": "Static placeholder state for the E00 walking skeleton. No product screen exists yet."
+  },
+  "probeTitle": "Persistence check",
+  "@probeTitle": {
+    "description": "Title of the development-only walking-skeleton diagnostic. Not a product screen."
+  },
+  "probeExplanation": "Runs one real round trip: this app, the API, PostgreSQL, and back. Each run is counted; it is not idempotent.",
+  "probeIdle": "Persistence check not run",
+  "probeRunning": "Running persistence check",
+  "probeRunAction": "Run persistence check",
+  "probePersisted": "Persisted. Visit count: {count}",
+  "@probePersisted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "probeFailed": "Persistence check failed",
+  "probeCorrelation": "Correlation ID: {id}",
+  "@probeCorrelation": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -45,10 +45,16 @@ before(async () => {
     });
   }
 
-  // The probe flag is enabled here so the enabled-path tests are meaningful;
-  // the disabled path is exercised by a separate child process below.
-  process.env.NODE_ENV = 'test';
-  process.env.GARAZO_FLAG_SYSTEM_WALKING_SKELETON = 'true';
+  // Since E00-T04 the composition root builds a PostgreSQL pool, which reads the
+  // validated configuration — so booting the app needs a COMPLETE environment,
+  // not just the probe flag. The database itself is never contacted here: these
+  // tests exercise transport shape, and the probe's unavailable path is exactly
+  // what an unreachable database should produce.
+  process.env.APP_ENV = 'test';
+  process.env.LOG_LEVEL = 'error';
+  process.env.API_PORT = '3000';
+  process.env.DATABASE_URL ??= 'postgres://garazo:unused@127.0.0.1:1/garazo';
+  process.env.WALKING_SKELETON_ENABLED = 'true';
 
   const { NestFactory } = requireFromApi('@nestjs/core') as {
     NestFactory: {
@@ -220,27 +226,27 @@ test('test_EARS_E00_5_probe_is_hidden_when_the_flag_is_off_or_in_production', ()
 
   assert.equal(
     isWalkingSkeletonEnabled({
-      NODE_ENV: 'development',
-      GARAZO_FLAG_SYSTEM_WALKING_SKELETON: 'true',
+      APP_ENV: 'development',
+      WALKING_SKELETON_ENABLED: 'true',
     }),
     true,
   );
   // Production wins even with the flag explicitly on.
   assert.equal(
     isWalkingSkeletonEnabled({
-      NODE_ENV: 'production',
-      GARAZO_FLAG_SYSTEM_WALKING_SKELETON: 'true',
+      APP_ENV: 'production',
+      WALKING_SKELETON_ENABLED: 'true',
     }),
     false,
   );
   assert.equal(
     isWalkingSkeletonEnabled({
-      NODE_ENV: 'development',
-      GARAZO_FLAG_SYSTEM_WALKING_SKELETON: 'false',
+      APP_ENV: 'development',
+      WALKING_SKELETON_ENABLED: 'false',
     }),
     false,
   );
   // Absent flag is off, not on.
-  assert.equal(isWalkingSkeletonEnabled({ NODE_ENV: 'development' }), false);
+  assert.equal(isWalkingSkeletonEnabled({ APP_ENV: 'development' }), false);
   assert.equal(isWalkingSkeletonEnabled({}), false);
 });

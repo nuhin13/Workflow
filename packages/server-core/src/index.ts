@@ -34,3 +34,14 @@ export type { OwnerMoneyGrant } from './access/owner-money-grant';
 
 export { noAdminScope, hasAdminPermission } from './access/admin-scope';
 export type { AdminScope, AdminPermission } from './access/admin-scope';
+
+// System diagnostic (E00-T04). The PostgreSQL adapter is exported so the API
+// composition root can bind it; nothing else may depend on it.
+export { RunSystemProbeUseCase } from './system/run-system-probe.use-case';
+export { PostgresSystemProbeRepository } from './system/postgres-system-probe.repository';
+export { SYSTEM_PROBE_KEY } from './system/system-probe';
+export type {
+  SystemProbeRecord,
+  SystemProbeRepository,
+  SystemProbeResult,
+} from './system/system-probe';
