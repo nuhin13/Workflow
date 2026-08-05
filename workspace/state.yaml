@@ -93,8 +93,21 @@ epics:
     checkpoint: workspace/epics/E00-genesis/checkpoint.md
   - id: E01
     title: Secure Workshop Access
-    status: speccing        # epic.md + tracker.md exist; task specs T01-T04 written, T05-T10 outstanding
+    status: in-progress
     runnable_flow: "Verify the owner phone, set up the workshop, enter only the authorized workshop, and switch Bangla/English presentation."
+    tasks:
+      - { id: E01-T01, title: "Define the secure-access API contract and regenerate clients", status: todo, owner: developer-backend }
+      - { id: E01-T02, title: "Create the access schema and tenant policies", status: todo, owner: developer-backend }
+      - { id: E01-T03, title: "Implement phone identity and application sessions", status: todo, owner: developer-backend }
+      - { id: E01-T04, title: "Implement workshop setup and server scope", status: todo, owner: developer-backend }
+      - { id: E01-T05, title: "Implement owner-PIN grants and recovery", status: todo, owner: developer-backend }
+      - { id: E01-T06, title: "Build the mobile access/session foundation", status: todo, owner: developer-frontend }
+      - { id: E01-T07, title: "Build phone onboarding and workshop setup (SCR-001)", status: todo, owner: developer-frontend }
+      - { id: E01-T08, title: "Build the authorized workshop home guard (SCR-002)", status: todo, owner: developer-frontend }
+      - { id: E01-T09, title: "Build Bangla/English presentation switching (SCR-011)", status: todo, owner: developer-frontend }
+      - { id: E01-T10, title: "Prove access, isolation, PIN lifecycle, and locale integration", status: todo, owner: qa }
+    qa_report: null
+    checkpoint: null
   - id: E02
     title: Fast Jobs and Customer Book
     status: pending
@@ -280,3 +293,5 @@ history:
     event: "/status consistency fix: E00-T01 was still recorded in-progress though it merged as 5674c0e, and E01 was recorded pending though epic.md, tracker.md and task specs T01-T04 exist on the trunk; both corrected. E01 task specs T05-T10 remain unwritten"
   - at: "2026-08-06T00:45:00+06:00"
     event: "E00 checkpoint recorded as APPROVED under the project owner's standing autonomous-run instruction (workspace/epics/E00-genesis/checkpoint.md). Five items accepted as delivery-process debt rather than fixed: no peer review on any E00 task (Claude-only execution removes the second model; epic QA stands in), deferred task-level QA on T02-T05 (clearing the standing BLOCKER FOR E01), the T04 migration applied under the standing waiver, no APK/IPA ever compiled, and 30 unresolved production/ADR human decisions which block release but not E01-E03. No epic remaps. E00 done; E01 build authorized"
+  - at: "2026-08-06T01:30:00+06:00"
+    event: "E01 specced: T05-T10 written, so all ten task specs exist. One real collision found in the already-written specs (T04 and T05 were wave-3 parallel yet both write packages/server-core/src/index.ts and apps/api/src/access/access.module.ts) resolved by serializing T05 after T04. T06 made sole owner of every shared Flutter file so T07/T08/T09 can run in parallel. Four blocking questions answered as spec-faithful defaults and logged: Q-007 security parameters (Argon2id, opaque hashed session tokens, 5-minute PIN grant), Q-008 vehicle types bike/cng/car/truck from BRD v1, Q-009 OTP recovery throttling which closed a cooldown bypass, Q-010 provisional consent copy. T01 corrected: the fifth wrong PIN returns 429 with retryAfterSeconds, not 401. Commit 67e8e2b"
