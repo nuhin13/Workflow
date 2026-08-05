@@ -85,7 +85,7 @@ epics:
     runnable_flow: "Start the Compose stack and run the diagnostic Flutter UI through the API to PostgreSQL and back with green CI."
     tasks:
       - { id: E00-T01, title: "Scaffold repository and module boundaries", status: in-progress, owner: developer-backend }
-      - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: todo, owner: null }
+      - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: in-progress, owner: claude-opus-5 }
       - { id: E00-T03, title: "Containerize runtime and CI baseline", status: todo, owner: null }
       - { id: E00-T04, title: "Implement the persistence walking skeleton", status: todo, owner: null }
       - { id: E00-T05, title: "Prove integration and recovery gate", status: todo, owner: null }
@@ -230,3 +230,9 @@ history:
     event: "handed off to codex (gpt-5.6-sol, authenticated and verified): E00-T01 resumed in worktree ../wt-E00-T01 and E01 specification restarted on kickoff_garazo; E02 task specs remain queued"
   - at: "2026-08-05T11:35:00+06:00"
     event: "project owner directed Claude-only execution; both codex runs stopped and their unverified output WIP-committed (E00-T01 app shells at 24cb917, E01 epic.md + tracker.md at 39b7811) with explicit trust warnings; cross-vendor handoff is now forbidden without owner approval and build is parked until the claude-code window resets at 06:30 Asia/Dhaka 2026-08-06"
+  - at: "2026-08-05T13:10:00+06:00"
+    event: "E00-T01 done and squash-merged to epic_00 as 5674c0e; pnpm workspace, Flutter owner shell with bn/en localization and an accessible root, Next.js admin shell, separate NestJS API and worker roots, provider ports, and generated Dart/TypeScript design tokens all verified by running make toolchain/tokens/lint/format/build, 7/7 contract tests and 6/6 Flutter tests"
+  - at: "2026-08-05T13:12:00+06:00"
+    event: "recorded two knowingly skipped gates on T01: peer review by a second model (constitution rule 12) waived by owner Claude-only instruction, and the Android APK compile unproven locally because cmdline-tools and Xcode are absent; both carried into the E00 checkpoint"
+  - at: "2026-08-05T13:15:00+06:00"
+    event: "started E00-T02 (OpenAPI contract and generated clients)"

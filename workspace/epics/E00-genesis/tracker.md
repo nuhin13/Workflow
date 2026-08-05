@@ -8,7 +8,7 @@
 ## Tasks
 
 - [ ] E00-T01 · Scaffold repository and module boundaries · in-progress · developer-backend
-- [ ] E00-T02 · Establish OpenAPI and generated clients · todo · —
+- [ ] E00-T02 · Establish OpenAPI and generated clients · in-progress · claude-opus-5
 - [ ] E00-T03 · Containerize runtime and CI baseline · todo · —
 - [ ] E00-T04 · Implement the persistence walking skeleton · todo · —
 - [ ] E00-T05 · Prove integration and recovery gate · todo · —
@@ -51,6 +51,17 @@ graph LR
 - 2026-07-30 Fresh-context `/analyze E00` found and corrected the request-body
   mismatch, lockfile collision, and MoSCoW inflation; all consistency checks
   now pass and await the human analyze gate.
+- 2026-08-05 T01 dispatched in worktree `../wt-E00-T01` (branch
+  `epic_00_task_01`); frozen once by a claude-code rate limit, briefly resumed on
+  codex, then completed directly by claude after the owner directed Claude-only
+  execution.
+- 2026-08-05 T01 done and squash-merged to `epic_00` as `5674c0e`. Verified:
+  make toolchain/tokens/lint/format/build pass, 7/7 contract tests, 6/6 Flutter
+  tests. Seven real defects were found and fixed by running the commands,
+  including a worker that booted and exited instantly.
+- 2026-08-05 Peer review (rule 12) SKIPPED for T01 on owner instruction
+  (Claude-only, no second model). Android APK compile remains unproven locally.
+- 2026-08-05 T02 started.
 - 2026-08-05 T01 dispatched to developer-backend on claude-code in worktree
   `../wt-E00-T01` (branch `epic_00_task_01`).
 - 2026-08-05 T01 frozen mid-task by a claude-code session rate limit. Partial
