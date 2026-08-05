@@ -1,0 +1,8 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  # @nestjs/core's postinstall only prints a funding notice — nothing to build.
+  '@nestjs/core': false
+  # unrs-resolver ships the native binding the ESLint import resolver needs.
+  unrs-resolver: true

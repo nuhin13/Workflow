@@ -1,0 +1,16 @@
+{
+  "name": "@garazo/server-core",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared modular-monolith domain/application code (ADR-0002). Owns module boundaries and provider-neutral ports; no adapters, no HTTP.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/node": "24.13.3"
+  }
+}

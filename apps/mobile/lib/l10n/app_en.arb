@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "appTitle": "Garazo",
+  "@appTitle": {
+    "description": "Application name shown as the shell title. Not business data."
+  },
+  "shellRootLabel": "Garazo owner app shell",
+  "@shellRootLabel": {
+    "description": "Accessible name for the shell root (NFR-A11Y-01)."
+  },
+  "shellNotConfigured": "Skeleton not configured.",
+  "@shellNotConfigured": {
+    "description": "Static placeholder state for the E00 walking skeleton. No product screen exists yet."
+  }
+}
