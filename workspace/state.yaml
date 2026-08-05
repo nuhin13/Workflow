@@ -228,3 +228,5 @@ history:
     event: "claude-code session rate limit terminated all three agents mid-run (resets 06:30 Asia/Dhaka 2026-08-06); froze per skills/rate-limit-handoff — WIP-committed E00-T01 partial scaffold (9dc905d) and E02 partial epic.md (34590e4), wrote handoff packets harness/handoffs/E00-T01.yaml, E01-spec.yaml, E02-spec.yaml"
   - at: "2026-08-05T11:20:00+06:00"
     event: "handed off to codex (gpt-5.6-sol, authenticated and verified): E00-T01 resumed in worktree ../wt-E00-T01 and E01 specification restarted on kickoff_garazo; E02 task specs remain queued"
+  - at: "2026-08-05T11:35:00+06:00"
+    event: "project owner directed Claude-only execution; both codex runs stopped and their unverified output WIP-committed (E00-T01 app shells at 24cb917, E01 epic.md + tracker.md at 39b7811) with explicit trust warnings; cross-vendor handoff is now forbidden without owner approval and build is parked until the claude-code window resets at 06:30 Asia/Dhaka 2026-08-06"
