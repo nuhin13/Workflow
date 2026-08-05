@@ -7,6 +7,17 @@ private objects are managed services, and everything else is rebuilt from git.
 **Status: NOT EXECUTABLE YET** — most steps are BLOCKED on
 `recovery-open-items.md`.
 
+**Rehearsed in E00-T05** with `make rehearse-rebuild` (dry-run; nothing
+provisioned or modified). Every SOURCE input this runbook needs exists and is
+version controlled, and the production topology was confirmed to hold no volume
+and no data service. Four steps remain blocked — registry, secret manager,
+verified backups, off-host logs. Full result:
+`docs/evidence/vm-recovery-rehearsal.md`.
+
+**The RTO in step 10 has not been measured**, because the rehearsal cannot
+complete past those blocked steps. Any figure quoted before that measurement is
+a guess.
+
 ## What you are rebuilding
 
 Running containers, and nothing else. If any step below feels like it is

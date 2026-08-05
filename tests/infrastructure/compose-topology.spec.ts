@@ -213,7 +213,17 @@ test('test_NFR_SEC_01_ci_verifies_but_cannot_deploy', () => {
   }
 
   assert.match(ci, /scan-secrets\.sh/);
-  assert.match(ci, /verify-compose\.sh/);
   assert.match(ci, /check:api/);
   assert.match(ci, /check:tokens/);
+
+  // Since E00-T05 the Compose smoke runs INSIDE the clean-clone gate rather
+  // than as its own CI step, so asserting the literal script name here would
+  // fail for a change that improved coverage. What matters is that the runtime
+  // check still happens: the gate must run, and the gate must include it.
+  assert.match(ci, /verify-clean-clone\.sh/);
+  assert.match(
+    readFileSync(join(repositoryRoot, 'scripts/verify-clean-clone.sh'), 'utf8'),
+    /verify-compose\.sh/,
+    'the clean-clone gate no longer runs the Compose smoke',
+  );
 });

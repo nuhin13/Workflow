@@ -6,6 +6,12 @@ than a correct explanation of the new one.
 **Status: NOT EXECUTABLE YET** — depends on the registry and secret decisions in
 `recovery-open-items.md`.
 
+**Partially exercised in E00-T05.** The schema half is proven: T04's migration
+rolls back cleanly, and its down-migration verifies the table's shape before
+dropping — a neighbouring table was created and confirmed untouched. The
+application half cannot be exercised without a registry to pull previous images
+from (open item 4).
+
 ## When to roll back
 
 Roll back on any of: health checks not passing after a deploy, a sharp rise in

@@ -150,8 +150,39 @@ jobs:
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build images and verify the stack becomes healthy
-        # Builds all three images, starts the stack, waits for health, checks
-        # the API answers, asserts non-root, greps logs for secret fixtures and
-        # confirms shutdown preserves the volume.
-        run: bash scripts/verify-compose.sh
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Set up Java for the OpenAPI generator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - run: corepack enable pnpm
+
+      - name: Clean-clone gate
+        # THE authoritative check: the same script a developer runs as
+        # `make verify`, covering pinned toolchain, install, drift, lint,
+        # format, build, every suite, secret scan, container images, Compose
+        # health and the real UI-to-PostgreSQL round trip.
+        #
+        # It overlaps the jobs above ON PURPOSE. Those run in parallel and give
+        # feedback in a couple of minutes; this one is slower and serial, and it
+        # is the one that must be green to merge. If CI and local verification
+        # diverge, one of them is lying — and it is usually the one nobody runs
+        # by hand.
+        run: bash scripts/verify-clean-clone.sh
+
+      - name: Rehearse the VM rebuild
+        # Provisions and mutates nothing. Fails if the VM stops being
+        # rebuildable from source and declared off-host material.
+        run: bash scripts/rehearse-vm-rebuild.sh dry-run

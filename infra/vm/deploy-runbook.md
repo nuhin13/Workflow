@@ -6,6 +6,12 @@ holds no production credential (see `.github/workflows/ci.yml`).
 **Status: NOT EXECUTABLE YET.** Steps marked BLOCKED depend on decisions in
 `recovery-open-items.md`. Do not improvise a value to get past one.
 
+**Exercised in E00-T05:** the container half of this runbook is proven. Images
+build, the stack reaches healthy, `/live` and `/ready` answer, and the
+diagnostic route is absent under production configuration — see
+`docs/evidence/walking-skeleton.md`. What remains unexercised is everything that
+needs a real host: registry pull, secret injection, TLS, and DNS.
+
 ## Before you start
 
 - [ ] The change is merged and CI is green on that commit.

@@ -367,10 +367,23 @@ letting a mismatched machine produce a build nobody else can reproduce.
 ```bash
 make toolchain   # verify the pinned versions match this machine
 make install     # pnpm install + flutter pub get
-make lint        # eslint the TypeScript workspace + flutter analyze
-make test        # EARS contract suite + Flutter widget tests
-make build       # build every buildable entry point
+make verify      # THE gate: toolchain → tests → images → real round trip
 ```
+
+`make verify` is the same script CI runs. Full walkthrough:
+[docs/operations/local-development.md](docs/operations/local-development.md).
+
+**Where to look**
+
+| Question | Document |
+|---|---|
+| How do I run this locally? | [local-development.md](docs/operations/local-development.md) |
+| What talks to what? | [system-map.md](docs/architecture/system-map.md) |
+| Did E00 honour every ADR? | [adr-consequence-audit.md](docs/architecture/adr-consequence-audit.md) |
+| What is actually secured? | [security/baseline.md](docs/security/baseline.md) |
+| Show me it working | [evidence/walking-skeleton.md](docs/evidence/walking-skeleton.md) |
+| Can we rebuild the VM? | [evidence/vm-recovery-rehearsal.md](docs/evidence/vm-recovery-rehearsal.md) |
+| What is still undecided? | [recovery-open-items.md](infra/vm/recovery-open-items.md) |
 
 **What is in the workspace**
 

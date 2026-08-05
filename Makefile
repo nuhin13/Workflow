@@ -8,7 +8,7 @@ PLATFORM ?=
 
 .PHONY: next status review validate dashboard metrics metrics-json hooks help \
         install toolchain tokens api contract lint format test build \
-        up down verify scan migrate-diagnostic migrate-diagnostic-down \
+        up down verify verify-runtime rehearse-rebuild scan migrate-diagnostic migrate-diagnostic-down \
         test-skeleton dev-api dev-worker dev-admin dev-mobile
 
 # ── Harness / tracker ─────────────────────────────────────────────────────────
@@ -62,8 +62,12 @@ up:          ## build and start the local development stack, wait for health
 	bash scripts/compose-up.sh
 down:        ## stop the local stack (named volumes are PRESERVED)
 	bash scripts/compose-down.sh
-verify:      ## full runtime smoke gate: build, start, health, non-root, log scan
+verify:      ## THE gate — pinned toolchain through the real round trip (E00 exit)
+	bash scripts/verify-clean-clone.sh
+verify-runtime: ## container images + Compose health only (a subset of verify)
 	bash scripts/verify-compose.sh
+rehearse-rebuild: ## dry-run the VM rebuild; provisions and mutates nothing
+	bash scripts/rehearse-vm-rebuild.sh dry-run
 migrate-diagnostic:      ## apply the E00 diagnostic migration (human-gated; refuses production)
 	bash scripts/migrate-diagnostic.sh up
 migrate-diagnostic-down: ## revert the E00 diagnostic migration
