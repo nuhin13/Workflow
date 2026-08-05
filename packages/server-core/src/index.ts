@@ -51,6 +51,30 @@ export type {
 export { ACCESS_ERROR_CODES, isPreSessionFailure } from './access/access-errors';
 export type { AccessErrorCode } from './access/access-errors';
 
+// Access schema repository contract, tenant-scope guard, and its PostgreSQL
+// adapter (E01-T02, NFR-SEC-01). `PostgresAccessRepository` is exported the
+// same way `PostgresSystemProbeRepository` is above: `apps/api`/`apps/worker`
+// may only ever import this package's public surface, never a deep path
+// (`tests/architecture/module-boundaries.spec.ts`), so a composition root's
+// ONLY route to bind a concrete adapter is through this barrel. Nothing
+// outside a composition root may depend on it — that boundary is a
+// convention documented here and in the class itself, not (yet) a lint rule.
+export type {
+  Account,
+  AccessRepository,
+  FailureState,
+  NewWorkshopInput,
+  SessionRecord,
+  WorkshopSummary,
+} from './access/access.repository';
+export { assertScoped, withTenantScope } from './access/tenant-guard';
+export type {
+  TenantScopedClient,
+  TenantScopePool,
+  WorkshopScoped,
+} from './access/tenant-guard';
+export { PostgresAccessRepository } from './access/postgres-access.repository';
+
 // System diagnostic (E00-T04). The PostgreSQL adapter is exported so the API
 // composition root can bind it; nothing else may depend on it.
 export { RunSystemProbeUseCase } from './system/run-system-probe.use-case';

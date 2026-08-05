@@ -9,6 +9,7 @@ PLATFORM ?=
 .PHONY: next status review validate dashboard metrics metrics-json hooks help \
         install toolchain tokens api contract lint format test build \
         up down verify verify-runtime rehearse-rebuild scan migrate-diagnostic migrate-diagnostic-down \
+        migrate migrate-down \
         test-skeleton dev-api dev-worker dev-admin dev-mobile
 
 # ── Harness / tracker ─────────────────────────────────────────────────────────
@@ -68,10 +69,14 @@ verify-runtime: ## container images + Compose health only (a subset of verify)
 	bash scripts/verify-compose.sh
 rehearse-rebuild: ## dry-run the VM rebuild; provisions and mutates nothing
 	bash scripts/rehearse-vm-rebuild.sh dry-run
-migrate-diagnostic:      ## apply the E00 diagnostic migration (human-gated; refuses production)
+migrate-diagnostic:      ## apply the E00 diagnostic migration only (human-gated; refuses production)
 	bash scripts/migrate-diagnostic.sh up
-migrate-diagnostic-down: ## revert the E00 diagnostic migration
+migrate-diagnostic-down: ## revert the E00 diagnostic migration only
 	bash scripts/migrate-diagnostic.sh down
+migrate:      ## apply migrations (all, or MIGRATION=000X_name for one); human-gated; refuses production
+	bash scripts/migrate-diagnostic.sh up $(if $(MIGRATION),$(MIGRATION),all)
+migrate-down: ## revert migrations (all in reverse, or MIGRATION=000X_name for one)
+	bash scripts/migrate-diagnostic.sh down $(if $(MIGRATION),$(MIGRATION),all)
 test-skeleton:           ## walking-skeleton integration + end-to-end suites
 	node --test "tests/integration/**/*.spec.ts" "tests/e2e/**/*.spec.ts"
 scan:        ## scan tracked files for committed credentials
