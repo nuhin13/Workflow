@@ -1,0 +1,32 @@
+name: garazo_owner
+description: "Garazo owner app — E00 walking-skeleton shell. No product feature."
+publish_to: "none"
+version: 0.0.1+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Localization boundary for NFR-I18N-01. flutter_localizations ships with the
+  # Flutter SDK and intl is its own code-generation dependency — neither is a new
+  # capability choice under the task's §2 dependency gate.
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  # Runtime required by the GENERATED API client
+  # (contracts/openapi/generator/dart.yaml). Not a capability choice: the
+  # openapi-generator dart template emits code against package:http.
+  http: ^1.6.0
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # Generates AppLocalizations from lib/l10n/*.arb per l10n.yaml.
+  generate: true

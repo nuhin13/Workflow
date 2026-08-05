@@ -1,12 +1,15 @@
 # Agentic harness — tracker targets.
-# Stack ops (up/down/migrate/test/lint) are added by the genesis epic (E00)
-# once the stack is decided.
+# Stack ops are added by the genesis epic (E00); E00-T01 adds the build/test
+# commands below, and T03 adds the container and CI targets.
 PY := python3
 SCHED := $(PY) harness/orchestrator/scheduler.py
 LAYER ?=
 PLATFORM ?=
 
-.PHONY: next status review validate dashboard metrics metrics-json hooks help
+.PHONY: next status review validate dashboard metrics metrics-json hooks help \
+        install toolchain tokens api contract lint format test build \
+        up down verify verify-runtime rehearse-rebuild scan migrate-diagnostic migrate-diagnostic-down \
+        test-skeleton dev-api dev-worker dev-admin dev-mobile
 
 # ── Harness / tracker ─────────────────────────────────────────────────────────
 next:        ## next executable task(s); make next PLATFORM=codex LAYER=frontend
@@ -29,3 +32,55 @@ hooks:       ## install git hooks (co-author strip, main/development protection)
 
 help:        ## show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
+
+# ── Product stack (E00-T01) ───────────────────────────────────────────────────
+# Every target below is additive; no harness target above was changed.
+install:     ## install pinned JS and Dart dependencies
+	corepack enable pnpm
+	pnpm install
+	cd apps/mobile && flutter pub get
+toolchain:   ## verify local Node/pnpm/Flutter/Dart match the repository pins
+	bash scripts/check-toolchain.sh
+api:         ## regenerate both API clients from the canonical OpenAPI contract
+	pnpm generate:api
+contract:    ## validate the OpenAPI contract and assert zero generated-client drift
+	pnpm check:api
+tokens:      ## regenerate Dart + TypeScript design tokens, then assert zero drift
+	pnpm generate:tokens
+	pnpm check:tokens
+lint:        ## eslint the TypeScript workspace and analyze the Flutter app
+	pnpm lint
+	cd apps/mobile && flutter analyze
+format:      ## check formatting of product code
+	pnpm format
+test:        ## run the EARS contract suite and the Flutter widget tests
+	pnpm test
+	cd apps/mobile && flutter test
+build:       ## build every buildable entry point
+	pnpm --recursive --if-present run build
+up:          ## build and start the local development stack, wait for health
+	bash scripts/compose-up.sh
+down:        ## stop the local stack (named volumes are PRESERVED)
+	bash scripts/compose-down.sh
+verify:      ## THE gate — pinned toolchain through the real round trip (E00 exit)
+	bash scripts/verify-clean-clone.sh
+verify-runtime: ## container images + Compose health only (a subset of verify)
+	bash scripts/verify-compose.sh
+rehearse-rebuild: ## dry-run the VM rebuild; provisions and mutates nothing
+	bash scripts/rehearse-vm-rebuild.sh dry-run
+migrate-diagnostic:      ## apply the E00 diagnostic migration (human-gated; refuses production)
+	bash scripts/migrate-diagnostic.sh up
+migrate-diagnostic-down: ## revert the E00 diagnostic migration
+	bash scripts/migrate-diagnostic.sh down
+test-skeleton:           ## walking-skeleton integration + end-to-end suites
+	node --test "tests/integration/**/*.spec.ts" "tests/e2e/**/*.spec.ts"
+scan:        ## scan tracked files for committed credentials
+	bash scripts/scan-secrets.sh
+dev-api:     ## run the NestJS API composition root
+	pnpm --filter @garazo/api run dev
+dev-worker:  ## run the NestJS worker composition root
+	pnpm --filter @garazo/worker run dev
+dev-admin:   ## run the Next.js admin shell
+	pnpm --filter @garazo/admin run dev
+dev-mobile:  ## run the Flutter owner shell
+	cd apps/mobile && flutter run

@@ -31,6 +31,20 @@ yarn-error.log*
 pnpm-debug.log*
 .pnpm-store/
 
+# Flutter / Dart (E00-T01)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+apps/mobile/build/
+**/ephemeral/
+# AppLocalizations is generated from lib/l10n/*.arb by `flutter pub get`; the ARB
+# files are the source of truth, so the generated Dart is not versioned.
+apps/mobile/lib/l10n/generated/
+
+# Generated API clients (T02 owns the generator; output stays unversioned)
+**/generated/openapi/
+
 # Env / secrets
 .env
 .env.*

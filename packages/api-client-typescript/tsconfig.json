@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    // The generated client targets the fetch API, so it needs the DOM lib for
+    // Response, RequestCredentials and WindowOrWorkerGlobalScope.
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    // This package holds ONLY generated code plus a one-line barrel. The OpenAPI
+    // Generator's runtime.ts does not compile under strictNullChecks or the
+    // unused-symbol rules, and hand-editing generated code is forbidden by the
+    // drift gate. Relaxing these three confines the compromise to the generated
+    // tree: consumers still see fully typed request and response models, and the
+    // rest of the repository stays strict.
+    "strictNullChecks": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": ["src"]
+}

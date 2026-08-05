@@ -5,7 +5,7 @@ type: genesis
 title: Prove integration and recovery gate
 layer: infra
 size: M
-status: todo
+status: review-requested
 owner_agent: devops
 preferred_agent: any
 tier: deep
@@ -36,9 +36,9 @@ files:
     - infra/vm/rollback-runbook.md
 feature_flags: []
 ui_reference: "N/A — integration verification; diagnostic UI is not a product screen"
-started_at:
-completed_at:
-executed_by:
+started_at: 2026-08-05
+completed_at: 2026-08-05
+executed_by: claude-opus-5 (orchestrator, direct execution)
 reviewed_at:
 reviewed_by:
 review_outcome:
@@ -181,17 +181,24 @@ a product screen.
 
 ## 12. Implementation checklist  (live execution log)
 
-- [ ] tests written FIRST and failing for EARS-E00-12/13/14
-- [ ] final `make verify` works from a clean clone with approved dependencies
-- [ ] generated-client and module-boundary drift checks are green
-- [ ] admin/API/worker images build non-root and Compose health is green
-- [ ] diagnostic migration apply/rollback and database failure path are proven
-- [ ] human-ready Flutter round-trip evidence contains no secret
-- [ ] production route/page absence is proven
-- [ ] VM dry-run/non-production rebuild and rollback rehearsal is recorded
-- [ ] every ADR consequence is implemented, exactly later-mapped, or justified N/A
-- [ ] security/config/observability/third-party inventory reviewed
-- [ ] independent `/qa E00` prompt/handoff is ready; no self-approval
+- [x] tests written FIRST and failing for EARS-E00-12/13/14 — each failed on
+      first run and caught three real gaps (see Run log)
+- [x] final `make verify` works — **all 14 steps pass**, no new dependency
+- [x] generated-client and module-boundary drift checks are green
+- [x] admin/API/worker images build non-root and Compose health is green
+- [x] diagnostic migration apply/rollback and database failure path are proven
+- [x] human-ready Flutter round-trip evidence contains no secret — asserted by
+      `test_EARS_E00_13_sensitive_fixture_absent_from_logs_errors_evidence`
+- [x] production route/page absence is proven — four independent guards, the
+      API booted in production mode in a child process rather than only read
+- [x] VM rebuild rehearsal recorded — dry-run, nothing provisioned; four steps
+      correctly reported BLOCKED
+- [x] every ADR consequence is implemented, exactly later-mapped, or justified —
+      38 / 9 / 18, no unmapped row
+- [x] security/config/observability/third-party inventory reviewed
+- [~] independent `/qa E00` prompt/handoff is ready; no self-approval — the
+      handoff is written below and nothing here is self-approved, but **QA has
+      not been run**
 
 ## 13. Test plan
 
@@ -237,32 +244,56 @@ a product screen.
 
 ## 15. Self-review (agent fills BEFORE status: review-requested)
 
-- [ ] All checklist items done (with commit hashes)
-- [ ] `make test && make lint` and `make verify` pass
-- [ ] Loading/error/empty/data states verified for diagnostic
-- [ ] Audit entry on lifecycle writes: N/A — no product lifecycle write
-- [ ] No secrets/PII logged or written to evidence
-- [ ] Diff confined to §5 list; §4 respected
+- [x] All checklist items done (with commit hashes) — `3c1cc00`
+- [x] `make test && make lint` and `make verify` pass — 14/14 gate steps, 106
+      node assertions, 19 Flutter tests
+- [x] Loading/error/empty/data states verified for diagnostic
+- [x] Audit entry on lifecycle writes: N/A — no product lifecycle write
+- [x] No secrets/PII logged or written to evidence — asserted by test, not
+      merely reviewed
+- [x] Diff confined to §5 list; §4 respected — two additions below
 
 ### Deviations from spec
 
-(none)
+1. **`tests/infrastructure/compose-topology.spec.ts` updated** (a T03 file, not
+   in §5). It asserted CI runs `verify-compose.sh` as its own step; the Compose
+   smoke now runs inside the clean-clone gate, so the literal assertion failed
+   for a change that *improved* coverage. It now asserts the gate runs and that
+   the gate includes the smoke.
+2. **`Makefile` gained `verify-runtime` and `rehearse-rebuild`.** §5 permits
+   wiring `verify` only. `verify` was repointed at the full gate, so the old
+   Compose-only behaviour needed a name rather than being silently lost, and the
+   rehearsal needed an entry point.
+3. **No new dependency, migration, environment key, API field or route was
+   added**, as §4 requires.
 
 ### Files touched (actual)
 
-- ...
+Created: `scripts/verify-clean-clone.sh`, `scripts/rehearse-vm-rebuild.sh`,
+`tests/e2e/clean-clone-verify.spec.ts`,
+`tests/e2e/production-route-absence.spec.ts`,
+`docs/architecture/{system-map,adr-consequence-audit}.md`,
+`docs/operations/local-development.md`, `docs/security/baseline.md`,
+`docs/evidence/{walking-skeleton,vm-recovery-rehearsal}.md`.
+
+Updated: `.github/workflows/ci.yml`, `Makefile`, `README.md`,
+`infra/vm/{deploy,rebuild,rollback}-runbook.md`,
+`tests/infrastructure/compose-topology.spec.ts`.
 
 ## 16. Definition of Done
 
-- [ ] All §14 criteria pass via tests named by EARS/trace ID
-- [ ] UI fidelity: N/A — diagnostic only; accessibility/token checks pass
-- [ ] Peer-AI review approved by a different model
-- [ ] Task-level QA APPROVE — security/migration/runtime integration
-- [ ] Squash-merged to epic branch; tracker + metrics stamped
-- [ ] Graphiti episode written with Entity/Decision/ThirdPartyService/File
-      nodes, or “Graphiti unavailable/not consulted” recorded
-- [ ] Independent epic `/qa E00` approves
-- [ ] Human sees the response and verifies E00 at checkpoint
+- [x] All §14 criteria pass via tests named by EARS/trace ID — EARS-E00-12,
+      -13 and -14 each have named passing tests
+- [x] UI fidelity: N/A — diagnostic only; accessibility and token checks pass
+- [ ] Peer-AI review approved by a different model — **NOT DONE.** Owner
+      directed single-platform execution (constitution rule 12)
+- [ ] Task-level QA APPROVE — **NOT DONE.** Fourth consecutive deferred gate
+- [ ] Squash-merged to epic branch; tracker + metrics stamped — pending
+- [x] Graphiti episode — **Graphiti unavailable / not consulted.** No Graphiti
+      MCP server is connected in this environment
+- [ ] Independent epic `/qa E00` approves — **NOT RUN.** The handoff is prepared
+      in §18; this task cannot approve itself
+- [ ] Human sees the response and verifies E00 at checkpoint — pending
 
 ## 17. Notes for the implementing agent
 
@@ -275,9 +306,57 @@ a product screen.
 
 ## 18. Handoff
 
-At `review-requested`, hand to a different-model peer with `make verify`
-output. After peer approval, hand the entire E00 diff, approved SRS, and repo
-to a fresh independent QA agent. Do not include implementation chat memory.
+### Prepared QA handoff — E00
+
+Give a **fresh** agent the repository at `epic_00`, `workspace/spec/srs.md`, the
+five task files, and nothing else. No implementation chat memory: the point of
+independent QA is a reader who has not already convinced themselves.
+
+Start here:
+
+```bash
+make verify            # 14 steps; must be green end to end
+make rehearse-rebuild  # must report 0 missing inputs, 4 blocked steps
+```
+
+Then read, in order:
+
+1. `docs/evidence/walking-skeleton.md` — reproduce the round trip yourself
+2. `docs/architecture/adr-consequence-audit.md` — check every 🔒 and ⏭️ row
+3. `docs/security/baseline.md` — verify each claim against its named test
+4. `infra/vm/recovery-open-items.md` — confirm nothing was guessed
+
+**Question these specifically:**
+
+- Does anything in E00 implement product behaviour it should not?
+- Is `system_probes` genuinely incapable of becoming a product table?
+- Are the four production guards truly independent, or do they share a failure?
+- Does any error path, log line or evidence document leak a value?
+- Is the `RunSystemProbeUseCase` safe-integer check correct for a `bigint`?
+- Is the adapter allowlist in the architecture test too permissive?
+
+**Known weaknesses, declared rather than discovered:**
+
+- No peer review happened on any E00 task.
+- Task-level QA is deferred on T02, T03, T04 and this task.
+- The T04 migration was applied under a standing waiver, not an in-thread
+  schema approval.
+- No APK or IPA has been compiled; device builds are unproven.
+- Base images are tag-pinned, not digest-pinned (open items 4 and 11).
+
+### Human demo — what to watch
+
+```bash
+make up
+DATABASE_URL=postgres://garazo:garazo-local-dev@127.0.0.1:5432/garazo make migrate-diagnostic
+make dev-mobile     # open /dev/walking-skeleton
+```
+
+Tap the action twice — the count goes 1 then 2. Restart the API and tap again:
+it continues, proving the number lives in PostgreSQL. Stop the database and tap:
+a redacted error with a correlation ID, and the API stays up.
+
+This task prepares that evidence. It cannot approve itself.
 
 ## Open Questions
 
@@ -290,4 +369,52 @@ to a fresh independent QA agent. Do not include implementation chat memory.
 
 ## Run log
 
-- (clean-clone ref, image digests, sanitized evidence, reviewer and QA refs)
+### The gate
+
+```
+$ bash scripts/verify-clean-clone.sh
+[01] pinned toolchain matches          [08] formatting
+[02] install (frozen lockfile)         [09] build all entry points
+[03] flutter dependencies              [10] secret scan
+[04] design tokens: zero drift         [11] node test suites
+[05] OpenAPI contract + client drift    [12] flutter test suites
+[06] eslint                            [13] container images + compose smoke
+[07] flutter analyze                   [14] walking skeleton round trip
+
+verify-clean-clone: all 14 steps passed        EXIT=0
+```
+
+106 node assertions, 19 Flutter tests.
+
+### Gaps the new tests caught on their first run
+
+Written before the documents and the CI wiring existed, so they failed honestly:
+
+| Caught | Fix |
+|---|---|
+| CI did not run the clean-clone gate at all | Added it as the authoritative job, with the fast parallel jobs kept for early feedback |
+| An ADR deferral said only "no adapter implements one yet" with no owner | Named E04 — exactly the vague "later" `L-auth-002` warns about |
+| Evidence documents did not exist yet | Written from a real run, then asserted free of sensitive fixtures |
+| A T03 test asserted CI runs `verify-compose.sh` literally | Now asserts the gate runs and the gate includes the smoke — the literal check failed for a change that improved coverage |
+
+### Image digests
+
+**Not recorded.** Images are built locally and no registry has been chosen
+(open item 4), so a local digest would imply a reproducibility guarantee that
+does not exist. Recording one would be worse than recording none.
+
+### ADR audit result
+
+38 consequences implemented and evidenced, 9 mapped to a named later epic, 18
+unresolved human decisions. No row without a disposition; no deferral without an
+owner.
+
+### Reviewer and QA refs
+
+- Peer review: **none**. Owner directed single-platform execution.
+- Independent QA: **not run**. Handoff prepared in §18.
+- Human checkpoint: pending.
+
+### Session refs
+
+- Commit `3c1cc00`.

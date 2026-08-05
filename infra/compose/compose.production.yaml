@@ -1,0 +1,121 @@
+# E00-T03 · production topology (ADR-0006 Option 3).
+#
+# The application VM runs EXACTLY three containers: admin, API, worker.
+#
+# PostgreSQL and private object storage are deliberately absent. They are
+# managed services reached over the network, because the authoritative database
+# and private objects must survive loss of this VM. Adding a `postgres` service
+# to this file would put the only copy of a workshop's money records on a single
+# host — the exact failure this topology exists to prevent. A test enforces it.
+#
+# No supplier, region, registry, TLS/ingress or secret manager is chosen here;
+# those are unresolved human decisions listed in infra/vm/recovery-open-items.md.
+
+name: garazo
+
+services:
+  api:
+    image: ${GARAZO_API_IMAGE:?set GARAZO_API_IMAGE to an immutable image reference}
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:?}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      API_PORT: 3000
+      # Supplied by the host environment from the managed database. Never
+      # committed, never defaulted — a default here would silently point
+      # production at the wrong datastore.
+      DATABASE_URL: ${DATABASE_URL:?}
+      WALKING_SKELETON_ENABLED: "false"
+    expose:
+      - "3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/v1/system/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # Placeholders. Real values need production sizing, which is an open item.
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    stop_grace_period: 15s
+
+  worker:
+    image: ${GARAZO_WORKER_IMAGE:?set GARAZO_WORKER_IMAGE to an immutable image reference}
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:?}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: ${DATABASE_URL:?}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-1}
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "process.exit(require('node:fs').existsSync('/tmp/garazo-worker-ready')?0:1)"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    # Longer than the API: the worker may be mid-job, and cutting it short is
+    # what leaves a half-applied money effect behind.
+    stop_grace_period: 30s
+
+  admin:
+    image: ${GARAZO_ADMIN_IMAGE:?set GARAZO_ADMIN_IMAGE to an immutable image reference}
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:?}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PORT: 3001
+      API_BASE_URL: http://api:3000
+    expose:
+      - "3001"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3001/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 384M
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    stop_grace_period: 15s
+
+# No volumes. Nothing on this VM is authoritative; that is the point.

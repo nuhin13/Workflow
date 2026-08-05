@@ -1,0 +1,11 @@
+{
+  "name": "@garazo/design-tokens",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Generated TypeScript target for the approved Garazo design tokens (workspace/plan/01-design/tokens.json). Do not hand-edit src/tokens.ts.",
+  "main": "src/tokens.ts",
+  "types": "src/tokens.ts",
+  "scripts": {
+    "build": "echo \"@garazo/design-tokens: no separate build step — consumed at source by apps/admin via next.config.ts transpilePackages\""
+  }
+}

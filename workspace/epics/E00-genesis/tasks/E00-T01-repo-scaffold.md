@@ -5,7 +5,7 @@ type: genesis
 title: Scaffold repository and module boundaries
 layer: cross-cutting
 size: M
-status: todo
+status: review-requested
 owner_agent: developer-backend
 preferred_agent: any
 tier: build
@@ -71,9 +71,9 @@ files:
     - README.md
 feature_flags: []
 ui_reference: "N/A — application shells only; no product screen is implemented"
-started_at:
-completed_at:
-executed_by:
+started_at: 2026-08-05
+completed_at: 2026-08-05
+executed_by: claude-opus-5 (orchestrator, direct execution)
 reviewed_at:
 reviewed_by:
 review_outcome:
@@ -245,17 +245,31 @@ identities and technology-neutral primitives only.
 
 ## 12. Implementation checklist  (live execution log)
 
-- [ ] tests written FIRST and failing for EARS-E00-1/2
-- [ ] exact dependency/version/license set presented and human-approved
-- [ ] Node, pnpm, Flutter, and Dart versions pinned
-- [ ] Android Flutter host builds from the pinned stable SDK
-- [ ] Dart/TypeScript design-token generation is deterministic and drift-free
-- [ ] Flutter and Next.js shells compile and consume generated design tokens
-- [ ] Flutter shell resolves approved Bangla and English locale keys
-- [ ] NestJS API and worker boot as separate entry points
-- [ ] server-core public module and provider ports compile without SDK types
-- [ ] Makefile preserves every existing harness target
-- [ ] lint, format, unit test, and build commands pass for both toolchains
+- [x] tests written FIRST and failing for EARS-E00-1/2 — `1d83648`; the three
+      shell contracts were red (missing l10n boundary and `app.dart`) before
+      `1f0a927` made them green
+- [~] exact dependency/version/license set presented and human-approved — the
+      baseline was fixed by §2 and the owner pre-approved it for this autonomous
+      run rather than reviewing it in-thread. Resolved versions are in the Run
+      log; **this still needs the owner's eyes at the E00 checkpoint.**
+- [x] Node, pnpm, Flutter, and Dart versions pinned — `9dc905d`, enforced by
+      `scripts/check-toolchain.sh` (`08c2507`)
+- [ ] Android Flutter host builds from the pinned stable SDK — **NOT PROVEN.**
+      The host files exist and the Flutter toolchain accepts the project, but no
+      APK was compiled; see Deviations.
+- [x] Dart/TypeScript design-token generation is deterministic and drift-free —
+      `08c2507`; verified idempotent across repeated generate/format cycles
+- [x] Flutter and Next.js shells compile and consume generated design tokens —
+      `1f0a927`, `08c2507`
+- [x] Flutter shell resolves approved Bangla and English locale keys — `1f0a927`
+- [x] NestJS API and worker boot as separate entry points — `08c2507`; the worker
+      was exiting immediately until its event loop was held open
+- [x] server-core public module and provider ports compile without SDK types —
+      `9dc905d`, compiled by `make build`
+- [x] Makefile preserves every existing harness target — all nine retained,
+      ten added (`08c2507`)
+- [x] lint, format, unit test, and build commands pass for both toolchains —
+      output in the Run log
 
 ## 13. Test plan
 
@@ -292,30 +306,71 @@ identities and technology-neutral primitives only.
 
 ## 15. Self-review (agent fills BEFORE status: review-requested)
 
-- [ ] All checklist items done (with commit hashes)
-- [ ] `make test && make lint` pass for affected apps
-- [ ] Loading/error/empty states present (N/A — non-product shell)
-- [ ] Audit entry on lifecycle writes (N/A — no lifecycle write)
-- [ ] No secrets/PII logged
-- [ ] Diff confined to §5 list; §4 respected
+- [~] All checklist items done (with commit hashes) — one is unproven (Android
+      APK compile) and one is pre-approved rather than reviewed (dependencies)
+- [x] `make test && make lint` pass for affected apps — 7/7 contract tests,
+      6/6 Flutter tests, ESLint and `flutter analyze` clean
+- [x] Loading/error/empty states present (N/A — non-product shell)
+- [x] Audit entry on lifecycle writes (N/A — no lifecycle write)
+- [x] No secrets/PII logged — no credential, endpoint, or key was introduced
+- [x] Diff confined to §5 list; §4 respected — see Deviations for the additions
 
 ### Deviations from spec
 
-(none)
+1. **Android APK compile could not be executed.** Android `cmdline-tools` and a
+   full Xcode are not installed on this machine. `apps/mobile/android/` was
+   created from the pinned Flutter SDK and `flutter analyze` + `flutter test`
+   both pass, but `test_EARS_E00_1_android_owner_shell_builds` verifies
+   structural presence and toolchain acceptance, NOT a real APK. **A device
+   build remains unproven until CI or a configured machine runs it.**
+2. **Three files were changed beyond the §5 intent**, each forced by a defect
+   found while verifying:
+   - `pnpm-workspace.yaml` gained an `allowBuilds` block (pnpm refused to run any
+     script until the two ignored build scripts were resolved; it had been left
+     with literal placeholder text).
+   - `eslint.config.mjs` pins the React version and disables
+     `@next/next/no-html-link-for-pages`. ESLint 10 removed a context API that
+     `eslint-plugin-react`'s version autodetection still calls, so linting the
+     admin app crashed outright.
+   - `package.json`'s format scripts were scoped to product paths. Prettier was
+     rewriting `harness/` and approved `workspace/` artifacts, which constitution
+     rule 6 forbids.
+3. **The Android package was renamed** `com.garazo.garazo_owner` to
+   `com.garazo.owner` to match the path the scaffold contract asserts.
+4. **The token generator now formats its own TypeScript output.** `make tokens`
+   and `make format` were overwriting each other in a loop, so neither could ever
+   be green in CI.
+5. **Provenance:** commits `1d83648` and `24cb917` came from a Codex run during
+   the claude-code rate-limit window, before the owner directed Claude-only
+   execution. Every file from those commits has now been executed or rewritten
+   here — nothing from that interlude is trusted on inspection alone. The Flutter
+   app in particular arrived as the untouched `flutter create` counter demo,
+   which violated §4, and was replaced.
 
 ### Files touched (actual)
 
-- ...
+Created: `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`,
+`.node-version`, `.flutter-version`, `tsconfig.base.json`, `eslint.config.mjs`,
+`prettier.config.mjs`, `scripts/check-toolchain.sh`,
+`scripts/generate-design-tokens.mjs`, `scripts/check-design-tokens.mjs`,
+`tests/contract/design-token-drift.spec.ts`, `apps/mobile/**`, `apps/admin/**`,
+`apps/api/**`, `apps/worker/**`, `packages/server-core/**`,
+`packages/design-tokens/**`.
+
+Updated: `Makefile`, `.gitignore`, `README.md`.
 
 ## 16. Definition of Done
 
-- [ ] All §14 criteria pass via tests named by EARS/trace ID
-- [ ] UI fidelity: N/A — no product screen; tokens and accessible shell only
-- [ ] Peer-AI review approved by a different model
-- [ ] Task-level QA: N/A — no auth/payment/migration/security behavior
-- [ ] Squash-merged to epic branch; tracker + metrics stamped
-- [ ] Graphiti episode written or “graph not consulted” noted
-- [ ] Human verified at E00 checkpoint
+- [x] All §14 criteria pass via tests named by EARS/trace ID — 7/7
+- [x] UI fidelity: N/A — no product screen; tokens and accessible shell only
+- [ ] Peer-AI review approved by a different model — **NOT DONE.** The owner
+      directed single-platform execution, so no second model reviewed this. A
+      knowingly skipped constitution rule 12 gate, not an oversight.
+- [x] Task-level QA: N/A — no auth/payment/migration/security behavior
+- [ ] Squash-merged to epic branch; tracker + metrics stamped — pending
+- [x] Graphiti episode written or “graph not consulted” noted — graph not
+      consulted (no Graphiti MCP server is connected in this environment)
+- [ ] Human verified at E00 checkpoint — pending
 
 ## 17. Notes for the implementing agent
 
@@ -342,4 +397,80 @@ N/A unless blocked or frozen.
 
 ## Run log
 
-- (key evidence, decisions, test results, and session refs)
+### Resolved dependency baseline (§2 gate)
+
+| Package | Version | License |
+|---|---|---|
+| Node | 24.4.0 | runtime pin |
+| pnpm | 11.20.0 | MIT |
+| Flutter | 3.44.0 | BSD-3-Clause |
+| Dart | 3.12.0 | BSD-3-Clause |
+| typescript | 5.9.3 | Apache-2.0 |
+| eslint | 10.8.0 | MIT |
+| eslint-config-next | 16.3.0 | MIT |
+| typescript-eslint | 8.66.0 | MIT |
+| prettier | 3.9.6 | MIT |
+| @types/node | 24.13.3 | MIT |
+| next | 16.3.0 | MIT |
+| react / react-dom | 19.2.8 | MIT |
+| @nestjs/core, common, platform-express | 11.1.14 | MIT |
+| rxjs | 7.8.2 | Apache-2.0 |
+| intl | 0.20.2 | BSD-3-Clause |
+| flutter_lints | 6.0.0 | BSD-3-Clause |
+| cupertino_icons | 1.0.9 | MIT |
+
+No ORM, state-management, auth, queue, provider SDK, telemetry, or UI-component
+library was added, per §4.
+
+### Verification (every command actually executed)
+
+```
+make toolchain   node 24.4.0 · pnpm 11.20.0 · flutter 3.44.0 · dart 3.12.0 — all match
+make tokens      Design-token targets match workspace/plan/01-design/tokens.json.
+make lint        eslint clean · flutter analyze: No issues found!
+make format      All matched files use Prettier code style!
+make build       6 workspace projects built; apps/admin prerendered / and /_not-found
+make test        7/7 contract tests + 6/6 Flutter widget tests
+```
+
+Contract suite:
+
+```
++ test_EARS_E00_1_each_entry_point_builds
++ test_EARS_E00_1_android_owner_shell_builds          (structural — see Deviations)
++ test_EARS_E00_1_design_token_targets_have_zero_drift
++ test_EARS_E00_2_api_worker_have_separate_composition_roots
++ test_NFR_I18N_01_shell_uses_localization_boundary
++ test_NFR_A11Y_01_shell_has_named_root
++ test_EARS_E00_2_api_and_worker_stay_resident_as_separate_processes
+```
+
+Manual QA (§13):
+
+1. Clean-clone install — `corepack enable pnpm && pnpm install` resolved 408
+   packages; `flutter pub get` resolved and generated `AppLocalizations`.
+2. API and worker run separately — the API stayed resident and answered
+   `HTTP 404` on `127.0.0.1:3000` (correct: no route exists until T02). The
+   worker initially **exited immediately**; fixed in `08c2507` and it now
+   survives an 8s idle and exits cleanly on SIGTERM.
+3. Shells show the token-backed placeholder with no product navigation or data.
+
+### Defects found and fixed while verifying
+
+| Defect | Impact if shipped |
+|---|---|
+| Worker exited instantly (signal handlers do not hold Node's event loop) | The worker would appear to start in every log and never process anything |
+| `pnpm-workspace.yaml` `allowBuilds` left as literal placeholder text | Every pnpm script failed, including install |
+| ESLint 10 vs eslint-plugin-react autodetection crash | `pnpm lint` crashed on the admin app |
+| Prettier rewriting `harness/` and approved `workspace/` artifacts | Violates constitution rule 6 |
+| Token generator output and Prettier fought in a loop | CI could never be both token-clean and format-clean |
+| `apps/mobile` was the raw `flutter create` counter demo | Ships product UI that §4 forbids, with no l10n or a11y boundary |
+| Flutter build output, `.dart_tool/` and generated l10n were committed | Repository noise and spurious diffs on every machine |
+
+### Session refs
+
+- Frozen once by a claude-code session rate limit; handoff packet
+  `harness/handoffs/E00-T01.yaml`.
+- Commits: `9dc905d` (partial scaffold), `1d83648` + `24cb917` (Codex interlude,
+  since verified or replaced), `1f0a927` (shell rewrite), `08c2507` (worker fix
+  and scaffold completion).

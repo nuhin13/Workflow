@@ -81,14 +81,14 @@ phases:
 epics:
   - id: E00
     title: Genesis and Walking Skeleton
-    status: in-progress
+    status: qa
     runnable_flow: "Start the Compose stack and run the diagnostic Flutter UI through the API to PostgreSQL and back with green CI."
     tasks:
       - { id: E00-T01, title: "Scaffold repository and module boundaries", status: in-progress, owner: developer-backend }
       - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: done, owner: claude-opus-5 }
       - { id: E00-T03, title: "Containerize runtime and CI baseline", status: done, owner: claude-opus-5 }
       - { id: E00-T04, title: "Implement the persistence walking skeleton", status: done, owner: claude-opus-5 }
-      - { id: E00-T05, title: "Prove integration and recovery gate", status: todo, owner: null }
+      - { id: E00-T05, title: "Prove integration and recovery gate", status: done, owner: claude-opus-5 }
     qa_report: null
     checkpoint: null
   - id: E01
@@ -258,3 +258,11 @@ history:
     event: "BLOCKER FOR E01 (updated): task-level QA now deferred on E00-T02, E00-T03 and E00-T04. Between them they define the authorization boundary, secret handling, log redaction, production topology, and the first schema migration. The T04 migration was also applied under the standing waiver rather than an in-thread schema approval"
   - at: "2026-08-05T21:16:00+06:00"
     event: "E00 is 4/5; only E00-T05 (integration and recovery gate) remains before the epic QA sweep and checkpoint"
+  - at: "2026-08-05T23:30:00+06:00"
+    event: "E00-T05 done and squash-merged to epic_00 as 08e2225; scripts/verify-clean-clone.sh proves E00 in one command across 14 steps from pinned toolchain through the real UI-to-PostgreSQL round trip, CI runs the same script, and the VM rebuild rehearsal confirms every source input exists while reporting four steps still blocked on unmade decisions"
+  - at: "2026-08-05T23:32:00+06:00"
+    event: "ADR consequence audit complete for all nine accepted ADRs: 38 consequences implemented and evidenced in E00, 9 mapped to a named later epic, 18 unresolved human decisions. No consequence is unaccounted for and no deferral says only 'later'"
+  - at: "2026-08-05T23:40:00+06:00"
+    event: "epic_00 merged into kickoff_garazo at the project owner's request; all five E00 tasks and the full product codebase (apps/, packages/, contracts/, infra/, scripts/, tests/, docs/) now live on the trunk"
+  - at: "2026-08-05T23:42:00+06:00"
+    event: "E00 status is qa, NOT verified. Outstanding before feature work: peer review never ran on any E00 task (constitution rule 12), task-level QA is deferred on T02/T03/T04/T05, the T04 migration was applied under a standing waiver rather than an in-thread schema approval, and no APK or IPA has ever been compiled"

@@ -1,0 +1,27 @@
+{
+  "name": "@garazo/api",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json && node dist/main.js",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@garazo/runtime-config": "workspace:*",
+    "@garazo/server-core": "workspace:*",
+    "@nestjs/common": "11.1.14",
+    "@nestjs/core": "11.1.14",
+    "@nestjs/platform-express": "11.1.14",
+    "pg": "^8.22.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "24.13.3",
+    "@types/pg": "^8.20.3",
+    "typescript": "5.9.3"
+  }
+}

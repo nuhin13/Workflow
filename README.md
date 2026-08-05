@@ -344,3 +344,73 @@ fails if one is missing. The map below is the short version.
 Deep dive: [`harness/docs/harness-guide.md`](harness/docs/harness-guide.md) ·
 Constitution: [`AGENTS.md`](AGENTS.md) ·
 Human playbook: [`harness/docs/HUMAN-GUIDE.md`](harness/docs/HUMAN-GUIDE.md)
+
+## 11. Product workspace bootstrap (Garazo)
+
+Epic 00 adds the product stack alongside the harness. The harness commands in
+section 10 are unchanged; everything below is additive.
+
+**What you need installed**
+
+| Tool | Pinned by | Version |
+|---|---|---|
+| Node | `.node-version` | 24.4.0 |
+| pnpm | `package.json` → `packageManager` | 11.20.0 (via `corepack enable pnpm`) |
+| Flutter | `.flutter-version` | 3.44.0 |
+| Dart | `apps/mobile/pubspec.yaml` → `environment.sdk` | ^3.12.0 (ships with Flutter) |
+
+Run `make toolchain` to check all four at once. It fails loudly rather than
+letting a mismatched machine produce a build nobody else can reproduce.
+
+**From a clean clone**
+
+```bash
+make toolchain   # verify the pinned versions match this machine
+make install     # pnpm install + flutter pub get
+make verify      # THE gate: toolchain → tests → images → real round trip
+```
+
+`make verify` is the same script CI runs. Full walkthrough:
+[docs/operations/local-development.md](docs/operations/local-development.md).
+
+**Where to look**
+
+| Question | Document |
+|---|---|
+| How do I run this locally? | [local-development.md](docs/operations/local-development.md) |
+| What talks to what? | [system-map.md](docs/architecture/system-map.md) |
+| Did E00 honour every ADR? | [adr-consequence-audit.md](docs/architecture/adr-consequence-audit.md) |
+| What is actually secured? | [security/baseline.md](docs/security/baseline.md) |
+| Show me it working | [evidence/walking-skeleton.md](docs/evidence/walking-skeleton.md) |
+| Can we rebuild the VM? | [evidence/vm-recovery-rehearsal.md](docs/evidence/vm-recovery-rehearsal.md) |
+| What is still undecided? | [recovery-open-items.md](infra/vm/recovery-open-items.md) |
+
+**What is in the workspace**
+
+```
+apps/mobile      Flutter owner app          — the shell only; no product screen yet
+apps/admin       Next.js admin              — the shell only
+apps/api         NestJS API                 — composition root, no HTTP route until T02
+apps/worker      NestJS worker              — separately runnable, never imports the API
+packages/server-core     shared modules + the provider ports (ADR-0004)
+packages/design-tokens   generated TypeScript tokens
+```
+
+**Design tokens are generated, never hand-written.**
+`workspace/plan/01-design/tokens.json` is the single source. `make tokens`
+regenerates both targets — `packages/design-tokens/src/tokens.ts` and
+`apps/mobile/lib/core/design/generated/design_tokens.dart` — and then asserts
+zero drift. Editing either generated file by hand will fail the check.
+
+**Bangla and English** shell copy lives in `apps/mobile/lib/l10n/*.arb` and is
+resolved through `AppLocalizations`. The generated Dart is not versioned;
+`flutter pub get` recreates it.
+
+**Running a shell locally**
+
+```bash
+make dev-api      # NestJS API
+make dev-worker   # NestJS worker (separate process, by design)
+make dev-admin    # Next.js admin
+make dev-mobile   # Flutter owner app
+```

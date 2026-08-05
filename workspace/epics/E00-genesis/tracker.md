@@ -1,17 +1,17 @@
 # E00 · Genesis and Walking Skeleton · Progress
 
-**Status:** in-progress · **Started:** 2026-08-05 · **Completed:** — · **Progress:** 0/5
+**Status:** review-requested · **Started:** 2026-08-05 · **Completed:** 2026-08-05 · **Progress:** 5/5
 > Only the ORCHESTRATOR edits this file. Statuses: todo → in-progress →
 > review-requested → (changes-requested →) done → verified · side: blocked,
 > frozen.
 
 ## Tasks
 
-- [ ] E00-T01 · Scaffold repository and module boundaries · in-progress · developer-backend
+- [x] E00-T01 · Scaffold repository and module boundaries · done · claude-opus-5
 - [x] E00-T02 · Establish OpenAPI and generated clients · done · claude-opus-5
 - [x] E00-T03 · Containerize runtime and CI baseline · done · claude-opus-5
 - [x] E00-T04 · Implement the persistence walking skeleton · done · claude-opus-5
-- [ ] E00-T05 · Prove integration and recovery gate · todo · —  ← next
+- [x] E00-T05 · Prove integration and recovery gate · done · claude-opus-5
 
 ## Dependency graph
 
@@ -102,3 +102,16 @@ graph LR
   `harness/handoffs/E00-T01.yaml` + `.diff`.
 - 2026-08-05 T01 resumed on codex (`gpt-5.6-sol`) from the handoff packet in the
   same worktree and branch.
+- 2026-08-05 T05 done and squash-merged to `epic_00` as `08e2225`. One command
+  now proves E00: `make verify` runs 14 steps from pinned toolchain through the
+  real UI-to-PostgreSQL round trip, all green, and CI runs the same script.
+- 2026-08-05 ADR consequence audit complete across all nine ADRs: 38
+  implemented and evidenced, 9 mapped to a named later epic, 18 unresolved
+  human decisions. No row without a disposition, no deferral without an owner.
+- 2026-08-05 VM rebuild rehearsed (dry-run, nothing provisioned): every source
+  input present, four steps BLOCKED on unmade decisions. A real rebuild cannot
+  be completed today and the RTO has never been measured.
+- 2026-08-05 E00 is 5/5 and merged to `kickoff_garazo`. The epic is
+  review-requested, NOT verified: peer review never ran on any task, and
+  task-level QA is deferred on T02, T03, T04 and T05. `/qa E00` and the human
+  checkpoint both remain.

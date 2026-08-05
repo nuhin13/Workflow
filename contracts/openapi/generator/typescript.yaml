@@ -1,0 +1,26 @@
+# E00-T02 · TypeScript client generation.
+# Values here exist to make output DETERMINISTIC: the drift check regenerates
+# into a clean tree and fails on any diff, so anything version- or date-derived
+# must stay switched off.
+generatorName: typescript-fetch
+inputSpec: contracts/openapi/garazo.v1.yaml
+outputDir: packages/api-client-typescript/src/generated
+additionalProperties:
+  npmName: "@garazo/api-client-typescript"
+  supportsES6: true
+  withoutRuntimeChecks: false
+  typescriptThreePlus: true
+  # No package.json / tsconfig — the workspace owns those, and generating them
+  # would put a second, drifting copy of our toolchain config in the tree.
+  withInterfaces: false
+globalProperties:
+  models: ""
+  apis: ""
+  supportingFiles: ""
+  modelDocs: "false"
+  apiDocs: "false"
+  modelTests: "false"
+  apiTests: "false"
+# Keeps the generator version stamp out of the output so regeneration on a
+# machine with a different CLI build does not produce a spurious diff.
+enablePostProcessFile: false

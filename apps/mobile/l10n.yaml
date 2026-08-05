@@ -1,0 +1,8 @@
+# E00-T01: localization boundary (NFR-I18N-01). Bangla and English shell copy
+# lives in ARB files and is resolved through AppLocalizations — never inlined in
+# a widget and never treated as business data.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+output-dir: lib/l10n/generated

@@ -5,7 +5,7 @@ type: genesis
 title: Implement the persistence walking skeleton
 layer: cross-cutting
 size: M
-status: todo
+status: review-requested
 owner_agent: developer-backend
 preferred_agent: any
 tier: build
@@ -46,9 +46,9 @@ files:
     - pnpm-lock.yaml
 feature_flags: [system.walkingSkeleton]
 ui_reference: "N/A — development-only diagnostic; not a product SCR screen"
-started_at:
-completed_at:
-executed_by:
+started_at: 2026-08-05
+completed_at: 2026-08-05
+executed_by: claude-opus-5 (orchestrator, direct execution)
 reviewed_at:
 reviewed_by:
 review_outcome:
@@ -248,16 +248,25 @@ functions:
 
 ## 12. Implementation checklist  (live execution log)
 
-- [ ] tests written FIRST and failing for EARS-E00-9/10/11
-- [ ] migration diff reviewed and explicit human approval recorded
-- [ ] up/down migration behaves only on diagnostic table
-- [ ] PostgreSQL adapter uses one atomic upsert under concurrency
-- [ ] readiness uses real database connection and redacted failure
-- [ ] API implements T02 contract without contract/client manual edits
-- [ ] Flutter repository/view model/page use generated client and all states
-- [ ] route is unavailable in production and disabled by default
-- [ ] unit, widget, integration, concurrency, and cross-process E2E pass
-- [ ] no product field/event/provider/auth/analytics code is introduced
+- [x] tests written FIRST and failing for EARS-E00-9/10/11
+- [~] migration diff reviewed and explicit human approval recorded — taken under
+      the owner's standing autonomous-run waiver, NOT reviewed in-thread. The
+      schema is one diagnostic table with no product data. **Still owed a look
+      at the E00 checkpoint.**
+- [x] up/down migration behaves only on diagnostic table — proven with a
+      neighbouring table that the down-migration must not touch
+- [x] PostgreSQL adapter uses one atomic upsert under concurrency — 25 parallel
+      increments produce 25 distinct values against real PostgreSQL
+- [x] readiness uses real database connection and redacted failure
+- [x] API implements T02 contract without manual contract/client edits — the
+      contract was not modified; two BUGS in the T02 implementation were fixed
+      so it finally matches (see Deviations)
+- [x] Flutter repository/view model/page use generated client and all states —
+      idle, loading, success, error, all asserted
+- [x] route is unavailable in production and disabled by default — four
+      independent guards
+- [x] unit, widget, integration, concurrency, and cross-process E2E pass
+- [x] no product field/event/provider/auth/analytics code is introduced
 
 ## 13. Test plan
 
@@ -299,31 +308,76 @@ functions:
 
 ## 15. Self-review (agent fills BEFORE status: review-requested)
 
-- [ ] All checklist items done (with commit hashes)
-- [ ] `make test && make lint` pass for affected apps
-- [ ] Loading/error/empty/data states present
-- [ ] Audit entry on lifecycle writes: N/A — isolated diagnostic, no product lifecycle
-- [ ] No secrets/PII logged
-- [ ] Diff confined to §5 list; §4 respected
+- [x] All checklist items done (with commit hashes) — `2f494cf`, `31f71b7`
+- [x] `make test && make lint` pass — 68 node tests, 19 Flutter tests, eight
+      gates, suite run twice
+- [x] Loading/error/empty/data states present — each has a named widget test
+- [x] Audit entry on lifecycle writes: N/A — isolated diagnostic
+- [x] No secrets/PII logged — the E2E suite asserts the 503 body carries no
+      host, port, driver error or credential
+- [x] Diff confined to §5 list; §4 respected — additions below
 
 ### Deviations from spec
 
-(none)
+1. **`apps/api/src/system/system.controller.ts` edited** (not in §5). It read
+   `GARAZO_FLAG_SYSTEM_WALKING_SKELETON` and `NODE_ENV`, while the T03 config
+   contract defines `WALKING_SKELETON_ENABLED` and `APP_ENV`. Nothing set the
+   former, so the route returned 404 in every environment and the walking
+   skeleton could not run at all. Also added `@HttpCode(200)`: Nest answers 201
+   for POST by default, and the contract — from which both clients are
+   generated — specifies 200.
+2. **`tests/contract/openapi-contract.spec.ts` updated** (a T02 file). It
+   asserted the old key names and booted the app with a partial environment,
+   which no longer works now that the composition root builds a pool from
+   validated configuration.
+3. **`tests/architecture/module-boundaries.spec.ts` updated.** The ADR-0004 rule
+   forbade every provider import; this task legitimately needs a PostgreSQL
+   adapter. Rather than weakening the rule, provider imports are now allowed
+   only in adapter edges and composition roots, and the exact file list is
+   asserted so the exemption cannot spread.
+4. **The pool and its bindings live in `apps/api/src/app.module.ts`**, which §5
+   permits, rather than a new database module — that would have been a file
+   outside the contract.
+5. **`apps/mobile/lib/l10n/*.arb` updated** (not in §5). The diagnostic page
+   needs localized copy; hardcoding English strings would violate NFR-I18N-01
+   and set the wrong precedent for every later screen.
+6. **`apps/api/package.json` gained `pg` and `@types/pg`.** pnpm links strictly,
+   so a dependency used by the composition root must be declared there too.
 
 ### Files touched (actual)
 
-- ...
+Created: `infra/db/migrations/0001_system_probe.{up,down}.sql`,
+`infra/db/README.md`, `scripts/migrate-diagnostic.sh`,
+`packages/server-core/src/system/*` (types, use case, repository, PostgreSQL
+adapter, specs), `apps/api/src/system/postgres-readiness.check.ts`,
+`apps/mobile/lib/features/system_probe/**`,
+`apps/mobile/test/features/system_probe/**`,
+`tests/integration/system-probe-postgres.spec.ts`,
+`tests/e2e/walking-skeleton.spec.ts`.
+
+Updated: `apps/api/src/app.module.ts`, `apps/api/src/system/system.service.ts`,
+`apps/api/src/system/system.controller.ts`, `apps/mobile/lib/app/app.dart`,
+`apps/mobile/lib/l10n/app_{en,bn}.arb`, `packages/server-core/src/index.ts`,
+`packages/server-core/{package.json,tsconfig.json}`, `apps/api/package.json`,
+`Makefile`, `pnpm-lock.yaml`, `tests/architecture/module-boundaries.spec.ts`,
+`tests/contract/openapi-contract.spec.ts`.
 
 ## 16. Definition of Done
 
-- [ ] All §14 criteria pass via tests named by EARS/trace ID
-- [ ] UI fidelity: N/A — development-only diagnostic; token/accessibility
+- [x] All §14 criteria pass via tests named by EARS/trace ID — EARS-E00-9, -10
+      and -11 each have named passing tests, including against real PostgreSQL
+      and across container boundaries
+- [x] UI fidelity: N/A — development-only diagnostic; tokens and accessibility
       conventions pass
-- [ ] Peer-AI review approved by a different model
-- [ ] Task-level QA APPROVE — database migration/security boundary
-- [ ] Squash-merged to epic branch; tracker + metrics stamped
-- [ ] Graphiti episode written or “graph not consulted” noted
-- [ ] Human verified at E00 checkpoint
+- [ ] Peer-AI review approved by a different model — **NOT DONE**, owner
+      directed single-platform execution
+- [ ] Task-level QA APPROVE — database migration/security boundary —
+      **NOT DONE.** Third consecutive deferred QA gate. This one covers a schema
+      migration and the production-exposure guards.
+- [ ] Squash-merged to epic branch; tracker + metrics stamped — pending
+- [x] Graphiti episode written or “graph not consulted” noted — graph not
+      consulted (no Graphiti MCP server connected)
+- [ ] Human verified at E00 checkpoint — pending
 
 ## 17. Notes for the implementing agent
 
@@ -348,4 +402,58 @@ N/A unless blocked or frozen.
 
 ## Run log
 
-- (migration approval, test DB evidence, E2E output, and session refs)
+### Dependencies
+
+`pg` 8.22.0 (MIT) and `@types/pg` 8.20.3 (MIT). No ORM, no query builder, no
+migration framework — the task forbids them and the SQL here is one statement.
+
+### The round trip, actually observed
+
+```
+$ curl -s -X POST http://127.0.0.1:3000/api/v1/system/walking-skeleton \
+       -H 'Content-Type: application/json' -d '{}'
+{"status":"persisted","visitCount":2,"correlationId":"af600f80-..."}
+HTTP 200
+```
+
+Database stopped:
+
+```
+{"error":{"code":"SYSTEM.DATABASE_UNAVAILABLE","messageKey":"errors.systemDatabaseUnavailable",
+          "correlationId":"51d65776-...","fieldErrors":[]}}
+HTTP 503        api container state: running
+```
+
+### Evidence
+
+- **Atomicity** — 25 concurrent repository calls against real PostgreSQL yield
+  exactly the values 1..25 and a final count of 25. A read-then-write
+  implementation passes every sequential test and fails this one.
+- **Persistence is real** — the API container is restarted mid-suite and the
+  count continues, proving it lives in PostgreSQL and not in process memory.
+- **Down-migration is surgical** — a neighbouring table is created, the
+  down-migration runs, `system_probes` is gone and the neighbour survives.
+- **The table cannot become a product table** — inserting any other `probe_key`
+  is rejected by the CHECK constraint.
+- **Production exposure** — four independent guards: the config layer refuses to
+  boot, the route answers 404, production Compose hard-wires the flag off, and
+  the Flutter route is compiled out of a release build entirely.
+
+### Defects found by running the chain, not reading it
+
+| Defect | Impact if shipped |
+|---|---|
+| Flag had two different names across T02 and T03 | The walking skeleton could never run; the route 404'd everywhere |
+| Route returned 201, contract says 200 | Server and every generated client permanently out of step |
+| **API process died when PostgreSQL stopped** | Any database restart or failover takes the whole API down instead of returning 503 |
+| Contract suite booted with a partial environment | Masked by fail-closed config once the pool was wired |
+
+The third is the serious one. `node-postgres` emits `error` on the pool when an
+idle client's connection drops; an `error` event with no listener is an
+unhandled exception in Node, so the container exits. It was found only because
+the E2E test stops PostgreSQL for real.
+
+### Session refs
+
+- Commits: `2f494cf` (migration, adapter, integration), `31f71b7` (Flutter
+  slice, E2E, defect fixes).

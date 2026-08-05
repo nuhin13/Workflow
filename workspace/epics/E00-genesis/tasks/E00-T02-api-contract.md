@@ -5,7 +5,7 @@ type: genesis
 title: Establish OpenAPI and generated clients
 layer: cross-cutting
 size: M
-status: todo
+status: review-requested
 owner_agent: developer-backend
 preferred_agent: any
 tier: build
@@ -46,9 +46,9 @@ files:
     - pnpm-lock.yaml
 feature_flags: [system.walkingSkeleton]
 ui_reference: "N/A — contract and security boundary; no product UI"
-started_at:
-completed_at:
-executed_by:
+started_at: 2026-08-05
+completed_at: 2026-08-05
+executed_by: claude-opus-5 (orchestrator, direct execution)
 reviewed_at:
 reviewed_by:
 review_outcome:
@@ -239,15 +239,26 @@ No UI changes. Generated clients compile but are not invoked until T04.
 
 ## 12. Implementation checklist  (live execution log)
 
-- [ ] tests written FIRST and failing for EARS-E00-3/4/5
-- [ ] generator exact version/license human-approved
-- [ ] canonical contract validates
-- [ ] Dart and TypeScript clients generated deterministically
-- [ ] API error/correlation behavior implemented and redacted
-- [ ] liveness/readiness endpoints match contract
-- [ ] access/grant types are separate and provider-neutral
-- [ ] module/provider architecture tests reject forbidden imports
-- [ ] generated-client drift test passes from clean tree
+- [x] tests written FIRST and failing for EARS-E00-3/4/5 — the architecture,
+      contract and drift suites were authored against the intended behaviour and
+      each failed before its implementation landed
+- [~] generator exact version/license human-approved — OpenAPI Generator 7.24.0
+      (Apache-2.0), pinned in `openapitools.json`, plus `@types/express` (MIT)
+      and `http` ^1.6.0 (BSD-3-Clause) required by the generated Dart client.
+      Taken under the owner's standing pre-approval for this run, NOT reviewed
+      in-thread; carried to the E00 checkpoint.
+- [x] canonical contract validates — `openapi-generator-cli validate`: no issues
+- [x] Dart and TypeScript clients generated deterministically — regeneration is
+      byte-identical; proven by `test_ADR_0008_generated_tree_has_zero_drift`
+- [x] API error/correlation behavior implemented and redacted —
+      `test_EARS_E00_4_error_envelope_leaks_no_internal_detail`
+- [x] liveness/readiness endpoints match contract — verified over real HTTP
+- [x] access/grant types are separate and provider-neutral —
+      `test_ADR_0007_identity_session_owner_grant_admin_scope_are_distinct`
+- [x] module/provider architecture tests reject forbidden imports —
+      `test_ADR_0002_forbidden_module_import_fails`,
+      `test_ADR_0004_domain_code_has_no_provider_sdk_import`
+- [x] generated-client drift test passes from clean tree — `make contract`
 
 ## 13. Test plan
 
@@ -285,30 +296,80 @@ No UI changes. Generated clients compile but are not invoked until T04.
 
 ## 15. Self-review (agent fills BEFORE status: review-requested)
 
-- [ ] All checklist items done (with commit hashes)
-- [ ] `make test && make lint` pass for affected apps
-- [ ] Loading/error/empty states: N/A — no UI
-- [ ] Audit entry on lifecycle writes: N/A — no lifecycle write
-- [ ] No secrets/PII logged
-- [ ] Diff confined to §5 list; §4 respected
+- [x] All checklist items done (with commit hashes) — `4dcc455` (contract and
+      generated clients), `941c28f` (access boundary, error envelope, system
+      routes). The dependency approval is pre-approved rather than reviewed.
+- [x] `make test && make lint` pass for affected apps — 25 node tests, 9 Flutter
+      tests, ESLint and `flutter analyze` clean
+- [x] Loading/error/empty states: N/A — no UI
+- [x] Audit entry on lifecycle writes: N/A — no lifecycle write
+- [x] No secrets/PII logged — asserted, not assumed: error bodies are checked
+      for stack markers, absolute paths, `node_modules` and datastore names
+- [x] Diff confined to §5 list; §4 respected — three additions listed below
 
 ### Deviations from spec
 
-(none)
+1. **`.prettierignore` added** (not in §5). Prettier was reformatting the
+   generated clients, so `make format` and `make contract` each undid the other
+   and neither could be green at the same time. The generated trees, the
+   generated l10n and `next-env.d.ts` are now excluded. Verified stable across
+   repeated runs in both orders.
+2. **`openapitools.json` added** (not in §5). It is how the generator version is
+   pinned; without it the CLI resolves a version at runtime and output would not
+   be reproducible across machines.
+3. **Two dependencies beyond the generator**: `@types/express` (MIT) for the API,
+   and `http` ^1.6.0 (BSD-3-Clause) for the mobile app because the generated Dart
+   client is written against `package:http`. Neither is a capability choice.
+4. **`x-enum-varnames` added to `ErrorCode`.** The dotted wire values are fixed by
+   §7 and unchanged, but without explicit member names the generator emits Dart
+   identifiers like `sYSTEMPeriodNOTREADY`.
+5. **The generate script strips the generator's standalone-package files**
+   (`.gitignore`, `pubspec.yaml`, `package.json`, `tsconfig*`, `.travis.yml`,
+   `git_push.sh`, `README.md`). The emitted `.gitignore` would have excluded the
+   generated clients from version control, which would make the drift gate
+   vacuous on a fresh clone.
+6. **`strictNullChecks` is off for `packages/api-client-typescript` only.** The
+   generator's `runtime.ts` does not compile under it and hand-editing generated
+   code is forbidden by the drift gate. Confined to that package; consumers still
+   get fully typed models and the rest of the repository stays strict.
 
 ### Files touched (actual)
 
-- ...
+Created: `contracts/openapi/garazo.v1.yaml`,
+`contracts/openapi/generator/{dart,typescript}.yaml`,
+`scripts/{generate-api-clients,check-api-contract}.sh`,
+`packages/api-client-typescript/{package.json,tsconfig.json,src/index.ts,src/generated/**}`,
+`apps/mobile/lib/core/api/generated/**`,
+`apps/api/src/common/errors/{api-error.ts,api-error.filter.ts}`,
+`apps/api/src/common/request/{request-context.ts,request-context.middleware.ts}`,
+`apps/api/src/system/{system.controller,system.service,system.module}.ts`,
+`packages/server-core/src/access/{access-context,owner-money-grant,admin-scope}.ts`,
+`tests/architecture/module-boundaries.spec.ts`,
+`tests/contract/{openapi-contract,generated-client-drift}.spec.ts`,
+`apps/mobile/test/core/api/generated_client_test.dart`,
+`.prettierignore`, `openapitools.json`.
+
+Updated: `apps/api/src/app.module.ts`, `apps/api/package.json`,
+`apps/mobile/{pubspec.yaml,pubspec.lock,analysis_options.yaml}`,
+`packages/server-core/src/index.ts`, `package.json`, `pnpm-lock.yaml`,
+`pnpm-workspace.yaml`, `Makefile`.
 
 ## 16. Definition of Done
 
-- [ ] All §14 criteria pass via tests named by EARS/trace ID
-- [ ] UI fidelity: N/A — no UI
-- [ ] Peer-AI review approved by a different model
-- [ ] Task-level QA APPROVE — security/authorization contract task
-- [ ] Squash-merged to epic branch; tracker + metrics stamped
-- [ ] Graphiti episode written or “graph not consulted” noted
-- [ ] Human verified at E00 checkpoint
+- [x] All §14 criteria pass via tests named by EARS/trace ID — EARS-E00-3, -4
+      and -5 each have named passing tests
+- [x] UI fidelity: N/A — no UI
+- [ ] Peer-AI review approved by a different model — **NOT DONE.** The owner
+      directed single-platform execution.
+- [ ] Task-level QA APPROVE — security/authorization contract task —
+      **NOT DONE and this one matters.** T02 defines the authorization
+      boundary, so the spec requires an independent QA pass. It is deferred, not
+      satisfied, and must run before E01 builds authentication on top of these
+      types.
+- [ ] Squash-merged to epic branch; tracker + metrics stamped — pending
+- [x] Graphiti episode written or “graph not consulted” noted — graph not
+      consulted (no Graphiti MCP server connected)
+- [ ] Human verified at E00 checkpoint — pending
 
 ## 17. Notes for the implementing agent
 
@@ -333,4 +394,59 @@ N/A unless blocked or frozen.
 
 ## Run log
 
-- (contract version, generator version, checks, and session refs)
+- Contract: `contracts/openapi/garazo.v1.yaml`, OpenAPI 3.0.3, info.version 1.0.0.
+- Generator: OpenAPI Generator **7.24.0** (Apache-2.0) via
+  `@openapitools/openapi-generator-cli` 2.40.1, pinned in `openapitools.json`.
+  Requires a JVM; Java 23.0.1 is present locally.
+- New dependencies: `@types/express` (MIT, apps/api devDependency),
+  `http` ^1.6.0 (BSD-3-Clause, apps/mobile — required by the generated client).
+
+### Verification (every command actually executed)
+
+```
+make toolchain   all pinned versions match
+make tokens      design-token targets match tokens.json
+make contract    contract valid, both generated clients clean
+make lint        eslint clean · flutter analyze: No issues found!
+make format      All matched files use Prettier code style!
+make build       6 workspace projects built
+make test        25 node tests + 9 Flutter tests, all passing
+```
+
+Idempotence was checked explicitly: `format → contract → tokens → format` was run
+twice in sequence and every step stayed green, so the generators and the
+formatter no longer contend.
+
+### Behaviour proven over real HTTP
+
+The contract suite boots the actual Nest application on an ephemeral port:
+
+- `/live` returns exactly `{status, correlationId}` and echoes the header.
+- A safe client correlation id is echoed; an over-long or empty one is replaced.
+  Control characters are rejected by the resolver itself, not merely by the HTTP
+  client refusing to send them.
+- `/ready` with no bound check returns 503 `SYSTEM.NOT_READY` in the standard
+  envelope — the genuine unavailable path, not a simulated one.
+- An unknown route, a rejected body and an unavailable dependency all return the
+  same envelope shape, and none contains a stack marker, an absolute path,
+  `node_modules`, or a datastore name.
+- The probe returns 503 `SYSTEM.DATABASE_UNAVAILABLE` rather than fabricating a
+  success while T04 has bound no implementation.
+- `isWalkingSkeletonEnabled` is false in production even with the flag on, false
+  when the flag is absent, and false when it is 'false'.
+
+### Notable decisions
+
+- The probe checks its environment gate BEFORE validating the body. Validating
+  first would let a caller distinguish a disabled route from a nonexistent one
+  by the error returned (EARS-E00-5).
+- `ApiErrorFilter` uses a bare `@Catch()`. Catching only our own error type
+  would let framework and runtime errors escape in their default shapes, which
+  is precisely where internal detail leaks.
+- Readiness answers `down` when no check is bound. Reporting ready without
+  having asked anything would be a false green.
+
+### Session refs
+
+- Commits: `4dcc455` (contract, generator configs, generated clients),
+  `941c28f` (access boundary, error envelope, system routes, Prettier fix).

@@ -1,0 +1,23 @@
+# E00-T02 · Dart client generation for the Flutter owner app.
+# Same determinism rules as the TypeScript config: the drift check regenerates
+# into a clean tree and fails on any diff.
+generatorName: dart
+inputSpec: contracts/openapi/garazo.v1.yaml
+outputDir: apps/mobile/lib/core/api/generated
+additionalProperties:
+  pubName: garazo_api_client
+  pubLibrary: garazo_api_client.api
+  pubDescription: "Generated Garazo API client. Do not edit by hand."
+  pubVersion: 1.0.0
+  # The generated tree lives INSIDE apps/mobile, so it must not carry its own
+  # pubspec — the app's pubspec is authoritative.
+  useEnumExtension: true
+globalProperties:
+  models: ""
+  apis: ""
+  supportingFiles: ""
+  modelDocs: "false"
+  apiDocs: "false"
+  modelTests: "false"
+  apiTests: "false"
+enablePostProcessFile: false
