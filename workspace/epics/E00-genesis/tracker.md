@@ -1,13 +1,13 @@
 # E00 · Genesis and Walking Skeleton · Progress
 
-**Status:** todo · **Started:** — · **Completed:** — · **Progress:** 0/5
+**Status:** in-progress · **Started:** 2026-08-05 · **Completed:** — · **Progress:** 0/5
 > Only the ORCHESTRATOR edits this file. Statuses: todo → in-progress →
 > review-requested → (changes-requested →) done → verified · side: blocked,
 > frozen.
 
 ## Tasks
 
-- [ ] E00-T01 · Scaffold repository and module boundaries · todo · —
+- [ ] E00-T01 · Scaffold repository and module boundaries · in-progress · developer-backend
 - [ ] E00-T02 · Establish OpenAPI and generated clients · todo · —
 - [ ] E00-T03 · Containerize runtime and CI baseline · todo · —
 - [ ] E00-T04 · Implement the persistence walking skeleton · todo · —

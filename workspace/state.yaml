@@ -81,10 +81,10 @@ phases:
 epics:
   - id: E00
     title: Genesis and Walking Skeleton
-    status: specced
+    status: in-progress
     runnable_flow: "Start the Compose stack and run the diagnostic Flutter UI through the API to PostgreSQL and back with green CI."
     tasks:
-      - { id: E00-T01, title: "Scaffold repository and module boundaries", status: todo, owner: null }
+      - { id: E00-T01, title: "Scaffold repository and module boundaries", status: in-progress, owner: developer-backend }
       - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: todo, owner: null }
       - { id: E00-T03, title: "Containerize runtime and CI baseline", status: todo, owner: null }
       - { id: E00-T04, title: "Implement the persistence walking skeleton", status: todo, owner: null }
@@ -220,3 +220,7 @@ history:
     event: "ADR-0006 accepted by the project owner as Option 3: one hardened VM with Docker Compose plus managed PostgreSQL and private object storage; technical plan v1 decided with all nine ADRs accepted; advanced to dev-plan"
   - at: "2026-07-30T17:34:39+06:00"
     event: "approved development plan v1, E00 specification, lean task routing, and the protected E00 product write-scope bootstrap; seeded E00–E15 and advanced to build with E00 awaiting formal analysis"
+  - at: "2026-08-05T00:00:00+06:00"
+    event: "project owner authorized an autonomous continuous build run: no per-task human check-in, ambiguities resolved by simplest spec-faithful default and logged, and the medium-profile db_schema_migration / auth_or_payment_code / new_dependency gates pre-approved for the run; release to main and real credentials remain owner-held"
+  - at: "2026-08-05T00:05:00+06:00"
+    event: "started E00 build: branch epic_00 cut from kickoff_garazo, E00-T01 dispatched to developer-backend in worktree ../wt-E00-T01 on epic_00_task_01; E01 and E02 epic specification dispatched in parallel to team-lead"
