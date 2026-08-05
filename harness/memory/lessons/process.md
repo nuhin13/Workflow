@@ -78,3 +78,26 @@
   name those artifacts so they can be re-approved.
 - recurrence: 1
 - status: open
+
+## L-process-010 — Fanned out three heavy agents with no quota headroom check
+- date: 2026-08-05 | source: Garazo /build E00 autonomous run
+- situation: the orchestrator dispatched three agents at once (E00-T01 implementation plus
+  E01 and E02 epic specification) at the start of a long autonomous run. All three died
+  within minutes on the same claude-code session rate limit, resetting ~19 hours later.
+  E01 produced nothing, E02 produced an epic.md but none of its 15 task specs, and T01 had
+  a partial scaffold with no tests written. Nothing was lost only because the work was
+  WIP-committed and packetized afterwards.
+- root cause: skills/rate-limit-handoff says never start a task with less headroom than its
+  token estimate, but the check was never run. Three concurrent agents burn the shared
+  session window roughly three times as fast, so parallelism converted a survivable single
+  freeze into a simultaneous three-way freeze at the worst moment — before any agent had
+  reached a committable checkpoint.
+- fix applied: before dispatching, check window headroom (statusline JSON /
+  harness/orchestrator/ratelimit_guard.py) and compare it against the SUM of the planned
+  agents' token_estimates, not one task's. Stagger dispatch so agent N reaches a
+  WIP-committable checkpoint before agent N+1 starts. On a long unattended run, verify the
+  fallback platform is authenticated FIRST (a 30-second `codex exec` smoke test) rather than
+  discovering it after the freeze. Instruct long-running agents to WIP-commit early and often
+  so a freeze always lands on a committed boundary.
+- recurrence: 1
+- status: open

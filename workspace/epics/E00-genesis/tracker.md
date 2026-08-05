@@ -51,3 +51,12 @@ graph LR
 - 2026-07-30 Fresh-context `/analyze E00` found and corrected the request-body
   mismatch, lockfile collision, and MoSCoW inflation; all consistency checks
   now pass and await the human analyze gate.
+- 2026-08-05 T01 dispatched to developer-backend on claude-code in worktree
+  `../wt-E00-T01` (branch `epic_00_task_01`).
+- 2026-08-05 T01 frozen mid-task by a claude-code session rate limit. Partial
+  scaffold WIP-committed as `9dc905d` (root workspace config, eslint/prettier,
+  `packages/server-core` module boundary + four provider ports,
+  `packages/design-tokens` manifest). No test was written or run. Handoff packet:
+  `harness/handoffs/E00-T01.yaml` + `.diff`.
+- 2026-08-05 T01 resumed on codex (`gpt-5.6-sol`) from the handoff packet in the
+  same worktree and branch.

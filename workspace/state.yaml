@@ -224,3 +224,7 @@ history:
     event: "project owner authorized an autonomous continuous build run: no per-task human check-in, ambiguities resolved by simplest spec-faithful default and logged, and the medium-profile db_schema_migration / auth_or_payment_code / new_dependency gates pre-approved for the run; release to main and real credentials remain owner-held"
   - at: "2026-08-05T00:05:00+06:00"
     event: "started E00 build: branch epic_00 cut from kickoff_garazo, E00-T01 dispatched to developer-backend in worktree ../wt-E00-T01 on epic_00_task_01; E01 and E02 epic specification dispatched in parallel to team-lead"
+  - at: "2026-08-05T11:07:00+06:00"
+    event: "claude-code session rate limit terminated all three agents mid-run (resets 06:30 Asia/Dhaka 2026-08-06); froze per skills/rate-limit-handoff — WIP-committed E00-T01 partial scaffold (9dc905d) and E02 partial epic.md (34590e4), wrote handoff packets harness/handoffs/E00-T01.yaml, E01-spec.yaml, E02-spec.yaml"
+  - at: "2026-08-05T11:20:00+06:00"
+    event: "handed off to codex (gpt-5.6-sol, authenticated and verified): E00-T01 resumed in worktree ../wt-E00-T01 and E01 specification restarted on kickoff_garazo; E02 task specs remain queued"
