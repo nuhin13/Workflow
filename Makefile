@@ -7,7 +7,8 @@ LAYER ?=
 PLATFORM ?=
 
 .PHONY: next status review validate dashboard metrics metrics-json hooks help \
-        install toolchain tokens api contract lint format test build dev-api dev-worker dev-admin dev-mobile
+        install toolchain tokens api contract lint format test build \
+        up down verify scan dev-api dev-worker dev-admin dev-mobile
 
 # ── Harness / tracker ─────────────────────────────────────────────────────────
 next:        ## next executable task(s); make next PLATFORM=codex LAYER=frontend
@@ -56,6 +57,14 @@ test:        ## run the EARS contract suite and the Flutter widget tests
 	cd apps/mobile && flutter test
 build:       ## build every buildable entry point
 	pnpm --recursive --if-present run build
+up:          ## build and start the local development stack, wait for health
+	bash scripts/compose-up.sh
+down:        ## stop the local stack (named volumes are PRESERVED)
+	bash scripts/compose-down.sh
+verify:      ## full runtime smoke gate: build, start, health, non-root, log scan
+	bash scripts/verify-compose.sh
+scan:        ## scan tracked files for committed credentials
+	bash scripts/scan-secrets.sh
 dev-api:     ## run the NestJS API composition root
 	pnpm --filter @garazo/api run dev
 dev-worker:  ## run the NestJS worker composition root

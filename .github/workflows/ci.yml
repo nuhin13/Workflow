@@ -1,0 +1,157 @@
+# E00-T03 · pull-request CI.
+#
+# This workflow VERIFIES. It does not deploy, and it holds no deployment
+# credential: a pipeline that can reach production is a pipeline that can be
+# made to reach production by anyone who can open a pull request. Deployment is
+# the runbook in infra/vm/deploy-runbook.md, run deliberately by an operator.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, development]
+
+# Least privilege. Nothing here needs to write to the repository.
+permissions:
+  contents: read
+
+concurrency:
+  # A superseded run tells you about code nobody is merging any more.
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "24.4.0"
+  FLUTTER_VERSION: "3.44.0"
+
+jobs:
+  typescript:
+    name: TypeScript — lint, build, test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable pnpm
+        run: corepack enable pnpm
+
+      - name: Install
+        # --frozen-lockfile: CI must fail on an out-of-date lockfile rather than
+        # silently resolving different versions than a developer tested.
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify pinned toolchain
+        run: bash scripts/check-toolchain.sh
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm format
+
+      - name: Build
+        run: pnpm --recursive --if-present run build
+
+      - name: Test
+        run: pnpm test
+
+  contracts:
+    name: Contracts and architecture
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # The OpenAPI generator runs on the JVM.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - run: corepack enable pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: Design tokens have zero drift
+        run: pnpm check:tokens
+
+      - name: OpenAPI contract is valid and clients are clean
+        run: pnpm check:api
+
+  flutter:
+    name: Flutter — analyze and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - name: Resolve dependencies
+        working-directory: apps/mobile
+        # Also generates AppLocalizations, which analyze and test both need.
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: apps/mobile
+        run: flutter analyze
+
+      - name: Test
+        working-directory: apps/mobile
+        run: flutter test
+
+  security:
+    name: Secrets and dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The scan greps tracked files; a shallow clone is enough, but the
+          # full history is what makes a leaked-and-deleted credential visible.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: corepack enable pnpm
+
+      - name: Secret scan
+        run: bash scripts/scan-secrets.sh
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Dependency audit
+        # Advisory: a new critical advisory against a transitive dependency
+        # should not block an unrelated bug fix at 03:00. It is surfaced, and
+        # acting on it is a decision, not an automatic merge block.
+        continue-on-error: true
+        run: pnpm audit --audit-level high
+
+  runtime:
+    name: Container images and Compose smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build images and verify the stack becomes healthy
+        # Builds all three images, starts the stack, waits for health, checks
+        # the API answers, asserts non-root, greps logs for secret fixtures and
+        # confirms shutdown preserves the volume.
+        run: bash scripts/verify-compose.sh

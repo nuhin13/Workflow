@@ -5,7 +5,7 @@ type: genesis
 title: Containerize runtime and CI baseline
 layer: infra
 size: M
-status: todo
+status: review-requested
 owner_agent: devops
 preferred_agent: any
 tier: build
@@ -52,9 +52,9 @@ files:
     - pnpm-lock.yaml
 feature_flags: []
 ui_reference: "N/A — infrastructure task"
-started_at:
-completed_at:
-executed_by:
+started_at: 2026-08-05
+completed_at: 2026-08-05
+executed_by: claude-opus-5 (orchestrator, direct execution)
 reviewed_at:
 reviewed_by:
 review_outcome:
@@ -226,16 +226,29 @@ No UI changes.
 
 ## 12. Implementation checklist  (live execution log)
 
-- [ ] tests written FIRST and failing for EARS-E00-6/7/8
-- [ ] three non-root, multi-stage Dockerfiles build
-- [ ] production Compose contains exactly admin/API/worker application services
-- [ ] development Compose adds only test-compatible dependencies
-- [ ] configuration validation updates all launch paths and `.env.example`
-- [ ] logger redaction tests cover every prohibited field category
-- [ ] API/worker graceful shutdown and health behavior work
-- [ ] CI gates both languages, contracts, architecture, secrets, dependencies, images, and Compose smoke
-- [ ] supplier-neutral hardening/deploy/rebuild/rollback/runbook open items complete
-- [ ] no real secret, endpoint, supplier, production value, or destructive volume command exists
+- [x] tests written FIRST and failing for EARS-E00-6/7/8 — config, logger and
+      lifecycle specs were authored and red before their implementations
+      (`d3feb90`)
+- [x] three non-root, multi-stage Dockerfiles build — all three build and were
+      run; every container reports user `garazo` (`bf39730`)
+- [x] production Compose contains exactly admin/API/worker — asserted through
+      the docker CLI, plus a source scan for any datastore image
+- [x] development Compose adds only test-compatible dependencies — PostgreSQL
+      17, loopback-bound, named volume
+- [x] configuration validation updates all launch paths and `.env.example` —
+      api and worker entry points fail closed; a test cross-checks every key
+      against `.env.example`, both Compose files and the docs
+- [x] logger redaction tests cover every prohibited field category — OTP, PIN,
+      token, phone, password, connection string, and protected money
+- [x] API/worker graceful shutdown and health behavior work — idempotent,
+      timeout-bounded, marker written after bootstrap and cleared before close
+- [x] CI gates both languages, contracts, architecture, secrets, dependencies,
+      images, and Compose smoke (`72ecae7`)
+- [x] supplier-neutral hardening/deploy/rebuild/rollback runbooks with an
+      explicit open-items register — twelve unresolved decisions recorded
+- [x] no real secret, endpoint, supplier, production value, or destructive
+      volume command exists — `scan-secrets.sh` passes and a test asserts
+      `compose-down.sh` carries no `-v`
 
 ## 13. Test plan
 
@@ -276,30 +289,74 @@ No UI changes.
 
 ## 15. Self-review (agent fills BEFORE status: review-requested)
 
-- [ ] All checklist items done (with commit hashes)
-- [ ] `make test && make lint` pass for affected code
-- [ ] Loading/error/empty states: N/A — infrastructure
-- [ ] Audit entry on lifecycle writes: N/A — no lifecycle write
-- [ ] No secrets/PII logged
-- [ ] Diff confined to §5 list; §4 respected
+- [x] All checklist items done (with commit hashes) — `d3feb90`, `bf39730`,
+      `72ecae7`
+- [x] `make test && make lint` pass — 51 node tests, 9 Flutter tests, and all
+      eight gates green
+- [x] Loading/error/empty states: N/A — infrastructure
+- [x] Audit entry on lifecycle writes: N/A — no lifecycle write
+- [x] No secrets/PII logged — proven with seeded fixtures, and the running
+      stack's logs were scanned for them
+- [x] Diff confined to §5 list; §4 respected — additions listed below
 
 ### Deviations from spec
 
-(none)
+1. **`packages/runtime-config/src/lifecycle.ts` and `lifecycle.spec.ts` added**
+   (not in §5). §8 requires `installGracefulShutdown` and `markWorkerReady`;
+   they needed a home, and putting process lifecycle in `config.ts` would have
+   conflated validation with runtime behaviour.
+2. **`tests/infrastructure/compose-topology.spec.ts` added** (not in §5). §13
+   names infrastructure tests but §5 lists no file for them.
+3. **`apps/admin/next.config.ts` updated** (not in §5). The admin Dockerfile
+   needs Next's `output: 'standalone'`; without it the image would have to carry
+   the whole pnpm store.
+4. **No base-image digest pin.** The task asks for a pinned, reproducible
+   runtime. Images pin the `node:24.4-alpine` tag, which is weaker: a tag can be
+   repointed, so two "identical" deploys can differ. A digest must come from the
+   registry the project deploys from and **no registry has been chosen**
+   (ADR-0006 open item 4). I did not invent one — a fabricated digest is worse
+   than an honest tag pin, and a test now fails if any digest appears in a
+   Dockerfile without verification.
+5. **`scripts/check-api-contract.sh` (a T02 file) was rewritten.** It wiped and
+   regenerated the client trees in place, racing a concurrent `flutter analyze`.
+   Left alone it would fail CI intermittently forever.
+6. **`tests/contract/design-token-drift.spec.ts` (a T02 file) was updated.** The
+   residency test spawned entry points with no environment; since this task they
+   validate configuration before bootstrap, so that spawn is correctly refused.
+   Updated, and a fail-closed counterpart test added.
+7. **Resource limits and `WORKER_CONCURRENCY: 1` are placeholders**, not
+   measured values (open item 12).
 
 ### Files touched (actual)
 
-- ...
+Created: `.github/workflows/ci.yml`, `.dockerignore`, `.env.example`,
+`apps/{admin,api,worker}/Dockerfile`,
+`infra/compose/{compose.production.yaml,compose.development.yaml,README.md}`,
+`infra/vm/{hardening-checklist,deploy-runbook,rebuild-runbook,rollback-runbook,recovery-open-items}.md`,
+`docs/operations/{configuration,observability,third-party-services}.md`,
+`packages/runtime-config/**`,
+`scripts/{compose-up,compose-down,verify-compose,scan-secrets}.sh`,
+`tests/infrastructure/compose-topology.spec.ts`.
+
+Updated: `Makefile`, `apps/api/src/main.ts`, `apps/worker/src/main.ts`,
+`apps/admin/next.config.ts`, `apps/{api,worker}/package.json`, `package.json`,
+`pnpm-lock.yaml`, `pnpm-workspace.yaml`, `scripts/check-api-contract.sh`,
+`tests/contract/design-token-drift.spec.ts`.
 
 ## 16. Definition of Done
 
-- [ ] All §14 criteria pass via tests named by EARS/trace ID
-- [ ] UI fidelity: N/A — no UI
-- [ ] Peer-AI review approved by a different model
-- [ ] Task-level QA APPROVE — security/config/runtime foundation
-- [ ] Squash-merged to epic branch; tracker + metrics stamped
-- [ ] Graphiti episode written or “graph not consulted” noted
-- [ ] Human verified at E00 checkpoint
+- [x] All §14 criteria pass via tests named by EARS/trace ID — EARS-E00-6, -7
+      and -8 each have named passing tests, plus a live stack run
+- [x] UI fidelity: N/A — no UI
+- [ ] Peer-AI review approved by a different model — **NOT DONE**, owner
+      directed single-platform execution
+- [ ] Task-level QA APPROVE — security/config/runtime foundation —
+      **NOT DONE.** Deferred alongside T02's gate. This task sets the secret
+      handling, log redaction and production topology every later epic inherits.
+- [ ] Squash-merged to epic branch; tracker + metrics stamped — pending
+- [x] Graphiti episode written or “graph not consulted” noted — graph not
+      consulted (no Graphiti MCP server connected)
+- [ ] Human verified at E00 checkpoint — pending
 
 ## 17. Notes for the implementing agent
 
@@ -326,4 +383,64 @@ N/A unless blocked or frozen.
 
 ## Run log
 
-- (image digests, Compose evidence, security scan, and session refs)
+### Images
+
+Built locally from `infra/compose/compose.development.yaml`:
+`garazo-dev-api`, `garazo-dev-worker`, `garazo-dev-admin`. All multi-stage, all
+running as the non-root user `garazo`.
+
+**No digest is recorded**, deliberately. Digests are registry-scoped and no
+registry has been chosen (open item 4). Recording a locally built digest would
+imply a reproducibility guarantee that does not exist.
+
+### Live stack evidence (`scripts/verify-compose.sh`)
+
+```
+ok — development Compose is valid
+ok — production Compose is valid
+ok — production runs exactly admin, api and worker
+ok — every service reported healthy
+ok — API liveness responds
+ok — API readiness answers in the contract shape
+ok — api runs as 'garazo'
+ok — worker runs as 'garazo'
+ok — admin runs as 'garazo'
+ok — container logs contain no known secret fixture
+ok — the development database volume survived shutdown
+all runtime checks passed
+```
+
+That is a real Postgres + API + worker + admin stack starting, becoming healthy,
+serving HTTP, and shutting down without losing data.
+
+### Security scan
+
+`scripts/scan-secrets.sh`: no credential patterns in tracked files. The only
+credential-shaped string committed is `garazo-local-dev`, the documented local
+PostgreSQL placeholder, and a test asserts it never appears in the production
+topology.
+
+### Gates
+
+```
+make toolchain OK   make tokens OK   make contract OK   make lint OK
+make format    OK   make build  OK   make test     OK   make scan    OK
+```
+
+51 node tests + 9 Flutter tests. The full suite was run three consecutive times
+to confirm the parallel-execution race described in Deviations is gone.
+
+### Defects found by running rather than reading
+
+| Defect | Impact if shipped |
+|---|---|
+| pnpm 11 changed `deploy` semantics | Image build failed outright |
+| `pnpm deploy` emitted workspace deps as symlinks outside the bundle | Images built clean, then died on `require()` at container start |
+| Drift gate wiped generated trees in place, racing `flutter analyze` | Intermittent CI failures unrelated to the change under test |
+| Flutter suite assumed generated l10n existed | Every fresh clone fails until someone runs `pub get` |
+| Residency test spawned entry points with no environment | Would have masked the new fail-closed config behaviour |
+
+### Session refs
+
+- Commits: `d3feb90` (config, logger, lifecycle), `bf39730` (containers, Compose,
+  smoke gate), `72ecae7` (CI, runbooks, infrastructure tests).

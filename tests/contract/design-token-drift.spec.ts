@@ -37,7 +37,20 @@ function listFiles(path: string): string[] {
   });
 }
 
+/**
+ * Ensures the Flutter app's generated sources exist.
+ *
+ * AppLocalizations is generated from lib/l10n/*.arb by `flutter pub get` and is
+ * deliberately not versioned. On a fresh clone it does not exist yet, so
+ * `flutter analyze` fails for a reason that has nothing to do with the change
+ * under test. Generating it here makes the suite honest on a clean checkout.
+ */
+function ensureFlutterGeneratedSources(): void {
+  run('flutter', ['pub', 'get'], repositoryPath('apps/mobile'));
+}
+
 test('test_EARS_E00_1_each_entry_point_builds', () => {
+  ensureFlutterGeneratedSources();
   requirePaths([
     'apps/mobile/pubspec.yaml',
     'apps/mobile/lib/main.dart',
@@ -54,6 +67,7 @@ test('test_EARS_E00_1_each_entry_point_builds', () => {
 });
 
 test('test_EARS_E00_1_android_owner_shell_builds', () => {
+  ensureFlutterGeneratedSources();
   requirePaths([
     'apps/mobile/.metadata',
     'apps/mobile/android/app/build.gradle.kts',
@@ -154,10 +168,15 @@ test('test_NFR_A11Y_01_shell_has_named_root', () => {
  * indistinguishable from a healthy one in a build log — the worker did exactly
  * that until its event loop was held open explicitly.
  */
-async function bootsAndStaysAlive(entryPoint: string, settleMs = 4000): Promise<boolean> {
+async function bootsAndStaysAlive(
+  entryPoint: string,
+  env: NodeJS.ProcessEnv,
+  settleMs = 4000,
+): Promise<boolean> {
   const child = spawn(process.execPath, [entryPoint], {
     cwd: repositoryRoot,
     stdio: ['ignore', 'pipe', 'pipe'],
+    env: { ...process.env, ...env },
   });
 
   let exitedEarly = false;
@@ -180,14 +199,58 @@ test('test_EARS_E00_2_api_and_worker_stay_resident_as_separate_processes', async
 
   requirePaths(['apps/api/dist/main.js', 'apps/worker/dist/main.js']);
 
+  // Since E00-T03 both processes validate their whole environment before
+  // bootstrap, so a residency check must supply valid configuration. The
+  // fail-closed path is asserted separately below.
+  const baseEnv = {
+    APP_ENV: 'test',
+    LOG_LEVEL: 'error',
+    DATABASE_URL: 'postgres://garazo:local@127.0.0.1:5432/garazo',
+  };
+
   assert.equal(
-    await bootsAndStaysAlive('apps/api/dist/main.js'),
+    await bootsAndStaysAlive('apps/api/dist/main.js', {
+      ...baseEnv,
+      API_PORT: '3999',
+      WALKING_SKELETON_ENABLED: 'false',
+    }),
     true,
     'the API exited instead of staying resident',
   );
   assert.equal(
-    await bootsAndStaysAlive('apps/worker/dist/main.js'),
+    await bootsAndStaysAlive('apps/worker/dist/main.js', {
+      ...baseEnv,
+      WORKER_CONCURRENCY: '1',
+    }),
     true,
     'the worker exited instead of staying resident — its event loop is not held open',
   );
+});
+
+test('test_L_PROCESS_005_entry_points_refuse_to_start_without_configuration', async () => {
+  // The counterpart to the residency test: a process with no configuration must
+  // die immediately and name only the KEYS, never the values. Booting half
+  // configured is how a service fails later, in production, under load.
+  for (const entryPoint of ['apps/api/dist/main.js', 'apps/worker/dist/main.js']) {
+    const child = spawn(process.execPath, [entryPoint], {
+      cwd: repositoryRoot,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      // A bare environment: PATH only, so no ambient config leaks in.
+      env: { PATH: process.env.PATH ?? '' },
+    });
+
+    let output = '';
+    child.stdout.on('data', (chunk: Buffer) => {
+      output += chunk.toString();
+    });
+
+    const code = await new Promise<number | null>((resolve) => {
+      child.once('exit', (exitCode) => resolve(exitCode));
+    });
+
+    assert.notEqual(code, 0, `${entryPoint} started without configuration`);
+    assert.match(output, /invalid configuration/, `${entryPoint} did not report a config failure`);
+    assert.match(output, /APP_ENV/, `${entryPoint} did not name the missing key`);
+    assert.ok(!output.includes('postgres://'), 'a configuration value leaked into the output');
+  }
 });

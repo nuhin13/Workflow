@@ -1,0 +1,36 @@
+# Keep the build context small and secret-free. Anything listed here cannot be
+# copied into an image even by accident.
+
+# Never ship credentials or local environment files. .env.example is the only
+# environment file in the repository and it holds no real value.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jks
+*.keystore
+google-services.json
+
+.git
+.github
+node_modules
+**/node_modules
+**/dist
+**/build
+**/.next
+**/.dart_tool
+**/coverage
+
+# The harness and the product workspace are planning material, not runtime
+# inputs. They must never be baked into a production image.
+harness
+workspace
+docs
+infra/vm
+*.md
+!apps/*/README.md
+
+**/*.spec.ts
+**/*.test.ts
+tests

@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "format": "prettier --ignore-path .prettierignore --check \"{apps/admin,apps/api,apps/worker,packages,scripts,tests}/**/*.{ts,tsx,mjs,json}\" \"*.{json,mjs}\"",
     "format:write": "prettier --ignore-path .prettierignore --write \"{apps/admin,apps/api,apps/worker,packages,scripts,tests}/**/*.{ts,tsx,mjs,json}\" \"*.{json,mjs}\"",
-    "test": "node --test \"tests/**/*.spec.ts\"",
+    "test": "node --test \"tests/**/*.spec.ts\" \"packages/*/src/**/*.spec.ts\"",
     "generate:tokens": "node scripts/generate-design-tokens.mjs",
     "check:tokens": "node scripts/check-design-tokens.mjs",
     "check:toolchain": "bash scripts/check-toolchain.sh",

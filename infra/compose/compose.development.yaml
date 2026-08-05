@@ -1,0 +1,119 @@
+# E00-T03 · local development and integration stack.
+#
+# This file differs from production ON PURPOSE: it builds images from source and
+# adds a PostgreSQL container so the walking skeleton and integration tests have
+# a real database to talk to.
+#
+# That PostgreSQL is for local and CI use ONLY. Production uses a managed
+# database (ADR-0005/0006) and compose.production.yaml has no such service.
+# The credential below is a well-known local placeholder, not a secret.
+
+name: garazo-dev
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: garazo
+      # Local-only placeholder. Identical in every checkout, worthless to an
+      # attacker, and never used outside a developer machine or CI.
+      POSTGRES_PASSWORD: garazo-local-dev
+      POSTGRES_DB: garazo
+    ports:
+      # Bound to loopback so a laptop on a café network does not expose a
+      # database to the LAN.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      # Named volume so `compose down` keeps local development data. Losing a
+      # day of local seed data to a routine restart is a real cost.
+      - garazo-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U garazo -d garazo"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_ENV: development
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      API_PORT: 3000
+      DATABASE_URL: postgres://garazo:garazo-local-dev@postgres:5432/garazo
+      WALKING_SKELETON_ENABLED: "true"
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/v1/system/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    stop_grace_period: 15s
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: apps/worker/Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_ENV: development
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgres://garazo:garazo-local-dev@postgres:5432/garazo
+      WORKER_CONCURRENCY: 1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "process.exit(require('node:fs').existsSync('/tmp/garazo-worker-ready')?0:1)"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    stop_grace_period: 30s
+
+  admin:
+    build:
+      context: ../..
+      dockerfile: apps/admin/Dockerfile
+    restart: unless-stopped
+    environment:
+      APP_ENV: development
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PORT: 3001
+      API_BASE_URL: http://api:3000
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3001/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    stop_grace_period: 15s
+
+volumes:
+  garazo-postgres-data:
