@@ -15,6 +15,10 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  # Runtime required by the GENERATED API client
+  # (contracts/openapi/generator/dart.yaml). Not a capability choice: the
+  # openapi-generator dart template emits code against package:http.
+  http: ^1.6.0
   cupertino_icons: ^1.0.8
 
 dev_dependencies:

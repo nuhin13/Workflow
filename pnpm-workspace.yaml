@@ -6,3 +6,5 @@ allowBuilds:
   '@nestjs/core': false
   # unrs-resolver ships the native binding the ESLint import resolver needs.
   unrs-resolver: true
+  # Downloads the pinned OpenAPI Generator JAR on install.
+  '@openapitools/openapi-generator-cli': true

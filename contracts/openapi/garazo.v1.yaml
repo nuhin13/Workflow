@@ -1,0 +1,283 @@
+openapi: 3.0.3
+info:
+  title: Garazo API
+  version: 1.0.0
+  description: |
+    Canonical Garazo application contract (ADR-0008). This file is the single
+    source of truth for every HTTP surface; the Dart and TypeScript clients are
+    GENERATED from it and are never hand-edited.
+
+    E00 defines infrastructure routes only. No product entity, payload, or
+    authorization surface is authorized here — those arrive with their own
+    epics. A workshop identifier supplied by a client is NEVER authorization
+    (NFR-SEC-01).
+  license:
+    name: UNLICENSED
+servers:
+  - url: /
+    description: Same-origin
+
+tags:
+  - name: system
+    description: Infrastructure liveness, readiness, and the gated E00 probe.
+
+paths:
+  /api/v1/system/live:
+    get:
+      tags: [system]
+      operationId: systemLive
+      summary: Process liveness
+      description: |
+        Process-local only. Makes no downstream call, so a healthy response says
+        nothing about the database or any provider.
+      security: []
+      responses:
+        "200":
+          description: The process is running.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LiveResponse"
+
+  /api/v1/system/ready:
+    get:
+      tags: [system]
+      operationId: systemReady
+      summary: Dependency readiness
+      description: |
+        Reports whether required dependencies are reachable. The body carries
+        coarse up/down states only — never a hostname, URL, driver version, or
+        stack trace.
+      security: []
+      responses:
+        "200":
+          description: Every required dependency is reachable.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadyResponse"
+        "503":
+          description: A required dependency is unavailable.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/system/walking-skeleton:
+    post:
+      tags: [system]
+      operationId: systemWalkingSkeleton
+      summary: Gated persistence probe (E00 diagnostic)
+      description: |
+        Proves one end-to-end round trip from client to API to PostgreSQL and
+        back. It exists to validate the skeleton, not to model product
+        behaviour, and it is deliberately NOT idempotent: each accepted call
+        increments the counter.
+
+        Available only when the environment is not production AND the
+        `system.walkingSkeleton` flag is true. Otherwise the route reports 404
+        so its existence is not disclosed (EARS-E00-5).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmptyObject"
+      responses:
+        "200":
+          description: The round trip persisted.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalkingSkeletonResponse"
+        "400":
+          description: The request body was not exactly an empty object.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: |
+            The route is not available in this environment. Indistinguishable
+            from any other unknown path by design.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "503":
+          description: The database was unavailable.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+components:
+  headers:
+    CorrelationId:
+      description: |
+        Server-resolved opaque correlation identifier. A client MAY supply
+        `X-Correlation-Id`; an absent or invalid value is replaced with a
+        server-generated one. It is never identity and never authorization.
+      required: true
+      schema:
+        $ref: "#/components/schemas/CorrelationId"
+
+  schemas:
+    CorrelationId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: "^[\\x20-\\x7E]+$"
+      description: 1–128 printable ASCII characters.
+      example: 01J8Z5S6H9QK3M4N5P6Q7R8S9T
+
+    EmptyObject:
+      type: object
+      additionalProperties: false
+      description: |
+        Exactly `{}`. Any property, or an absent body, is rejected with 400
+        VALIDATION.INVALID_FIELD.
+
+    LiveResponse:
+      type: object
+      required: [status, correlationId]
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        correlationId:
+          $ref: "#/components/schemas/CorrelationId"
+
+    DependencyState:
+      type: string
+      enum: [up, down]
+      description: Coarse state only. No detail about the dependency is exposed.
+
+    ReadinessChecks:
+      type: object
+      required: [database]
+      additionalProperties: false
+      properties:
+        database:
+          $ref: "#/components/schemas/DependencyState"
+
+    ReadyResponse:
+      type: object
+      required: [status, checks, correlationId]
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          enum: [ready]
+        checks:
+          $ref: "#/components/schemas/ReadinessChecks"
+        correlationId:
+          $ref: "#/components/schemas/CorrelationId"
+
+    WalkingSkeletonResponse:
+      type: object
+      required: [status, visitCount, correlationId]
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          enum: [persisted]
+        visitCount:
+          type: integer
+          format: int64
+          minimum: 1
+          description: |
+            Total accepted probe calls persisted so far. At least 1 on success.
+        correlationId:
+          $ref: "#/components/schemas/CorrelationId"
+
+    ErrorCode:
+      type: string
+      description: |
+        Stable machine-readable code. Clients branch on this, never on the
+        message.
+      enum:
+        - VALIDATION.INVALID_FIELD
+        - SYSTEM.NOT_FOUND
+        - SYSTEM.NOT_READY
+        - SYSTEM.DATABASE_UNAVAILABLE
+        - SYSTEM.INTERNAL_ERROR
+      # The wire values are dotted and fixed by the task contract. Without
+      # explicit member names the generator derives identifiers like
+      # `sYSTEMPeriodNOTREADY`, which every future epic would have to read and
+      # type. These names change the generated code only, never the wire value.
+      x-enum-varnames:
+        - ValidationInvalidField
+        - SystemNotFound
+        - SystemNotReady
+        - SystemDatabaseUnavailable
+        - SystemInternalError
+
+    FieldError:
+      type: object
+      required: [field, messageKey]
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+          description: Dotted path to the offending request field.
+          maxLength: 200
+        messageKey:
+          type: string
+          description: Localization key. Never a rendered sentence.
+          maxLength: 200
+
+    ApiError:
+      type: object
+      required: [code, messageKey, correlationId, fieldErrors]
+      additionalProperties: false
+      properties:
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+        messageKey:
+          type: string
+          maxLength: 200
+          description: |
+            Localization key resolved by the client, so Bangla and English
+            surfaces stay consistent (NFR-I18N-01). Never a server-rendered
+            sentence, never a stack trace, never a provider message.
+        correlationId:
+          $ref: "#/components/schemas/CorrelationId"
+        fieldErrors:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldError"
+
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      additionalProperties: false
+      description: |
+        The ONLY error shape this API returns. No other top-level error
+        structure is permitted (EARS-E00-4).
+      properties:
+        error:
+          $ref: "#/components/schemas/ApiError"

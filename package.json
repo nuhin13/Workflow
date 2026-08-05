@@ -10,20 +10,23 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "format": "prettier --check \"{apps/admin,apps/api,apps/worker,packages,scripts,tests}/**/*.{ts,tsx,mjs,json}\" \"*.{json,mjs}\"",
-    "format:write": "prettier --write \"{apps/admin,apps/api,apps/worker,packages,scripts,tests}/**/*.{ts,tsx,mjs,json}\" \"*.{json,mjs}\"",
-    "test": "node --test tests/contract/**/*.spec.ts",
+    "format": "prettier --ignore-path .prettierignore --check \"{apps/admin,apps/api,apps/worker,packages,scripts,tests}/**/*.{ts,tsx,mjs,json}\" \"*.{json,mjs}\"",
+    "format:write": "prettier --ignore-path .prettierignore --write \"{apps/admin,apps/api,apps/worker,packages,scripts,tests}/**/*.{ts,tsx,mjs,json}\" \"*.{json,mjs}\"",
+    "test": "node --test \"tests/**/*.spec.ts\"",
     "generate:tokens": "node scripts/generate-design-tokens.mjs",
     "check:tokens": "node scripts/check-design-tokens.mjs",
     "check:toolchain": "bash scripts/check-toolchain.sh",
-    "build": "pnpm -r run build"
+    "build": "pnpm -r run build",
+    "generate:api": "bash scripts/generate-api-clients.sh",
+    "check:api": "bash scripts/check-api-contract.sh"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.40.1",
+    "@types/node": "24.13.3",
     "eslint": "10.8.0",
     "eslint-config-next": "16.3.0",
     "prettier": "3.9.6",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.66.0",
-    "@types/node": "24.13.3"
+    "typescript-eslint": "8.66.0"
   }
 }

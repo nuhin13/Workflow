@@ -1,0 +1,17 @@
+# Generated code is DERIVED and may not be hand-edited — the drift gates in
+# scripts/check-api-contract.sh and scripts/check-design-tokens.mjs regenerate
+# it and fail on any difference. Formatting it would put Prettier and the
+# generators in a loop where `make format` and `make contract` each undo the
+# other, so neither can ever be green at the same time.
+packages/api-client-typescript/src/generated/
+apps/mobile/lib/core/api/generated/
+apps/mobile/lib/l10n/generated/
+apps/mobile/lib/core/design/generated/
+
+# Rewritten by `next build` on every run and already gitignored.
+apps/admin/next-env.d.ts
+
+# Build output
+dist/
+.next/
+node_modules/

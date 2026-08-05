@@ -17,3 +17,20 @@ export type {
   PrivateObject,
   ObjectReference,
 } from './ports/object-storage.port';
+
+// Access boundary (E00-T02). Authorization is what the SERVER resolved; a
+// client-supplied identifier is data, never authority (NFR-SEC-01, ADR-0007).
+export { asOpaqueId, anonymousContext } from './access/access-context';
+export type {
+  OpaqueId,
+  EpochMillis,
+  AuthenticatedActor,
+  WorkshopScope,
+  RequestContext,
+} from './access/access-context';
+
+export { lockedOwnerMoneyGrant, grantsMoneyAccess } from './access/owner-money-grant';
+export type { OwnerMoneyGrant } from './access/owner-money-grant';
+
+export { noAdminScope, hasAdminPermission } from './access/admin-scope';
+export type { AdminScope, AdminPermission } from './access/admin-scope';

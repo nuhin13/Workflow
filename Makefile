@@ -7,7 +7,7 @@ LAYER ?=
 PLATFORM ?=
 
 .PHONY: next status review validate dashboard metrics metrics-json hooks help \
-        install toolchain tokens lint format test build dev-api dev-worker dev-admin dev-mobile
+        install toolchain tokens api contract lint format test build dev-api dev-worker dev-admin dev-mobile
 
 # ── Harness / tracker ─────────────────────────────────────────────────────────
 next:        ## next executable task(s); make next PLATFORM=codex LAYER=frontend
@@ -39,6 +39,10 @@ install:     ## install pinned JS and Dart dependencies
 	cd apps/mobile && flutter pub get
 toolchain:   ## verify local Node/pnpm/Flutter/Dart match the repository pins
 	bash scripts/check-toolchain.sh
+api:         ## regenerate both API clients from the canonical OpenAPI contract
+	pnpm generate:api
+contract:    ## validate the OpenAPI contract and assert zero generated-client drift
+	pnpm check:api
 tokens:      ## regenerate Dart + TypeScript design tokens, then assert zero drift
 	pnpm generate:tokens
 	pnpm check:tokens

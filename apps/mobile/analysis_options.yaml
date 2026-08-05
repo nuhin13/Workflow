@@ -9,6 +9,17 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    # Generated from contracts/openapi/garazo.v1.yaml by the pinned OpenAPI
+    # Generator. We do not own its style and cannot fix its lints without
+    # hand-editing generated code, which the drift check forbids. That it
+    # COMPILES is proven by test/core/api/generated_client_test.dart, which
+    # imports and exercises it.
+    - lib/core/api/generated/**
+    # Generated from lib/l10n/*.arb by `flutter pub get`.
+    - lib/l10n/generated/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
