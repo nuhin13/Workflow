@@ -10,8 +10,8 @@
 - [ ] E00-T01 · Scaffold repository and module boundaries · in-progress · developer-backend
 - [x] E00-T02 · Establish OpenAPI and generated clients · done · claude-opus-5
 - [x] E00-T03 · Containerize runtime and CI baseline · done · claude-opus-5
-- [ ] E00-T04 · Implement the persistence walking skeleton · in-progress · claude-opus-5
-- [ ] E00-T05 · Prove integration and recovery gate · todo · —
+- [x] E00-T04 · Implement the persistence walking skeleton · done · claude-opus-5
+- [ ] E00-T05 · Prove integration and recovery gate · todo · —  ← next
 
 ## Dependency graph
 
@@ -79,7 +79,20 @@ graph LR
 - 2026-08-05 Twelve production decisions recorded as gates in
   `infra/vm/recovery-open-items.md` (supplier, registry, secret manager, RPO/RTO,
   backups, observability, base-image digest, sizing). None were guessed.
-- 2026-08-05 T04 started.
+- 2026-08-05 T04 done and squash-merged to `epic_00` as `cd77b02`. The walking
+  skeleton runs for real: Flutter → generated client → NestJS → PostgreSQL →
+  back, with an atomic upsert proven by 25 concurrent increments and
+  persistence proven by restarting the API mid-suite. 68 node + 19 Flutter tests.
+- 2026-08-05 Three defects found only by running the full chain: the probe flag
+  had two different names across T02/T03 so the route 404'd everywhere; the
+  route returned 201 where the contract says 200; and the API process DIED when
+  PostgreSQL stopped, because an unhandled `pg` pool error event is fatal in
+  Node. The last would have turned any database restart into an API outage.
+- 2026-08-05 T04 carries a DEFERRED task-level QA gate — the third in a row, and
+  this one covers a schema migration and the production-exposure guards.
+- 2026-08-05 The migration was applied under the owner's standing waiver rather
+  than an in-thread schema approval; it is one diagnostic table with no product
+  data, and still owed a look at the checkpoint.
 - 2026-08-05 T01 dispatched to developer-backend on claude-code in worktree
   `../wt-E00-T01` (branch `epic_00_task_01`).
 - 2026-08-05 T01 frozen mid-task by a claude-code session rate limit. Partial

@@ -87,7 +87,7 @@ epics:
       - { id: E00-T01, title: "Scaffold repository and module boundaries", status: in-progress, owner: developer-backend }
       - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: done, owner: claude-opus-5 }
       - { id: E00-T03, title: "Containerize runtime and CI baseline", status: done, owner: claude-opus-5 }
-      - { id: E00-T04, title: "Implement the persistence walking skeleton", status: in-progress, owner: claude-opus-5 }
+      - { id: E00-T04, title: "Implement the persistence walking skeleton", status: done, owner: claude-opus-5 }
       - { id: E00-T05, title: "Prove integration and recovery gate", status: todo, owner: null }
     qa_report: null
     checkpoint: null
@@ -250,3 +250,11 @@ history:
     event: "BLOCKER FOR E01 (updated): task-level QA is now deferred on BOTH E00-T02 and E00-T03. Together they define the authorization boundary, secret handling, log redaction and production topology that every later epic inherits; independent QA must run before E01 implementation"
   - at: "2026-08-05T18:36:00+06:00"
     event: "started E00-T04 (persistence walking skeleton)"
+  - at: "2026-08-05T21:10:00+06:00"
+    event: "E00-T04 done and squash-merged to epic_00 as cd77b02; the walking skeleton now runs end to end through a real container boundary into real PostgreSQL, with an atomic upsert proven by 25 concurrent increments, persistence proven by restarting the API, a reversible diagnostic migration whose down path verifies its target, and four independent guards keeping the route out of production"
+  - at: "2026-08-05T21:12:00+06:00"
+    event: "three cross-task defects fixed in T04: the walking-skeleton flag had two different names across T02 and T03 so the route returned 404 in every environment; the route answered 201 where the contract specifies 200, putting every generated client out of step; and the API process terminated when PostgreSQL stopped because an unhandled node-postgres pool error event is fatal in Node, which would have turned any database restart or failover into a full API outage"
+  - at: "2026-08-05T21:14:00+06:00"
+    event: "BLOCKER FOR E01 (updated): task-level QA now deferred on E00-T02, E00-T03 and E00-T04. Between them they define the authorization boundary, secret handling, log redaction, production topology, and the first schema migration. The T04 migration was also applied under the standing waiver rather than an in-thread schema approval"
+  - at: "2026-08-05T21:16:00+06:00"
+    event: "E00 is 4/5; only E00-T05 (integration and recovery gate) remains before the epic QA sweep and checkpoint"
