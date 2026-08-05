@@ -8,8 +8,8 @@
 ## Tasks
 
 - [ ] E00-T01 · Scaffold repository and module boundaries · in-progress · developer-backend
-- [ ] E00-T02 · Establish OpenAPI and generated clients · in-progress · claude-opus-5
-- [ ] E00-T03 · Containerize runtime and CI baseline · todo · —
+- [x] E00-T02 · Establish OpenAPI and generated clients · done · claude-opus-5
+- [ ] E00-T03 · Containerize runtime and CI baseline · in-progress · claude-opus-5
 - [ ] E00-T04 · Implement the persistence walking skeleton · todo · —
 - [ ] E00-T05 · Prove integration and recovery gate · todo · —
 
@@ -61,7 +61,14 @@ graph LR
   including a worker that booted and exited instantly.
 - 2026-08-05 Peer review (rule 12) SKIPPED for T01 on owner instruction
   (Claude-only, no second model). Android APK compile remains unproven locally.
-- 2026-08-05 T02 started.
+- 2026-08-05 T02 done and squash-merged to `epic_00` as `cf0de26`. OpenAPI
+  contract, pinned generator 7.24.0, Dart + TypeScript clients with a zero-drift
+  gate, the four distinct access types, one redacted error envelope, and the
+  system routes. 25 node tests + 9 Flutter tests green.
+- 2026-08-05 T02 carries a DEFERRED task-level QA gate. Its spec requires
+  independent QA because it defines the authorization boundary; that has not
+  run and must before E01 builds auth on these types.
+- 2026-08-05 T03 started.
 - 2026-08-05 T01 dispatched to developer-backend on claude-code in worktree
   `../wt-E00-T01` (branch `epic_00_task_01`).
 - 2026-08-05 T01 frozen mid-task by a claude-code session rate limit. Partial

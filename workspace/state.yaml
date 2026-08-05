@@ -85,8 +85,8 @@ epics:
     runnable_flow: "Start the Compose stack and run the diagnostic Flutter UI through the API to PostgreSQL and back with green CI."
     tasks:
       - { id: E00-T01, title: "Scaffold repository and module boundaries", status: in-progress, owner: developer-backend }
-      - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: in-progress, owner: claude-opus-5 }
-      - { id: E00-T03, title: "Containerize runtime and CI baseline", status: todo, owner: null }
+      - { id: E00-T02, title: "Establish OpenAPI and generated clients", status: done, owner: claude-opus-5 }
+      - { id: E00-T03, title: "Containerize runtime and CI baseline", status: in-progress, owner: claude-opus-5 }
       - { id: E00-T04, title: "Implement the persistence walking skeleton", status: todo, owner: null }
       - { id: E00-T05, title: "Prove integration and recovery gate", status: todo, owner: null }
     qa_report: null
@@ -236,3 +236,9 @@ history:
     event: "recorded two knowingly skipped gates on T01: peer review by a second model (constitution rule 12) waived by owner Claude-only instruction, and the Android APK compile unproven locally because cmdline-tools and Xcode are absent; both carried into the E00 checkpoint"
   - at: "2026-08-05T13:15:00+06:00"
     event: "started E00-T02 (OpenAPI contract and generated clients)"
+  - at: "2026-08-05T15:40:00+06:00"
+    event: "E00-T02 done and squash-merged to epic_00 as cf0de26; canonical OpenAPI contract with pinned generator 7.24.0, deterministic Dart and TypeScript clients behind a zero-drift gate, four structurally distinct access types, one redacted error envelope, and the system live/ready/gated-probe routes verified over real HTTP"
+  - at: "2026-08-05T15:42:00+06:00"
+    event: "BLOCKER FOR E01: E00-T02's required task-level QA gate has not run. It defines the authorization boundary (AuthenticatedActor, WorkshopScope, OwnerMoneyGrant, AdminScope) that E01 authentication will build on, so independent QA must happen before E01 implementation starts"
+  - at: "2026-08-05T15:45:00+06:00"
+    event: "started E00-T03 (containerize runtime and CI baseline)"
