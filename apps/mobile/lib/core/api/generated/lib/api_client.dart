@@ -193,14 +193,40 @@ class ApiClient {
           return ErrorEnvelope.fromJson(value);
         case 'FieldError':
           return FieldError.fromJson(value);
+        case 'GrantEnvelope':
+          return GrantEnvelope.fromJson(value);
+        case 'IdentityAssertionRequest':
+          return IdentityAssertionRequest.fromJson(value);
         case 'LiveResponse':
           return LiveResponse.fromJson(value);
+        case 'Locale':
+          return LocaleTypeTransformer().decode(value);
+        case 'LocalePreference':
+          return LocalePreference.fromJson(value);
+        case 'OwnerPinRecoveryRequest':
+          return OwnerPinRecoveryRequest.fromJson(value);
+        case 'OwnerPinSetRequest':
+          return OwnerPinSetRequest.fromJson(value);
+        case 'OwnerPinVerifyRequest':
+          return OwnerPinVerifyRequest.fromJson(value);
+        case 'OwnerPinVerifyResponse':
+          return OwnerPinVerifyResponse.fromJson(value);
         case 'ReadinessChecks':
           return ReadinessChecks.fromJson(value);
         case 'ReadyResponse':
           return ReadyResponse.fromJson(value);
+        case 'SessionEnvelope':
+          return SessionEnvelope.fromJson(value);
+        case 'SessionExchangeResponse':
+          return SessionExchangeResponse.fromJson(value);
+        case 'VehicleType':
+          return VehicleTypeTypeTransformer().decode(value);
         case 'WalkingSkeletonResponse':
           return WalkingSkeletonResponse.fromJson(value);
+        case 'WorkshopSetupRequest':
+          return WorkshopSetupRequest.fromJson(value);
+        case 'WorkshopSummary':
+          return WorkshopSummary.fromJson(value);
         default:
           dynamic match;
           if (value is List && (match = _regList.firstMatch(targetType)?.group(1)) != null) {

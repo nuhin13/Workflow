@@ -24,7 +24,17 @@ export const ErrorCode = {
     SystemNotFound: 'SYSTEM.NOT_FOUND',
     SystemNotReady: 'SYSTEM.NOT_READY',
     SystemDatabaseUnavailable: 'SYSTEM.DATABASE_UNAVAILABLE',
-    SystemInternalError: 'SYSTEM.INTERNAL_ERROR'
+    SystemInternalError: 'SYSTEM.INTERNAL_ERROR',
+    AuthInvalidCredentials: 'AUTH.INVALID_CREDENTIALS',
+    AuthSessionInvalid: 'AUTH.SESSION_INVALID',
+    AuthPinInvalid: 'AUTH.PIN_INVALID',
+    AuthPinCooldown: 'AUTH.PIN_COOLDOWN',
+    AuthPinNotSet: 'AUTH.PIN_NOT_SET',
+    AuthRecoveryInvalid: 'AUTH.RECOVERY_INVALID',
+    AuthRecoveryCooldown: 'AUTH.RECOVERY_COOLDOWN',
+    AuthGrantRequired: 'AUTH.GRANT_REQUIRED',
+    WorkshopNotSetUp: 'WORKSHOP.NOT_SET_UP',
+    WorkshopAlreadySetUp: 'WORKSHOP.ALREADY_SET_UP'
 } as const;
 export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
 

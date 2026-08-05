@@ -25,6 +25,11 @@ export type EpochMillis = number;
  * `anonymous` is a first-class state, not a null: E00 has no authentication at
  * all, and every consumer must handle the unauthenticated case explicitly
  * rather than assuming a logged-in actor exists.
+ *
+ * E01 note: `actorId` identifies the Garazo account behind a rotated
+ * application session (`SessionToken`, `./session-token.ts`). It is never a
+ * Firebase uid and the session token itself is never carried on this type —
+ * a resolved actor is what the token proved, not the token.
  */
 export type AuthenticatedActor =
   | { readonly kind: 'anonymous' }
@@ -42,6 +47,12 @@ export type AuthenticatedActor =
  * `none` means the request carries no workshop authority. A client-supplied
  * workshop identifier can never produce anything other than `none` — that is
  * the whole point of this type (NFR-SEC-01).
+ *
+ * E01 note: an authenticated account that has not finished workshop setup
+ * (`WORKSHOP.NOT_SET_UP`) is ALSO `none` — it has no workshop authority yet,
+ * for the same reason an anonymous request has none. The distinction between
+ * "not signed in" and "signed in, no workshop" lives on `AuthenticatedActor`,
+ * not here; this type only ever answers "which workshop, if any".
  */
 export type WorkshopScope =
   | { readonly kind: 'none' }

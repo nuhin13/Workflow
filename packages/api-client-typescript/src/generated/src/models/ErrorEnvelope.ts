@@ -23,7 +23,11 @@ import {
 
 /**
  * The ONLY error shape this API returns. No other top-level error
- * structure is permitted (EARS-E00-4).
+ * structure is permitted (EARS-E00-4). E01 adds error CODES to
+ * `ErrorCode` above; it does not add a second envelope, and per-code
+ * extras like remaining attempts or a retry delay ride on response
+ * headers, never on this body (see `PinRemainingAttempts`,
+ * `RetryAfterSeconds`).
  * 
  * @export
  * @interface ErrorEnvelope

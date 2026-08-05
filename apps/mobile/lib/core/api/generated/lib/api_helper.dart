@@ -61,6 +61,12 @@ String parameterToString(dynamic value) {
   if (value is ErrorCode) {
     return ErrorCodeTypeTransformer().encode(value).toString();
   }
+  if (value is Locale) {
+    return LocaleTypeTransformer().encode(value).toString();
+  }
+  if (value is VehicleType) {
+    return VehicleTypeTypeTransformer().encode(value).toString();
+  }
   return value.toString();
 }
 

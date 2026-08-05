@@ -35,6 +35,22 @@ export type { OwnerMoneyGrant } from './access/owner-money-grant';
 export { noAdminScope, hasAdminPermission } from './access/admin-scope';
 export type { AdminScope, AdminPermission } from './access/admin-scope';
 
+// Session/grant tokens (E01-T01). Structurally distinct branded types so
+// "signed in" and "may see money" can never be substituted for one another
+// (ADR-0007, BRD Law 2).
+export { asSessionToken, asOwnerGrantToken } from './access/session-token';
+export type {
+  SessionToken,
+  OwnerGrantToken,
+  TokenEnvelope,
+  SessionEnvelope,
+  GrantEnvelope,
+} from './access/session-token';
+
+// Access error vocabulary (E01-T01, ADR-0007, Q-005, Q-009).
+export { ACCESS_ERROR_CODES, isPreSessionFailure } from './access/access-errors';
+export type { AccessErrorCode } from './access/access-errors';
+
 // System diagnostic (E00-T04). The PostgreSQL adapter is exported so the API
 // composition root can bind it; nothing else may depend on it.
 export { RunSystemProbeUseCase } from './system/run-system-probe.use-case';

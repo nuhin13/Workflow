@@ -28,17 +28,32 @@ part 'auth/oauth.dart';
 part 'auth/http_basic_auth.dart';
 part 'auth/http_bearer_auth.dart';
 
+part 'api/access_api.dart';
 part 'api/system_api.dart';
+part 'api/workshops_api.dart';
 
 part 'model/api_error.dart';
 part 'model/dependency_state.dart';
 part 'model/error_code.dart';
 part 'model/error_envelope.dart';
 part 'model/field_error.dart';
+part 'model/grant_envelope.dart';
+part 'model/identity_assertion_request.dart';
 part 'model/live_response.dart';
+part 'model/locale.dart';
+part 'model/locale_preference.dart';
+part 'model/owner_pin_recovery_request.dart';
+part 'model/owner_pin_set_request.dart';
+part 'model/owner_pin_verify_request.dart';
+part 'model/owner_pin_verify_response.dart';
 part 'model/readiness_checks.dart';
 part 'model/ready_response.dart';
+part 'model/session_envelope.dart';
+part 'model/session_exchange_response.dart';
+part 'model/vehicle_type.dart';
 part 'model/walking_skeleton_response.dart';
+part 'model/workshop_setup_request.dart';
+part 'model/workshop_summary.dart';
 
 
 /// An [ApiClient] instance that uses the default values obtained from

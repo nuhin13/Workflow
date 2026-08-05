@@ -17,6 +17,16 @@ enum ErrorCode {
   SystemNotReady._(r'SYSTEM.NOT_READY'),
   SystemDatabaseUnavailable._(r'SYSTEM.DATABASE_UNAVAILABLE'),
   SystemInternalError._(r'SYSTEM.INTERNAL_ERROR'),
+  AuthInvalidCredentials._(r'AUTH.INVALID_CREDENTIALS'),
+  AuthSessionInvalid._(r'AUTH.SESSION_INVALID'),
+  AuthPinInvalid._(r'AUTH.PIN_INVALID'),
+  AuthPinCooldown._(r'AUTH.PIN_COOLDOWN'),
+  AuthPinNotSet._(r'AUTH.PIN_NOT_SET'),
+  AuthRecoveryInvalid._(r'AUTH.RECOVERY_INVALID'),
+  AuthRecoveryCooldown._(r'AUTH.RECOVERY_COOLDOWN'),
+  AuthGrantRequired._(r'AUTH.GRANT_REQUIRED'),
+  WorkshopNotSetUp._(r'WORKSHOP.NOT_SET_UP'),
+  WorkshopAlreadySetUp._(r'WORKSHOP.ALREADY_SET_UP'),
   ;
 
   /// Instantiate a new enum with the provided value.
@@ -81,6 +91,16 @@ class ErrorCodeTypeTransformer {
         case r'SYSTEM.NOT_READY': return ErrorCode.SystemNotReady;
         case r'SYSTEM.DATABASE_UNAVAILABLE': return ErrorCode.SystemDatabaseUnavailable;
         case r'SYSTEM.INTERNAL_ERROR': return ErrorCode.SystemInternalError;
+        case r'AUTH.INVALID_CREDENTIALS': return ErrorCode.AuthInvalidCredentials;
+        case r'AUTH.SESSION_INVALID': return ErrorCode.AuthSessionInvalid;
+        case r'AUTH.PIN_INVALID': return ErrorCode.AuthPinInvalid;
+        case r'AUTH.PIN_COOLDOWN': return ErrorCode.AuthPinCooldown;
+        case r'AUTH.PIN_NOT_SET': return ErrorCode.AuthPinNotSet;
+        case r'AUTH.RECOVERY_INVALID': return ErrorCode.AuthRecoveryInvalid;
+        case r'AUTH.RECOVERY_COOLDOWN': return ErrorCode.AuthRecoveryCooldown;
+        case r'AUTH.GRANT_REQUIRED': return ErrorCode.AuthGrantRequired;
+        case r'WORKSHOP.NOT_SET_UP': return ErrorCode.WorkshopNotSetUp;
+        case r'WORKSHOP.ALREADY_SET_UP': return ErrorCode.WorkshopAlreadySetUp;
         default:
           if (!allowNull) {
             throw ArgumentError('Unknown enum value to decode: $data');

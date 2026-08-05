@@ -20,6 +20,16 @@ servers:
 tags:
   - name: system
     description: Infrastructure liveness, readiness, and the gated E00 probe.
+  - name: access
+    description: |
+      Phone-identity exchange, application sessions, presentation locale, and
+      the owner-PIN grant lifecycle (E01, ADR-0007). Firebase proves phone
+      possession only; it never appears here as authorization.
+  - name: workshops
+    description: |
+      Server-resolved workshop scope and one-time setup (E01, NFR-SEC-01).
+      Every route resolves "current" from the session — no route accepts a
+      client-supplied workshop identifier.
 
 paths:
   /api/v1/system/live:
@@ -133,7 +143,470 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
 
+  /api/v1/access/sessions:
+    post:
+      tags: [access]
+      operationId: exchangeIdentityAssertion
+      summary: Exchange a Firebase phone-identity assertion for a Garazo session
+      description: |
+        Verifies the assertion through the server's `PhoneIdentityPort` and
+        rotates the Garazo application session: this call always issues a NEW
+        session, and any previous session for the account stops being valid.
+        Not idempotent.
+
+        `workshop` is `null` when the account has completed no setup yet. That
+        is how a client knows to show first-time setup rather than the
+        dashboard — it is never signalled as a 404.
+
+        Every failure of this exchange — unknown number, wrong code, expired
+        assertion — returns the SAME `AUTH.INVALID_CREDENTIALS` response, so
+        this endpoint cannot be used to test whether a phone number is a
+        registered Garazo account (`EARS-E01-T01-3`, `L-auth-003`).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdentityAssertionRequest"
+      responses:
+        "200":
+          description: The assertion was valid; a new session was issued.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionExchangeResponse"
+        "400":
+          description: The request body failed validation.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: |
+            The assertion was invalid, expired, or unknown. Returns
+            `AUTH.INVALID_CREDENTIALS` — the one and only pre-session failure
+            code — regardless of the underlying reason.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/access/session:
+    get:
+      tags: [access]
+      operationId: getCurrentSession
+      summary: Restore the current authorized session and workshop context
+      security:
+        - sessionToken: []
+      responses:
+        "200":
+          description: The session is live.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionExchangeResponse"
+        "401":
+          description: Missing, expired, or revoked session.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+    delete:
+      tags: [access]
+      operationId: revokeCurrentSession
+      summary: Revoke the current application session
+      security:
+        - sessionToken: []
+      responses:
+        "204":
+          description: The session was revoked. No body.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+        "401":
+          description: Missing, expired, or already-revoked session.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/workshops/current:
+    get:
+      tags: [workshops]
+      operationId: getCurrentWorkshop
+      summary: Read the workshop resolved for the current session
+      description: |
+        "Current" means the workshop this session is authorized for, resolved
+        entirely server-side. There is no request parameter that names a
+        workshop, so a client cannot name someone else's (`NFR-SEC-01`).
+      security:
+        - sessionToken: []
+      responses:
+        "200":
+          description: The session has a set-up workshop.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkshopSummary"
+        "401":
+          description: Missing, expired, or revoked session.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "409":
+          description: The session's account has not completed workshop setup.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/workshops/current/setup:
+    put:
+      tags: [workshops]
+      operationId: setUpCurrentWorkshop
+      summary: Complete the one-time initial workshop setup
+      description: |
+        Idempotent by method, but only ever succeeds once per account: a
+        second call returns `WORKSHOP.ALREADY_SET_UP`. BD region profile and
+        the default Bangla locale are assigned by the access domain, not by
+        this request.
+      security:
+        - sessionToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkshopSetupRequest"
+      responses:
+        "200":
+          description: Setup completed; the resolved workshop is returned.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkshopSummary"
+        "400":
+          description: The request body failed validation.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Missing, expired, or revoked session.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "409":
+          description: Setup was already completed for this account.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/access/preferences/locale:
+    patch:
+      tags: [access]
+      operationId: setLocalePreference
+      summary: Persist the Bangla/English presentation preference
+      description: |
+        Changes presentation only. No stored business value changes when the
+        locale changes (`NFR-I18N-01`–`03`).
+      security:
+        - sessionToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocalePreference"
+      responses:
+        "200":
+          description: The preference was persisted.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocalePreference"
+        "400":
+          description: The request body failed validation.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Missing, expired, or revoked session.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/access/owner-pin:
+    put:
+      tags: [access]
+      operationId: setOwnerPin
+      summary: Establish the initial owner PIN, or replace it with recovery proof
+      description: |
+        Idempotent by method. Establishing a PIN for the first time needs no
+        `recoveryAssertion`; replacing an existing PIN without a valid session
+        step-up requires one (`recoveryAssertion`), verified the same way
+        `POST .../recoveries` verifies it.
+      security:
+        - sessionToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OwnerPinSetRequest"
+      responses:
+        "204":
+          description: The PIN was established or replaced. No body.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+        "400":
+          description: The request body failed validation.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: |
+            Missing/expired/revoked session, or an invalid/expired
+            `recoveryAssertion` (`AUTH.RECOVERY_INVALID`).
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/access/owner-pin/verifications:
+    post:
+      tags: [access]
+      operationId: verifyOwnerPin
+      summary: Verify the owner PIN and issue the separate owner-money grant
+      description: |
+        Not idempotent — each call consumes one attempt of the current
+        failure cycle (`Q-005`). Success resets the next cooldown to 60
+        seconds (`FR-ACCESS-15`).
+
+        The FIFTH wrong attempt of a cycle returns 429 `AUTH.PIN_COOLDOWN`,
+        not 401: the cooldown starts on that attempt, so the response that
+        starts it must already carry `retryAfterSeconds`
+        (`EARS-E01-T01` correction, aligns with `T05`). Attempts 1–4 return
+        401 `AUTH.PIN_INVALID` with the `X-Pin-Remaining-Attempts` header.
+      security:
+        - sessionToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OwnerPinVerifyRequest"
+      responses:
+        "200":
+          description: The PIN was correct; a new owner-money grant was issued.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerPinVerifyResponse"
+        "401":
+          description: |
+            Wrong PIN on attempt 1–4 of the current failure cycle. The
+            cooldown has not started yet.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+            X-Pin-Remaining-Attempts:
+              $ref: "#/components/headers/PinRemainingAttempts"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "409":
+          description: No PIN has been established yet for this account.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "429":
+          description: |
+            Either this attempt was the fifth wrong attempt of the cycle (the
+            cooldown starts now) or a cooldown from an earlier cycle is still
+            active. Both cases return `AUTH.PIN_COOLDOWN` with
+            `Retry-After`/`X-Retry-After-Seconds`.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+            Retry-After:
+              $ref: "#/components/headers/RetryAfterSeconds"
+            X-Retry-After-Seconds:
+              $ref: "#/components/headers/RetryAfterSeconds"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/access/owner-pin/grant:
+    delete:
+      tags: [access]
+      operationId: revokeOwnerGrant
+      summary: Explicitly revoke the current owner-money grant
+      description: |
+        Explicit lock (`FR-ACCESS-07`). Always succeeds when the session is
+        valid, whether or not a grant was currently active.
+      security:
+        - sessionToken: []
+      responses:
+        "204":
+          description: The grant, if any, is revoked. No body.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+        "401":
+          description: Missing, expired, or revoked session.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /api/v1/access/owner-pin/recoveries:
+    post:
+      tags: [access]
+      operationId: recoverOwnerPin
+      summary: Verify a registered-phone OTP assertion and set a new PIN
+      description: |
+        Atomically verifies `recoveryAssertion` and sets `newPin` in one step
+        — there is no separate "verify then set" round trip, so there is
+        nothing to race. An invalid or expired assertion leaves the existing
+        PIN unchanged (`FR-ACCESS-14`). Success resets the next failure-cycle
+        cooldown to 60 seconds (`FR-ACCESS-15`).
+
+        Throttled independently of the PIN failure cycle so recovery cannot
+        be used to bypass PIN cooldown (`Q-009`): at most 5 OTP sends per
+        registered phone per rolling hour, each OTP valid 5 minutes, at most
+        5 verify attempts per OTP. Exceeding either limit returns
+        `AUTH.RECOVERY_COOLDOWN` and never reveals whether the phone is
+        registered.
+      security:
+        - sessionToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OwnerPinRecoveryRequest"
+      responses:
+        "204":
+          description: The new PIN was set. No body.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+        "401":
+          description: |
+            Missing/expired/revoked session, or the recovery assertion was
+            invalid or expired (`AUTH.RECOVERY_INVALID`). The existing PIN is
+            unchanged.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "429":
+          description: |
+            The recovery send/verify limit was exceeded (`Q-009`). Never
+            reveals whether the phone is registered.
+          headers:
+            X-Correlation-Id:
+              $ref: "#/components/headers/CorrelationId"
+            Retry-After:
+              $ref: "#/components/headers/RetryAfterSeconds"
+            X-Retry-After-Seconds:
+              $ref: "#/components/headers/RetryAfterSeconds"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
 components:
+  securitySchemes:
+    sessionToken:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: |
+        Garazo application session token, presented as
+        `Authorization: Bearer <token>`. Proves "signed in"; it does NOT by
+        itself authorize protected owner-money access (ADR-0007) — that needs
+        the separate owner-money grant token returned by
+        `POST /api/v1/access/owner-pin/verifications`.
+
   headers:
     CorrelationId:
       description: |
@@ -143,6 +616,28 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/CorrelationId"
+
+    PinRemainingAttempts:
+      description: |
+        Wrong-PIN attempts left in the current failure cycle before the
+        cooldown starts. Present only on `AUTH.PIN_INVALID` (attempts 1–4).
+        Safe to disclose: it tells the legitimate owner something they need
+        and reveals nothing about any other account (`Q-005`).
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 4
+
+    RetryAfterSeconds:
+      description: |
+        Seconds until the active cooldown ends. Present on every 429 response
+        from the owner-PIN and recovery routes (`AUTH.PIN_COOLDOWN`,
+        `AUTH.RECOVERY_COOLDOWN`).
+      required: true
+      schema:
+        type: integer
+        minimum: 1
 
   schemas:
     CorrelationId:
@@ -225,6 +720,16 @@ components:
         - SYSTEM.NOT_READY
         - SYSTEM.DATABASE_UNAVAILABLE
         - SYSTEM.INTERNAL_ERROR
+        - AUTH.INVALID_CREDENTIALS
+        - AUTH.SESSION_INVALID
+        - AUTH.PIN_INVALID
+        - AUTH.PIN_COOLDOWN
+        - AUTH.PIN_NOT_SET
+        - AUTH.RECOVERY_INVALID
+        - AUTH.RECOVERY_COOLDOWN
+        - AUTH.GRANT_REQUIRED
+        - WORKSHOP.NOT_SET_UP
+        - WORKSHOP.ALREADY_SET_UP
       # The wire values are dotted and fixed by the task contract. Without
       # explicit member names the generator derives identifiers like
       # `sYSTEMPeriodNOTREADY`, which every future epic would have to read and
@@ -235,6 +740,16 @@ components:
         - SystemNotReady
         - SystemDatabaseUnavailable
         - SystemInternalError
+        - AuthInvalidCredentials
+        - AuthSessionInvalid
+        - AuthPinInvalid
+        - AuthPinCooldown
+        - AuthPinNotSet
+        - AuthRecoveryInvalid
+        - AuthRecoveryCooldown
+        - AuthGrantRequired
+        - WorkshopNotSetUp
+        - WorkshopAlreadySetUp
 
     FieldError:
       type: object
@@ -277,7 +792,192 @@ components:
       additionalProperties: false
       description: |
         The ONLY error shape this API returns. No other top-level error
-        structure is permitted (EARS-E00-4).
+        structure is permitted (EARS-E00-4). E01 adds error CODES to
+        `ErrorCode` above; it does not add a second envelope, and per-code
+        extras like remaining attempts or a retry delay ride on response
+        headers, never on this body (see `PinRemainingAttempts`,
+        `RetryAfterSeconds`).
       properties:
         error:
           $ref: "#/components/schemas/ApiError"
+
+    # ── E01-T01 · secure workshop access (ADR-0007, Q-005, Q-008, Q-009) ──────
+
+    IdentityAssertionRequest:
+      type: object
+      required: [identityAssertion]
+      additionalProperties: false
+      properties:
+        identityAssertion:
+          type: string
+          minLength: 1
+          maxLength: 4096
+          description: |
+            Opaque signed assertion from `PhoneIdentityPort` proving phone
+            possession. Never logged, never echoed back, never stored raw.
+
+    SessionEnvelope:
+      type: object
+      required: [token, expiresAt]
+      additionalProperties: false
+      description: |
+        Proves "signed in". Structurally identical to `GrantEnvelope` but kept
+        as a separate schema on purpose, so a generated client cannot pass one
+        where the other is required (ADR-0007).
+      properties:
+        token:
+          type: string
+          minLength: 32
+          maxLength: 512
+        expiresAt:
+          type: string
+          format: date-time
+
+    GrantEnvelope:
+      type: object
+      required: [token, expiresAt]
+      additionalProperties: false
+      description: |
+        Proves "may see protected owner-money values right now". Structurally
+        identical to `SessionEnvelope` but a separate schema on purpose — being
+        signed in must never be expressible as "may see money" (BRD Law 2).
+      properties:
+        token:
+          type: string
+          minLength: 32
+          maxLength: 512
+        expiresAt:
+          type: string
+          format: date-time
+
+    VehicleType:
+      type: string
+      description: |
+        The approved workshop vehicle-type keys (`Q-008`, BRD v1 §1, ordered by
+        the §3 beachhead). Additive-only: later keys may be appended, existing
+        keys never change meaning. Display labels live in ARB files, never
+        here.
+      enum: [bike, cng, car, truck]
+
+    Locale:
+      type: string
+      description: Supported presentation locales. Changes presentation only.
+      enum: [bn, en]
+
+    WorkshopSummary:
+      type: object
+      required: [workshopId, name, vehicleTypes, locale, regionProfile]
+      additionalProperties: false
+      properties:
+        workshopId:
+          type: string
+          description: Opaque; identifies the workshop, never authorizes anything.
+          minLength: 1
+        name:
+          type: string
+          maxLength: 120
+        vehicleTypes:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/VehicleType"
+        locale:
+          $ref: "#/components/schemas/Locale"
+        regionProfile:
+          type: string
+          enum: [BD]
+
+    SessionExchangeResponse:
+      type: object
+      required: [session, workshop]
+      additionalProperties: false
+      description: |
+        `workshop` is `null` when the account has completed no setup yet. That
+        is a legitimate first-time state, not an error, and must not be
+        modelled as a 404.
+      properties:
+        session:
+          $ref: "#/components/schemas/SessionEnvelope"
+        workshop:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/WorkshopSummary"
+
+    WorkshopSetupRequest:
+      type: object
+      required: [name, vehicleTypes]
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+          description: 1–120 characters after trimming; must not be only whitespace.
+        vehicleTypes:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/VehicleType"
+
+    LocalePreference:
+      type: object
+      required: [locale]
+      additionalProperties: false
+      properties:
+        locale:
+          $ref: "#/components/schemas/Locale"
+
+    OwnerPinSetRequest:
+      type: object
+      required: [pin]
+      additionalProperties: false
+      properties:
+        pin:
+          type: string
+          pattern: "^[0-9]{4,6}$"
+          description: Exactly 4–6 digits. Never logged, never echoed, never stored raw.
+        recoveryAssertion:
+          type: string
+          minLength: 1
+          maxLength: 4096
+          description: |
+            Required only to REPLACE an existing PIN outside a verified
+            step-up; omitted when establishing the first PIN. Never logged,
+            never echoed, never stored raw.
+
+    OwnerPinVerifyRequest:
+      type: object
+      required: [pin]
+      additionalProperties: false
+      properties:
+        pin:
+          type: string
+          pattern: "^[0-9]{4,6}$"
+          description: Never logged, never echoed, never stored raw.
+
+    OwnerPinVerifyResponse:
+      type: object
+      required: [grant]
+      additionalProperties: false
+      properties:
+        grant:
+          $ref: "#/components/schemas/GrantEnvelope"
+
+    OwnerPinRecoveryRequest:
+      type: object
+      required: [recoveryAssertion, newPin]
+      additionalProperties: false
+      properties:
+        recoveryAssertion:
+          type: string
+          minLength: 1
+          maxLength: 4096
+          description: |
+            Registered-phone OTP proof, opaque to Garazo. Never logged, never
+            echoed, never stored raw.
+        newPin:
+          type: string
+          pattern: "^[0-9]{4,6}$"
+          description: Never logged, never echoed, never stored raw.

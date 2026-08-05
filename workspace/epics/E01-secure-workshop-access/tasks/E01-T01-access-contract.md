@@ -5,7 +5,7 @@ type: feature
 title: Define the secure-access API contract and regenerate clients
 layer: cross-cutting
 size: M
-status: todo
+status: review-requested
 owner_agent: developer-backend
 preferred_agent: any
 tier: deep
@@ -47,9 +47,9 @@ files:
     - packages/server-core/src/access/access-context.ts
 feature_flags: []
 ui_reference: "N/A — contract only; SCR-001/002/011 are implemented by T06–T09"
-started_at:
-completed_at:
-executed_by:
+started_at: 2026-08-05
+completed_at: 2026-08-05
+executed_by: developer-backend
 reviewed_at:
 reviewed_by:
 review_outcome:
@@ -334,15 +334,18 @@ None. The contract defines what T06–T09 consume.
 
 ## 12. Implementation checklist  (live execution log)
 
-- [ ] tests written FIRST and failing for EARS-E01-1/2 and NFR-SEC-01
-- [ ] ten routes added with complete schemas and status codes
-- [ ] `additionalProperties: false` on every request body
-- [ ] access error codes added to the ONE envelope with `x-enum-varnames`
-- [ ] no route anywhere accepts a client-supplied workshop identifier
-- [ ] `SessionToken` and `OwnerGrantToken` are separate, non-substitutable types
-- [ ] pre-session failures collapse to one indistinguishable code
-- [ ] both clients regenerate with zero drift; neither hand-edited
-- [ ] `make contract` and `make verify` pass
+- [x] tests written FIRST and failing for EARS-E01-1/2 and NFR-SEC-01
+      (`packages/server-core/src/access/{session-token,access-errors}.spec.ts`
+      and `tests/{contract/access-contract,architecture/access-boundaries}.spec.ts`
+      confirmed red on missing modules before implementation)
+- [x] ten routes added with complete schemas and status codes
+- [x] `additionalProperties: false` on every request body
+- [x] access error codes added to the ONE envelope with `x-enum-varnames`
+- [x] no route anywhere accepts a client-supplied workshop identifier
+- [x] `SessionToken` and `OwnerGrantToken` are separate, non-substitutable types
+- [x] pre-session failures collapse to one indistinguishable code
+- [x] both clients regenerate with zero drift; neither hand-edited
+- [x] `make contract` and `make verify` pass
 
 ## 13. Test plan
 
@@ -386,20 +389,64 @@ None. The contract defines what T06–T09 consume.
 
 ## 15. Self-review (agent fills BEFORE status: review-requested)
 
-- [ ] All checklist items done (with commit hashes)
-- [ ] `make verify` passes
-- [ ] Loading/error/empty states: N/A — no UI
-- [ ] Audit entry on lifecycle writes: N/A — no lifecycle write
-- [ ] No secrets/PII logged
-- [ ] Diff confined to §5 list; §4 respected
+- [x] All checklist items done (commit hashes recorded in §Run log below)
+- [x] `make verify` passes (all 14 steps, including `make contract`)
+- [x] Loading/error/empty states: N/A — no UI
+- [x] Audit entry on lifecycle writes: N/A — no lifecycle write
+- [x] No secrets/PII logged — no logging code in this task; contract marks
+      `identityAssertion`/`recoveryAssertion`/`pin`/`newPin` "never logged,
+      never echoed, never stored raw" in their schema descriptions
+- [x] Diff confined to §5 list; §4 respected — `git status` shows exactly the
+      files in §5 create/update (generated-client subtrees regenerated, not
+      hand-edited)
 
 ### Deviations from spec
 
-(none)
+The spec left three points silent on transport mechanics. Simplest
+spec-faithful choices were made and are recorded here rather than raised as
+blocking questions, per the standing instruction to log rather than stop:
+
+1. **`remainingAttempts` / `retryAfterSeconds` transport.** §7 shows these as
+   `AUTH.PIN_INVALID + {remainingAttempts}` / `AUTH.PIN_COOLDOWN +
+   {retryAfterSeconds}` but §4 explicitly forbids modifying "the error
+   envelope's shape". Adding these as new `ApiError` properties would do
+   exactly that. Chose HTTP response headers instead — `X-Pin-Remaining-Attempts`
+   on the 401 responses, and both the standard `Retry-After` and an explicit
+   `X-Retry-After-Seconds` on the 429 responses — so `ApiError`/`ErrorEnvelope`
+   stay byte-for-byte what E00 defined, while the values are still disclosed
+   exactly where the table says they must be.
+2. **`AuthenticatedActor` / `WorkshopScope` extension (§5 update target).**
+   Re-derived from ADR-0007 and the existing E00 types: an authenticated
+   account with no workshop yet is representable as `WorkshopScope: {kind:
+   'none'}` — the same "no workshop authority" state an anonymous request is
+   in — so no new discriminant branch is structurally required for this
+   contract-only task. Added clarifying doc comments to
+   `access-context.ts` (touching the file, as §5 lists) rather than inventing
+   an unused field; T03/T04 own binding real session/workshop resolution to
+   these types and may reopen this if implementation surfaces a real need.
+3. **`name` "not only whitespace" validation.** Expressed as `minLength: 1`
+   plus a description note in the OpenAPI schema; OpenAPI 3.0.3 has no clean
+   way to express "not all-whitespace" as a JSON Schema `pattern` without
+   also constraining allowed characters the SRS never restricted, and
+   conventions.md §3 states runtime validation enforces the same constraint
+   independently — left as a T04 implementation-level check.
 
 ### Files touched (actual)
 
-- ...
+Create:
+- `packages/server-core/src/access/session-token.ts`
+- `packages/server-core/src/access/session-token.spec.ts` (colocated unit test, conventions.md §8)
+- `packages/server-core/src/access/access-errors.ts`
+- `packages/server-core/src/access/access-errors.spec.ts` (colocated unit test, conventions.md §8)
+- `tests/contract/access-contract.spec.ts`
+- `tests/architecture/access-boundaries.spec.ts`
+
+Update:
+- `contracts/openapi/garazo.v1.yaml`
+- `packages/api-client-typescript/src/generated/**` (regenerated, zero drift)
+- `apps/mobile/lib/core/api/generated/**` (regenerated, zero drift)
+- `packages/server-core/src/index.ts`
+- `packages/server-core/src/access/access-context.ts` (doc comments only; see Deviation 2)
 
 ## 16. Definition of Done
 
@@ -431,9 +478,12 @@ every one of them consumes this contract.
 
 ## Open Questions
 
-- None. Q-005 fixes the PIN behaviour; ADR-0007 fixes the identity boundary.
-  Token format and lifetime values are T03 implementation choices within this
-  contract.
+- None blocking. Q-005 fixes the PIN behaviour; ADR-0007 fixes the identity
+  boundary. Token format and lifetime values are T03 implementation choices
+  within this contract. Three spec-silent transport/typing decisions were
+  made and logged in §15 "Deviations from spec" rather than raised here,
+  because none contradicts an accepted ADR/EARS criterion and each is a
+  reversible implementation-level choice within the task's own scope fence.
 
 ## Feedback log
 
@@ -441,4 +491,24 @@ every one of them consumes this contract.
 
 ## Run log
 
-- (contract version, generator output, drift check, and session refs)
+- Contract version: `garazo.v1.yaml` `info.version: 1.0.0` (unchanged; E01
+  additive, no breaking change to E00 routes).
+- Commits on `epic_01_task_01`:
+  - `e7e5271` — `test(E01-T01): add failing tests for the secure-access contract`
+  - `5bb1471` — `feat(E01-T01): define the secure-access API contract and regenerate clients`
+- `pnpm exec openapi-generator-cli validate -i contracts/openapi/garazo.v1.yaml`
+  → "No validation issues detected."
+- `pnpm generate:api` → both clients regenerated; `bash scripts/check-api-contract.sh`
+  (also `make contract`) → "contract valid and both generated clients are
+  clean" (run twice; zero further drift on the second run).
+- `node --test tests/contract/access-contract.spec.ts
+  tests/architecture/access-boundaries.spec.ts` → 9/9 pass.
+- `pnpm test` → 97/97 pass (88 pre-existing E00 + 9 new).
+- `pnpm lint` → 0 errors, 4 pre-existing warnings unrelated to this diff.
+- `pnpm format` → all matched files already Prettier-clean.
+- `cd apps/mobile && flutter analyze` → "No issues found!"
+- `bash scripts/verify-clean-clone.sh` (`make verify`) → "all 14 steps passed".
+- Not independently re-verified: production Firebase adapter behavior (no
+  adapter exists yet; T03 builds it) and Flutter widget-level consumption of
+  the new Dart models (T06-T09 consume them; `flutter analyze` confirms they
+  compile cleanly against the generated client as-is).
